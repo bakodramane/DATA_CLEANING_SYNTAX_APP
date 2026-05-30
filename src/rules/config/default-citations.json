@@ -1,0 +1,90 @@
+[
+  {
+    "key": "UNECE_GSDEM",
+    "title": "Generic Statistical Data Editing Model",
+    "authorOrOrganisation": "UNECE",
+    "year": "NEEDS_VERIFICATION",
+    "sourceType": "official_guidance",
+    "note": "Bibliographic details should be verified before production documentation."
+  },
+  {
+    "key": "DE_WAAL_2011",
+    "title": "Handbook of Statistical Data Editing and Imputation",
+    "authorOrOrganisation": "De Waal, Pannekoek and Scholtus",
+    "year": 2011,
+    "sourceType": "book",
+    "note": "Bibliographic details should be verified before production documentation."
+  },
+  {
+    "key": "FELLEGI_HOLT_1976",
+    "title": "A Systematic Approach to Automatic Edit and Imputation",
+    "authorOrOrganisation": "Fellegi and Holt",
+    "year": 1976,
+    "sourceType": "journal_article",
+    "note": "Bibliographic details should be verified before production documentation."
+  },
+  {
+    "key": "TUKEY_1977",
+    "title": "Exploratory Data Analysis",
+    "authorOrOrganisation": "Tukey",
+    "year": 1977,
+    "sourceType": "book",
+    "note": "Bibliographic details should be verified before production documentation."
+  },
+  {
+    "key": "ROUSSEEUW_CROUX_1993",
+    "title": "Alternatives to the Median Absolute Deviation",
+    "authorOrOrganisation": "Rousseeuw and Croux",
+    "year": 1993,
+    "sourceType": "journal_article",
+    "note": "Bibliographic details should be verified before production documentation."
+  },
+  {
+    "key": "HUBERT_VANDERVIEREN_2008",
+    "title": "An Adjusted Boxplot for Skewed Distributions",
+    "authorOrOrganisation": "Hubert and Vandervieren",
+    "year": 2008,
+    "sourceType": "journal_article",
+    "note": "Bibliographic details should be verified before production documentation."
+  },
+  {
+    "key": "HIDIROGLOU_BERTHELOT_1986",
+    "title": "Statistical Editing and Imputation for Periodic Business Surveys",
+    "authorOrOrganisation": "Hidiroglou and Berthelot",
+    "year": 1986,
+    "sourceType": "working_paper",
+    "note": "Bibliographic details should be verified before production documentation."
+  },
+  {
+    "key": "RUBIN_1987",
+    "title": "Multiple Imputation for Nonresponse in Surveys",
+    "authorOrOrganisation": "Rubin",
+    "year": 1987,
+    "sourceType": "book",
+    "note": "Bibliographic details should be verified before production documentation."
+  },
+  {
+    "key": "LITTLE_RUBIN_2019",
+    "title": "Statistical Analysis with Missing Data",
+    "authorOrOrganisation": "Little and Rubin",
+    "year": 2019,
+    "sourceType": "book",
+    "note": "Bibliographic details should be verified before production documentation."
+  },
+  {
+    "key": "VAN_BUUREN_2018",
+    "title": "Flexible Imputation of Missing Data",
+    "authorOrOrganisation": "Van Buuren",
+    "year": 2018,
+    "sourceType": "book",
+    "note": "Bibliographic details should be verified before production documentation."
+  },
+  {
+    "key": "IHSN_DDI",
+    "title": "DDI metadata guidance",
+    "authorOrOrganisation": "IHSN",
+    "year": "NEEDS_VERIFICATION",
+    "sourceType": "official_guidance",
+    "note": "Bibliographic details should be verified before production documentation."
+  }
+]

@@ -1,0 +1,944 @@
+[
+  {
+    "id": "preserve_import_metadata",
+    "family": "metadata_preservation",
+    "scope": "variable",
+    "label": "Preserve imported source metadata",
+    "description": "Document the dictionary source row and unmapped columns for auditability.",
+    "defaultAction": "no_action",
+    "requiresReview": false,
+    "isAutomatic": true,
+    "generatedStepType": "import_declaration",
+    "parameters": {
+      "preserveSourceMetadata": true
+    },
+    "rationale": "Imported metadata should remain traceable so analysts can review how dictionary fields were interpreted.",
+    "citationKeys": ["IHSN_DDI"],
+    "severity": "info",
+    "recommendation": "optional",
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "preserve_variable_label",
+    "family": "variable_labelling",
+    "scope": "variable",
+    "label": "Preserve variable label",
+    "description": "Create syntax to apply the codebook label to the analysis dataset.",
+    "requiredMetadata": ["label"],
+    "defaultAction": "no_action",
+    "requiresReview": false,
+    "isAutomatic": true,
+    "generatedStepType": "variable_label",
+    "parameters": {},
+    "rationale": "Survey variable labels preserve questionnaire and codebook meaning during analysis.",
+    "citationKeys": ["IHSN_DDI"],
+    "severity": "info",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "supported" },
+      "stata14": { "status": "supported" },
+      "python": {
+        "status": "partially_supported",
+        "note": "Python stores labels in metadata dictionaries."
+      }
+    }
+  },
+  {
+    "id": "preserve_value_labels",
+    "family": "value_labelling",
+    "scope": "variable",
+    "label": "Preserve value labels",
+    "description": "Create syntax to preserve labelled categorical codes.",
+    "requiredMetadata": ["valueLabels"],
+    "defaultAction": "no_action",
+    "requiresReview": false,
+    "isAutomatic": true,
+    "generatedStepType": "value_label",
+    "parameters": {},
+    "rationale": "Value labels document the meaning of categorical survey codes and reduce interpretation errors.",
+    "citationKeys": ["IHSN_DDI"],
+    "severity": "info",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "supported" },
+      "stata14": { "status": "supported" },
+      "python": {
+        "status": "partially_supported",
+        "note": "Python stores value labels in dictionaries rather than native metadata."
+      }
+    }
+  },
+  {
+    "id": "declare_missing_codes",
+    "family": "missing_value_declaration",
+    "scope": "variable",
+    "label": "Declare missing-value codes",
+    "description": "Create syntax to document or recode declared missing-value codes.",
+    "requiredMetadata": ["declaredMissingCodes"],
+    "defaultAction": "set_missing",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "missing_value_declaration",
+    "parameters": {
+      "preserveOriginalCodesInComments": true
+    },
+    "rationale": "Declared missing-value codes should be explicit before analysis so nonresponse is not treated as valid data.",
+    "citationKeys": ["DE_WAAL_2011", "IHSN_DDI"],
+    "severity": "warning",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "supported" }
+    }
+  },
+  {
+    "id": "range_check_from_metadata",
+    "family": "range_and_domain_checks",
+    "scope": "variable",
+    "label": "Range check from metadata",
+    "description": "Flag values outside the declared valid minimum and maximum.",
+    "applicableVariableTypes": [
+      "continuous",
+      "count",
+      "date",
+      "time",
+      "weight"
+    ],
+    "requiredMetadata": ["validRange"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "range_check",
+    "parameters": {},
+    "rationale": "Values outside declared valid ranges should be flagged for review without overwriting source data.",
+    "citationKeys": ["DE_WAAL_2011", "UNECE_GSDEM"],
+    "severity": "warning",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "supported" }
+    }
+  },
+  {
+    "id": "non_negative_quantity_check",
+    "family": "range_and_domain_checks",
+    "scope": "variable",
+    "label": "Non-negative quantity check",
+    "description": "Flag negative values for variables that appear to be non-negative quantities.",
+    "applicableVariableTypes": ["continuous", "count"],
+    "requiredMetadata": ["nonNegativeCandidate"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "range_check",
+    "parameters": {
+      "min": 0,
+      "source": "non_negative_quantity_heuristic"
+    },
+    "rationale": "Counts and quantity-like survey measures are usually expected to be non-negative and should be reviewed when negative.",
+    "citationKeys": ["DE_WAAL_2011"],
+    "severity": "warning",
+    "recommendation": "optional",
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "supported" }
+    }
+  },
+  {
+    "id": "domain_check_from_labels",
+    "family": "range_and_domain_checks",
+    "scope": "variable",
+    "label": "Domain check from labelled values",
+    "description": "Flag categorical values that are not listed in value labels or declared missing codes.",
+    "applicableVariableTypes": ["binary", "nominal", "ordinal", "string"],
+    "requiredMetadata": ["allowedValues"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "domain_check",
+    "parameters": {},
+    "rationale": "Categorical variables should be checked against their documented code domain before analysis.",
+    "citationKeys": ["DE_WAAL_2011", "IHSN_DDI"],
+    "severity": "warning",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "supported" }
+    }
+  },
+  {
+    "id": "string_blank_check",
+    "family": "range_and_domain_checks",
+    "scope": "variable",
+    "label": "Blank string check",
+    "description": "Flag blank strings for review where text fields are analysed.",
+    "applicableVariableTypes": ["string"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "missingness_diagnosis",
+    "parameters": {
+      "checkBlankStrings": true
+    },
+    "rationale": "Blank strings can represent item nonresponse and should be documented before analysis.",
+    "citationKeys": ["DE_WAAL_2011"],
+    "severity": "warning",
+    "recommendation": "optional",
+    "rendererSupport": {
+      "r": {
+        "status": "partially_supported",
+        "note": "Rendered as missingness diagnosis; blank-string logic may need review."
+      },
+      "spss18": { "status": "partially_supported" },
+      "stata14": { "status": "partially_supported" },
+      "python": { "status": "partially_supported" }
+    }
+  },
+  {
+    "id": "string_length_check",
+    "family": "range_and_domain_checks",
+    "scope": "variable",
+    "label": "String length check",
+    "description": "Flag strings outside documented length constraints.",
+    "applicableVariableTypes": ["string"],
+    "requiredMetadata": ["lengthConstraint"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "range_check",
+    "parameters": {
+      "checkStringLength": true
+    },
+    "rationale": "String length checks are useful when the data dictionary defines valid text lengths.",
+    "citationKeys": ["DE_WAAL_2011"],
+    "severity": "warning",
+    "recommendation": "optional",
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "structural_missingness_check",
+    "family": "structural_missingness_protection",
+    "scope": "variable",
+    "label": "Protect structural missingness",
+    "description": "Flag and document structural missingness rules created by valid skip patterns.",
+    "requiredMetadata": ["structuralMissingRules"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "structural_missing_check",
+    "parameters": {
+      "protectFromImputation": true
+    },
+    "rationale": "Structural missing values come from valid questionnaire routing and must not be treated as ordinary item nonresponse.",
+    "citationKeys": ["DE_WAAL_2011", "IHSN_DDI"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "protect_structural_missingness",
+        "severity": "warning",
+        "message": "Structural missing values should be excluded from imputation unless an advanced review explicitly overrides this protection."
+      }
+    ],
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "skip_pattern_check",
+    "family": "skip_pattern_checks",
+    "scope": "variable",
+    "label": "Skip-pattern check",
+    "description": "Flag values that violate documented questionnaire routing.",
+    "requiredMetadata": ["skipPatternDependencies"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "skip_pattern_check",
+    "parameters": {
+      "protectFromImputation": true
+    },
+    "rationale": "Skip-pattern dependencies define when a question is applicable and should be checked before treating missingness.",
+    "citationKeys": ["IHSN_DDI", "DE_WAAL_2011"],
+    "severity": "warning",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "duplicate_identifier_check",
+    "family": "duplicate_identifier_checks",
+    "scope": "variable",
+    "label": "Duplicate identifier check",
+    "description": "Check whether identifier values are duplicated.",
+    "applicableRoles": ["identifier"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "duplicate_id_check",
+    "parameters": {
+      "checkMissingIds": true
+    },
+    "rationale": "Identifiers are audit and linkage keys; duplicates can break record linkage and should be flagged.",
+    "citationKeys": ["IHSN_DDI", "DE_WAAL_2011"],
+    "severity": "error",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "design_variable_protection_warning",
+    "family": "audit_logging",
+    "scope": "variable",
+    "label": "Design variable protection warning",
+    "description": "Document that survey design variables require specialist review.",
+    "applicableRoles": ["weight", "stratum", "psu"],
+    "defaultAction": "no_action",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "audit_log",
+    "parameters": {
+      "protectDesignVariable": true
+    },
+    "rationale": "Survey weights, strata and primary sampling units affect design-based inference and should not be modified without specialist review.",
+    "citationKeys": ["IHSN_DDI", "UNECE_GSDEM"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "design_variable_review_required",
+        "severity": "warning",
+        "message": "Survey-design variables should not be imputed, recoded or treated as outliers without specialist review."
+      }
+    ],
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "missingness_diagnosis_basic",
+    "family": "missingness_diagnosis",
+    "scope": "variable",
+    "label": "Missingness diagnosis",
+    "description": "Summarise the number and percentage of missing values.",
+    "excludedRoles": ["metadata"],
+    "defaultAction": "no_action",
+    "requiresReview": false,
+    "isAutomatic": true,
+    "generatedStepType": "missingness_diagnosis",
+    "parameters": {
+      "createIndicators": false,
+      "warnWhenPctMissingAtLeast": 20
+    },
+    "rationale": "Missingness summaries help separate complete, item-missing and structurally missing records before treatment decisions.",
+    "citationKeys": ["LITTLE_RUBIN_2019"],
+    "severity": "info",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "supported" }
+    }
+  },
+  {
+    "id": "date_plausibility_check",
+    "family": "range_and_domain_checks",
+    "scope": "variable",
+    "label": "Plausible date check",
+    "description": "Flag dates outside a documented plausible range.",
+    "applicableVariableTypes": ["date"],
+    "requiredMetadata": ["validRange"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "range_check",
+    "parameters": {},
+    "rationale": "Date variables should be checked against plausible survey-specific bounds where documented.",
+    "citationKeys": ["DE_WAAL_2011"],
+    "severity": "warning",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "supported" }
+    }
+  },
+  {
+    "id": "date_chronology_consistency_check",
+    "family": "consistency_checks",
+    "scope": "variable",
+    "label": "Chronological consistency check",
+    "description": "Propose chronological checks when related date variables exist.",
+    "applicableVariableTypes": ["date"],
+    "requiredMetadata": ["relatedDateVariables"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "consistency_check",
+    "parameters": {
+      "requiresUserDefinedChronology": true
+    },
+    "rationale": "Related dates should be reviewed for chronological consistency only when the intended ordering is known.",
+    "citationKeys": ["FELLEGI_HOLT_1976", "DE_WAAL_2011"],
+    "severity": "warning",
+    "recommendation": "optional",
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "outlier_tukey_flag",
+    "family": "outlier_detection",
+    "scope": "variable",
+    "label": "Tukey boxplot outlier flag",
+    "description": "Flag numeric outliers using Tukey boxplot fences.",
+    "applicableVariableTypes": ["continuous", "count"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "outlier_flag",
+    "parameters": {
+      "method": "tukey",
+      "multiplier": 1.5
+    },
+    "rationale": "Tukey fences provide a transparent first-pass flag for unusual numeric values without deleting or changing data.",
+    "citationKeys": ["TUKEY_1977"],
+    "severity": "warning",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "partially_supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "supported" }
+    }
+  },
+  {
+    "id": "outlier_mad_flag",
+    "family": "outlier_detection",
+    "scope": "variable",
+    "label": "MAD robust outlier flag",
+    "description": "Flag numeric outliers using median absolute deviation.",
+    "applicableVariableTypes": ["continuous", "count"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": true,
+    "generatedStepType": "outlier_flag",
+    "parameters": {
+      "method": "mad",
+      "threshold": 3.5
+    },
+    "rationale": "MAD-based flags are robust to extreme values and should be reviewed rather than automatically treated.",
+    "citationKeys": ["ROUSSEEUW_CROUX_1993"],
+    "severity": "warning",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "partially_supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "supported" }
+    }
+  },
+  {
+    "id": "outlier_adjusted_boxplot_flag",
+    "family": "outlier_detection",
+    "scope": "variable",
+    "label": "Adjusted boxplot outlier flag",
+    "description": "Planned robust outlier flag for skewed numeric variables.",
+    "applicableVariableTypes": ["continuous", "count"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "outlier_flag",
+    "parameters": {
+      "method": "adjusted_boxplot"
+    },
+    "rationale": "Adjusted boxplots may be preferable for skewed variables, but the current renderer path marks this as a planned specialist option.",
+    "citationKeys": ["HUBERT_VANDERVIEREN_2008"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "planned_outlier_method",
+        "severity": "warning",
+        "message": "Adjusted boxplot rendering is planned and should be treated as partially supported."
+      }
+    ],
+    "recommendation": "planned",
+    "requiresAdvancedMode": true,
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "outlier_hidiroglou_berthelot_flag",
+    "family": "outlier_detection",
+    "scope": "variable",
+    "label": "Hidiroglou-Berthelot outlier flag",
+    "description": "Planned outlier method for business survey variables with size or prior-period context.",
+    "applicableVariableTypes": ["continuous", "count"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "defaultAction": "flag",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "outlier_flag",
+    "parameters": {
+      "method": "hidiroglou_berthelot",
+      "requiresSizeOrPriorPeriodVariable": true
+    },
+    "rationale": "Hidiroglou-Berthelot methods require specialist review and auxiliary size or prior-period variables.",
+    "citationKeys": ["HIDIROGLOU_BERTHELOT_1986"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "specialist_outlier_method",
+        "severity": "warning",
+        "message": "This rule requires a size or prior-period variable and is not part of the MVP renderer path."
+      }
+    ],
+    "recommendation": "planned",
+    "requiresSpecialistMode": true,
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "outlier_treatment_review_only",
+    "family": "outlier_treatment",
+    "scope": "variable",
+    "label": "Outlier treatment requires explicit review",
+    "description": "Document that treatment decisions must not be automatic.",
+    "applicableVariableTypes": ["continuous", "count"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "defaultAction": "no_action",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "outlier_treatment",
+    "parameters": {
+      "noSilentDeletion": true,
+      "noSilentWinsorisation": true
+    },
+    "rationale": "Outlier treatment can change estimates and must be an explicit reviewer decision rather than a default automated action.",
+    "citationKeys": ["DE_WAAL_2011"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "treatment_requires_user_action",
+        "severity": "warning",
+        "message": "Do not delete, cap, winsorise or set values to missing without explicit user review."
+      }
+    ],
+    "recommendation": "optional",
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "impute_continuous_mice_pmm",
+    "family": "imputation",
+    "scope": "variable",
+    "label": "Multiple imputation for continuous or count variables",
+    "description": "Use MICE with predictive mean matching when auxiliary variables are available.",
+    "applicableVariableTypes": ["continuous", "count"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "requiredMetadata": ["auxiliaryVariables"],
+    "defaultAction": "impute",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "imputation",
+    "parameters": {
+      "method": "mice_pmm",
+      "targetMissingness": ["item_nonresponse", "dont_know", "refusal"],
+      "includeStructuralMissing": false
+    },
+    "rationale": "Multiple imputation with appropriate predictors can support analysis-ready datasets when item nonresponse is present.",
+    "citationKeys": ["RUBIN_1987", "LITTLE_RUBIN_2019", "VAN_BUUREN_2018"],
+    "severity": "warning",
+    "recommendation": "recommended",
+    "requiresImputationAllowed": true,
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "partially_supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "partially_supported" }
+    }
+  },
+  {
+    "id": "impute_binary_logistic_mice",
+    "family": "imputation",
+    "scope": "variable",
+    "label": "Logistic multiple imputation for binary variables",
+    "description": "Use a logistic-type imputation model for binary item nonresponse when predictors are available.",
+    "applicableVariableTypes": ["binary"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "requiredMetadata": ["auxiliaryVariables"],
+    "defaultAction": "impute",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "imputation",
+    "parameters": {
+      "method": "logistic_mice",
+      "targetMissingness": ["item_nonresponse", "dont_know", "refusal"],
+      "includeStructuralMissing": false
+    },
+    "rationale": "Binary imputation should use a model appropriate for two-category outcomes and be reviewed before production use.",
+    "citationKeys": ["RUBIN_1987", "VAN_BUUREN_2018"],
+    "severity": "warning",
+    "recommendation": "recommended",
+    "requiresImputationAllowed": true,
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "partially_supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "partially_supported" }
+    }
+  },
+  {
+    "id": "impute_nominal_multinomial_mice",
+    "family": "imputation",
+    "scope": "variable",
+    "label": "Multinomial imputation for nominal variables",
+    "description": "Use a multinomial imputation approach for nominal item nonresponse where supported.",
+    "applicableVariableTypes": ["nominal"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "requiredMetadata": ["auxiliaryVariables"],
+    "defaultAction": "impute",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "imputation",
+    "parameters": {
+      "method": "multinomial_mice",
+      "targetMissingness": ["item_nonresponse", "dont_know", "refusal"],
+      "includeStructuralMissing": false
+    },
+    "rationale": "Nominal imputation requires a categorical model and careful review of category prevalence and predictors.",
+    "citationKeys": ["RUBIN_1987", "VAN_BUUREN_2018"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "categorical_imputation_support_varies",
+        "severity": "warning",
+        "message": "Renderer support for multinomial imputation is partial and the generated syntax may require user adaptation."
+      }
+    ],
+    "recommendation": "recommended",
+    "requiresImputationAllowed": true,
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "partially_supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "partially_supported" }
+    }
+  },
+  {
+    "id": "impute_ordinal_mice",
+    "family": "imputation",
+    "scope": "variable",
+    "label": "Ordinal imputation",
+    "description": "Use an ordinal/logistic-type imputation approach for ordered categories where supported.",
+    "applicableVariableTypes": ["ordinal"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "requiredMetadata": ["auxiliaryVariables"],
+    "defaultAction": "impute",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "imputation",
+    "parameters": {
+      "method": "ordinal_mice",
+      "targetMissingness": ["item_nonresponse", "dont_know", "refusal"],
+      "includeStructuralMissing": false
+    },
+    "rationale": "Ordinal imputation should preserve ordering assumptions and be reviewed before production use.",
+    "citationKeys": ["RUBIN_1987", "VAN_BUUREN_2018"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "ordinal_model_review_required",
+        "severity": "warning",
+        "message": "Ordinal imputation support varies by software and requires model review."
+      }
+    ],
+    "recommendation": "recommended",
+    "requiresImputationAllowed": true,
+    "rendererSupport": {
+      "r": { "status": "supported" },
+      "spss18": { "status": "partially_supported" },
+      "stata14": { "status": "supported" },
+      "python": { "status": "partially_supported" }
+    }
+  },
+  {
+    "id": "impute_hot_deck_donor",
+    "family": "imputation",
+    "scope": "variable",
+    "label": "Hot-deck donor imputation",
+    "description": "Consider donor imputation where production constraints make multiple imputation impractical.",
+    "applicableVariableTypes": [
+      "continuous",
+      "count",
+      "binary",
+      "nominal",
+      "ordinal"
+    ],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "defaultAction": "impute",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "imputation",
+    "parameters": {
+      "method": "hot_deck",
+      "targetMissingness": ["item_nonresponse", "dont_know", "refusal"],
+      "includeStructuralMissing": false
+    },
+    "rationale": "Donor imputation can be practical in production workflows but requires well-defined donor classes and review.",
+    "citationKeys": ["DE_WAAL_2011"],
+    "severity": "warning",
+    "recommendation": "optional",
+    "requiresImputationAllowed": true,
+    "rendererSupport": {
+      "r": { "status": "partially_supported" },
+      "spss18": { "status": "partially_supported" },
+      "stata14": { "status": "partially_supported" },
+      "python": { "status": "partially_supported" }
+    }
+  },
+  {
+    "id": "impute_regression_warning",
+    "family": "imputation",
+    "scope": "variable",
+    "label": "Regression imputation with warning",
+    "description": "Consider regression imputation only as a reviewed, model-dependent option.",
+    "applicableVariableTypes": ["continuous", "count"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "requiredMetadata": ["auxiliaryVariables"],
+    "defaultAction": "impute",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "imputation",
+    "parameters": {
+      "method": "regression",
+      "includeStructuralMissing": false
+    },
+    "rationale": "Regression imputation can understate uncertainty if used naively and should only be proposed with a clear warning.",
+    "citationKeys": ["LITTLE_RUBIN_2019"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "regression_imputation_uncertainty_warning",
+        "severity": "warning",
+        "message": "Single regression imputation can understate uncertainty and is not equivalent to full multiple imputation inference."
+      }
+    ],
+    "recommendation": "optional",
+    "requiresImputationAllowed": true,
+    "rendererSupport": {
+      "r": { "status": "partially_supported" },
+      "spss18": { "status": "partially_supported" },
+      "stata14": { "status": "partially_supported" },
+      "python": { "status": "partially_supported" }
+    }
+  },
+  {
+    "id": "impute_median_fill_discouraged",
+    "family": "imputation",
+    "scope": "variable",
+    "label": "Median fill as discouraged option",
+    "description": "Document median fill as a simple but discouraged option for numeric missingness.",
+    "applicableVariableTypes": ["continuous", "count"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "defaultAction": "impute",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "imputation",
+    "parameters": {
+      "method": "median_fill",
+      "includeStructuralMissing": false
+    },
+    "rationale": "Median fill is simple but can distort relationships and should only be used after explicit review.",
+    "citationKeys": ["LITTLE_RUBIN_2019"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "simple_fill_discouraged",
+        "severity": "warning",
+        "message": "Simple fill methods can distort variance and relationships; prefer diagnostics or principled imputation."
+      }
+    ],
+    "recommendation": "discouraged",
+    "requiresImputationAllowed": true,
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "impute_mode_fill_discouraged",
+    "family": "imputation",
+    "scope": "variable",
+    "label": "Mode fill as discouraged option",
+    "description": "Document mode fill as a simple but discouraged option for categorical missingness.",
+    "applicableVariableTypes": ["binary", "nominal", "ordinal"],
+    "excludedRoles": ["identifier", "weight", "stratum", "psu", "metadata"],
+    "defaultAction": "impute",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "imputation",
+    "parameters": {
+      "method": "mode_fill",
+      "includeStructuralMissing": false
+    },
+    "rationale": "Mode fill can overstate dominant categories and should only be used after explicit review.",
+    "citationKeys": ["LITTLE_RUBIN_2019"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "simple_fill_discouraged",
+        "severity": "warning",
+        "message": "Simple fill methods can distort category distributions; prefer diagnostics or principled imputation."
+      }
+    ],
+    "recommendation": "discouraged",
+    "requiresImputationAllowed": true,
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "date_imputation_specialist_review",
+    "family": "imputation",
+    "scope": "variable",
+    "label": "Date imputation specialist review",
+    "description": "Do not recommend date imputation by default; require specialist review.",
+    "applicableVariableTypes": ["date"],
+    "defaultAction": "no_action",
+    "requiresReview": true,
+    "isAutomatic": false,
+    "generatedStepType": "imputation",
+    "parameters": {
+      "method": "specialist_review_required",
+      "includeStructuralMissing": false
+    },
+    "rationale": "Date imputation can create invalid chronology and should not be automated by default.",
+    "citationKeys": ["LITTLE_RUBIN_2019", "DE_WAAL_2011"],
+    "severity": "warning",
+    "warnings": [
+      {
+        "code": "date_imputation_not_recommended",
+        "severity": "warning",
+        "message": "Date imputation is not recommended by default and needs specialist review."
+      }
+    ],
+    "recommendation": "optional",
+    "requiresImputationAllowed": true,
+    "requiresSpecialistMode": true,
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "audit_log_basic",
+    "family": "audit_logging",
+    "scope": "plan",
+    "label": "Create audit log fields",
+    "description": "Document generated flags and reviewer decisions.",
+    "defaultAction": "derive",
+    "requiresReview": false,
+    "isAutomatic": true,
+    "generatedStepType": "audit_log",
+    "parameters": {
+      "createFlagSummary": true
+    },
+    "rationale": "Audit fields document flags and review decisions without overwriting source values.",
+    "citationKeys": ["UNECE_GSDEM", "DE_WAAL_2011"],
+    "severity": "info",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  },
+  {
+    "id": "summary_report_basic",
+    "family": "summary_reporting",
+    "scope": "plan",
+    "label": "Create summary report",
+    "description": "Summarise proposed checks, warnings and assumptions.",
+    "defaultAction": "no_action",
+    "requiresReview": false,
+    "isAutomatic": true,
+    "generatedStepType": "summary_report",
+    "parameters": {
+      "includeAssumptions": true,
+      "includeWarnings": true
+    },
+    "rationale": "A plain-language summary report supports transparent survey documentation and reviewer handoff.",
+    "citationKeys": ["UNECE_GSDEM"],
+    "severity": "info",
+    "recommendation": "recommended",
+    "rendererSupport": {
+      "r": { "status": "unsupported" },
+      "spss18": { "status": "unsupported" },
+      "stata14": { "status": "unsupported" },
+      "python": { "status": "unsupported" }
+    }
+  }
+]
