@@ -1,0 +1,56 @@
+# Generated target: R
+# Generation timestamp: 2026-05-30T12:00:00.000Z
+# Cleaning Plan: Sample household survey cleaning plan
+---
+# Required packages:
+# install.packages(c("dplyr", "labelled", "mice"))
+library(dplyr)
+library(labelled)
+library(mice)
+---
+# Step ID: step_variable_labels
+---
+# Rationale: Preserve survey codebook labels in the R analysis dataset.
+---
+# Citation: IHSN_DDI
+---
+var_label(data$age) <- "Age in completed years"
+---
+val_labels(data$sex) <- c("Male" = 1, "Female" = 2)
+---
+# Declared missing codes for income: -98, -99
+# These are recoded to NA for R analysis. Review before running.
+data <- data %>%
+  mutate(
+    income = if_else(income %in% c(-98, -99), NA_real_, income)
+  )
+---
+flag_age_range = if_else(!is.na(age) & (age < 0 | age > 120), 1L, 0L)
+---
+flag_sex_domain = if_else(!is.na(sex) & !(sex %in% c(1, 2, 9)), 1L, 0L)
+---
+income_median <- median(data$income, na.rm = TRUE)
+income_mad <- mad(data$income, constant = 1.4826, na.rm = TRUE)
+---
+flag_income_outlier_mad = if_else(!is.na(income) & income_mad > 0 & abs(income - income_median) / income_mad > 3.5, 1L, 0L)
+---
+missingness_summary <- bind_rows(
+  data.frame(
+    variable = "income",
+    n_missing = sum(is.na(data$income)),
+    pct_missing = mean(is.na(data$income)) * 100
+  )
+)
+---
+missing_income = if_else(is.na(income), 1L, 0L)
+---
+mice_methods["income"] <- "pmm"
+---
+mice_fit <- mice(imputation_data, m = 5, method = mice_methods, maxit = 10, seed = 12345)
+completed_data_example <- complete(mice_fit, action = 1)
+---
+# fit <- with(mice_fit, lm(outcome ~ income + age + sex))
+# pooled <- pool(fit)
+# summary(pooled)
+---
+# WARNING: Step type "structural_missing_check" is not yet supported by the Phase 2 R renderer.
