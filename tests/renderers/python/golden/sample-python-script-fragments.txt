@@ -1,0 +1,56 @@
+# Generated target: Python script
+---
+# Generation timestamp: 2026-05-30T12:00:00.000Z
+---
+# Version assumption: pandas/numpy plus scikit-learn for practical imputation
+---
+# Required packages:
+# pip install pandas numpy scikit-learn statsmodels
+import numpy as np
+import pandas as pd
+from sklearn.experimental import enable_iterative_imputer  # noqa: F401
+from sklearn.impute import IterativeImputer
+---
+# Step ID: step_variable_labels
+---
+# Rationale: Preserve survey codebook labels in the analysis dataset.
+---
+# Citation: IHSN_DDI
+---
+variable_labels.update({
+    "age": "Age in completed years",
+---
+value_labels.update({
+    "sex": {
+        1: "Male",
+        2: "Female",
+---
+data["income"] = data["income"].replace([-98, -99], np.nan)
+---
+data["flag_age_range"] = np.where(
+    data["age"].notna() & ((data["age"] < 0) | (data["age"] > 120)),
+---
+data["flag_sex_domain"] = np.where(
+    data["sex"].notna() & ~data["sex"].isin([1, 2, 9]),
+---
+income_median = data["income"].median(skipna=True)
+income_mad = (data["income"] - income_median).abs().median(skipna=True) * 1.4826
+---
+data["flag_income_outlier_mad"] = np.where(
+---
+missing_summary = data[["income"]].isna().sum().to_frame("n_missing")
+missing_summary["pct_missing"] = missing_summary["n_missing"] / len(data) * 100
+---
+data["missing_income"] = np.where(data["income"].isna(), 1, 0)
+---
+# WARNING: IterativeImputer is experimental in scikit-learn and must be reviewed before production use.
+---
+imputation_variables = ["income", "weight", "age", "sex", "education_level", "employment_status"]
+---
+imputer = IterativeImputer(random_state=12345, max_iter=10, sample_posterior=True)
+---
+completed_data_example = data.copy()
+---
+# Do not treat completed_data_example as full multiple-imputation inference.
+---
+# WARNING: Step type "structural_missing_check" is not yet supported by the Phase 3 Python renderer.

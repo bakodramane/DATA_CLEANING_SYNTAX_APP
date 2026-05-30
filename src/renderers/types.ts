@@ -1,6 +1,6 @@
 import type { CleaningStepType } from '../core'
 
-export type RenderedLanguage = 'r'
+export type RenderedLanguage = 'r' | 'spss18' | 'stata14' | 'python'
 
 export interface UnsupportedRenderedStep {
   id: string

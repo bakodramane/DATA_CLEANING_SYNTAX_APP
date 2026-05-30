@@ -10,7 +10,7 @@ library(mice)
 ---
 # Step ID: step_variable_labels
 ---
-# Rationale: Preserve survey codebook labels in the R analysis dataset.
+# Rationale: Preserve survey codebook labels in the analysis dataset.
 ---
 # Citation: IHSN_DDI
 ---

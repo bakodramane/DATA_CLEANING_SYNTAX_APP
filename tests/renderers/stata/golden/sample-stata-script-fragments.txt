@@ -1,0 +1,42 @@
+* Generated target: Stata v14 do-file syntax
+---
+* Generation timestamp: 2026-05-30T12:00:00.000Z
+---
+* Version assumption: Stata v14
+---
+* Step ID: step_variable_labels
+---
+* Rationale: Preserve survey codebook labels in the analysis dataset.
+---
+* Citation: IHSN_DDI
+---
+label variable age "Age in completed years"
+---
+label define sex_lbl 1 "Male" 2 "Female", replace
+label values sex sex_lbl
+---
+mvdecode income, mv(-98 -99)
+---
+generate byte flag_age_range = !missing(age) & (age < 0 | age > 120)
+label variable flag_age_range "Flag: age outside expected range"
+---
+generate byte flag_sex_domain = !missing(sex) & !inlist(sex, 1, 2, 9)
+---
+quietly summarize income, detail
+scalar income_median = r(p50)
+tempvar absdev_income
+generate double `absdev_income' = abs(income - income_median)
+---
+generate byte flag_income_outlier_mad = !missing(income) & income_mad > 0 & abs(income - income_median) / income_mad > 3.5
+---
+misstable summarize income
+generate byte missing_income = missing(income)
+---
+mi set mlong
+mi register imputed income
+mi register regular weight age sex education_level employment_status
+mi impute chained (pmm) income = weight age sex education_level employment_status, add(20) rseed(12345)
+---
+* mi estimate: regress outcome income age sex
+---
+* WARNING: Step type "structural_missing_check" is not yet supported by the Phase 3 Stata v14 renderer.

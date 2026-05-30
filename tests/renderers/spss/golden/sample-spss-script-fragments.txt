@@ -1,0 +1,39 @@
+* Generated target: SPSS v18 command syntax.
+---
+* Generation timestamp: 2026-05-30T12:00:00.000Z.
+---
+* Version assumption: IBM SPSS Statistics v18 command syntax.
+---
+* Step ID: step_variable_labels.
+---
+* Rationale: Preserve survey codebook labels in the analysis dataset.
+---
+* Citation: IHSN_DDI.
+---
+VARIABLE LABELS age "Age in completed years".
+---
+VALUE LABELS sex
+  1 "Male"
+  2 "Female"
+.
+---
+MISSING VALUES income (-98, -99).
+---
+COMPUTE flag_age_range = 0.
+IF (NOT MISSING(age) AND (age < 0 OR age > 120)) flag_age_range = 1.
+VARIABLE LABELS flag_age_range "Flag: age outside expected range".
+---
+IF (NOT MISSING(sex) AND NOT ANY(sex, 1, 2, 9)) flag_sex_domain = 1.
+---
+* WARNING: SPSS v18 mad outlier thresholds are emitted as a review template; verify thresholds before running production syntax.
+---
+COMPUTE flag_income_outlier_mad = 0.
+---
+FREQUENCIES VARIABLES=income /FORMAT=NOTABLE /MISSING=INCLUDE.
+---
+COMPUTE missing_income = MISSING(income).
+---
+MULTIPLE IMPUTATION income
+  /IMPUTE METHOD=AUTO NIMPUTATIONS=5 MAXPCTMISSING=NONE
+---
+* WARNING: Step type "structural_missing_check" is not yet supported by the Phase 3 SPSS v18 renderer.
