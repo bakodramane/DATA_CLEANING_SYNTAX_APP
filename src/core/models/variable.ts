@@ -78,6 +78,8 @@ export interface SourceMetadata {
   columnName?: string
   originalType?: string
   rowNumber?: number
+  originalColumns?: Record<string, string>
+  unmappedColumns?: Record<string, string>
   notes?: string[]
 }
 
