@@ -11,8 +11,9 @@ Plan, then render ready-to-review scripts for:
 - R scripts
 - Python scripts
 
-Phase 0 establishes the repository, local app shell, documentation skeleton,
-testing setup, and CI. No cleaning logic is implemented in this phase.
+The current app includes the local metadata-to-syntax workflow, editable rule
+configuration, renderer previews, downloads, and Progressive Web App support.
+After a first successful load, the static app shell can reopen offline.
 
 ## Development
 
@@ -29,6 +30,17 @@ npm test
 npm run build
 ```
 
+## Install And Offline Use
+
+Builds include a web app manifest and service worker. In a supported browser,
+open the app once, then use the browser install action to add it to the desktop
+or home screen. After the first load, the app shell and static assets are cached
+for offline reloads.
+
+The demo dictionary, pasted CSV dictionaries, local CSV/XLSX uploads, rule
+review, Cleaning Plan generation, syntax previews, and downloads all run in the
+browser. Uploaded dictionaries and generated scripts are not sent to a server.
+
 ## Project Principles
 
 - Offline-first core workflow
@@ -40,6 +52,7 @@ npm run build
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [Offline Mode](docs/offline-mode.md)
 - [Methodology](docs/methodology.md)
 - [References](docs/references.md)
 - [Adding a Rule](docs/adding-a-rule.md)

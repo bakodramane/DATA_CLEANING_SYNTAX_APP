@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { OfflineStatusIndicator } from './OfflineStatusIndicator'
 import { Stepper } from './Stepper'
 import type { WorkflowStep, WorkflowStepId } from '../state/workflowTypes'
 
@@ -38,6 +39,8 @@ export function Layout({
         steps={steps}
         onSelectStep={onSelectStep}
       />
+
+      <OfflineStatusIndicator />
 
       <section className="step-panel">{children}</section>
     </main>

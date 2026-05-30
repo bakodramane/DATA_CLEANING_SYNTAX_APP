@@ -1,0 +1,67 @@
+# Offline Mode
+
+The application is a static Progressive Web App. It does not require a backend
+server for the core workflow.
+
+## What Works Offline
+
+After the first successful online load, the following features continue to work
+without internet access:
+
+- load the built-in demo household survey dictionary;
+- paste a CSV dictionary;
+- upload a local CSV or XLSX dictionary;
+- review and correct variable types and roles;
+- review recommended and blocked cleaning rules;
+- generate a Cleaning Plan;
+- preview SPSS v18, Stata v14, R, and Python syntax;
+- download Cleaning Plan JSON, scripts, and the summary report.
+
+## First Load Requirement
+
+The browser needs one successful online load to install the service worker and
+cache the app shell. After that, the service worker can serve the cached app
+shell during offline reloads.
+
+## Installation
+
+In a supported browser:
+
+1. Open the app while online.
+2. Use the browser install action, often shown in the address bar or browser
+   menu.
+3. Reopen the installed app later, including when offline.
+
+## User Data Handling
+
+Uploaded dictionaries and generated outputs stay in the browser. The app does
+not upload user dictionaries, Cleaning Plans, generated scripts, or summary
+reports to a server. Generated downloads are created as local browser blobs and
+are not cached by the service worker as remote resources.
+
+## Optional Online Updates
+
+Phase 7 includes only a safe placeholder for future optional template or rule
+pack updates. It does not fetch remote packs, use the GitHub API, send telemetry,
+or upload user data. When offline, the app reports that optional updates are
+unavailable while core local features continue to work.
+
+## Static Hosting Notes
+
+The production build is emitted to `dist/`. The default Vite base path is
+relative (`./`) for static hosting and GitHub Pages subpaths. If a deployment
+workflow needs an explicit GitHub Pages base path, set `VITE_BASE_PATH` before
+building:
+
+```powershell
+$env:VITE_BASE_PATH='/DATA_CLEANING_SYNTAX_APP/'
+npm run build
+```
+
+## Limitations
+
+- No DDI XML, SPSS `.sav`, or Stata `.dta` metadata import yet.
+- No AI-assisted codebook interpretation.
+- No backend, authentication, cloud storage, telemetry, or analytics.
+- No execution of generated SPSS, Stata, R, or Python scripts.
+- Browser support for install prompts varies by platform.

@@ -116,6 +116,29 @@ h3 {
   color: var(--accent-strong);
 }
 
+.offline-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-muted);
+  padding: 10px 12px;
+}
+
+.offline-status strong {
+  color: var(--accent-strong);
+}
+
+.offline-status[data-online='false'] {
+  border-color: #ddb78b;
+  background: #fff8ef;
+}
+
+.offline-status[data-online='false'] strong {
+  color: var(--warning);
+}
+
 .step-panel {
   border: 1px solid var(--border);
   border-radius: 8px;

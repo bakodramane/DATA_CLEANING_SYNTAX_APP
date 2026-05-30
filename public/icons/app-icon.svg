@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Data Cleaning Syntax icon">
+  <rect width="512" height="512" rx="80" fill="#17695a" />
+  <path d="M104 128h132c96 0 164 52 164 128s-68 128-164 128H104V128Zm78 74v108h54c49 0 83-21 83-54s-34-54-83-54h-54Z" fill="#ffffff" />
+  <path d="M392 128h40v256h-40z" fill="#f3e9de" />
+  <path d="M104 416h328v32H104z" fill="#dbe8df" opacity=".85" />
+</svg>
