@@ -33,6 +33,18 @@ describe('parseSpssSavMetadata', () => {
     )
   })
 
+  it('returns fallback when an SPSS signature is present but the header is incomplete', () => {
+    const result = parseSpssSavMetadata(ascii('$FL2'))
+
+    expect(result.variables).toEqual([])
+    expect(result.warnings.map((warning) => warning.code)).toEqual(
+      expect.arrayContaining([
+        'malformed_statistical_package',
+        'metadata_only_fallback',
+      ]),
+    )
+  })
+
   it('imports synthetic SPSS SAV dictionary metadata without reading records', () => {
     const result = parseSpssSavMetadata(createSyntheticSpssSav(), {
       sourceName: 'synthetic-minimal.sav',
@@ -69,6 +81,54 @@ describe('parseSpssSavMetadata', () => {
     })
     expect(result.warnings.map((warning) => warning.code)).toContain(
       'privacy_notice',
+    )
+  })
+
+  it('warns for SPSS range-based user-missing metadata without importing records', () => {
+    const result = parseSpssSavMetadata(
+      concatBytes([
+        createHeader(),
+        variableRecord({
+          name: 'INCOME',
+          type: 0,
+          label: 'Income',
+          missingValues: [numericSpssValue(-99), numericSpssValue(-90)],
+          missingValueCount: -2,
+          printFormat: spssFormat(5, 8, 0),
+          writeFormat: spssFormat(5, 8, 0),
+        }),
+        terminatorRecord(),
+      ]),
+    )
+    const income = result.variables.find(
+      (variable) => variable.name === 'INCOME',
+    )
+
+    expect(income?.declaredMissingCodes).toEqual([])
+    expect(result.warnings.map((warning) => warning.code)).toContain(
+      'unsupported_package_metadata',
+    )
+    expect(result.sourceMetadata).toMatchObject({ recordsRead: false })
+  })
+
+  it('keeps parsed SPSS variables while warning about unsupported dictionary records', () => {
+    const result = parseSpssSavMetadata(
+      concatBytes([
+        createHeader(),
+        variableRecord({
+          name: 'AGE',
+          type: 0,
+          label: 'Age',
+          printFormat: spssFormat(5, 8, 0),
+          writeFormat: spssFormat(5, 8, 0),
+        }),
+        int32(12345),
+      ]),
+    )
+
+    expect(result.importedVariableCount).toBe(1)
+    expect(result.warnings.map((warning) => warning.code)).toContain(
+      'unsupported_package_metadata',
     )
   })
 
@@ -157,6 +217,7 @@ function variableRecord(options: {
   type: number
   label?: string
   missingValues?: Uint8Array[]
+  missingValueCount?: number
   printFormat: number
   writeFormat: number
 }): Uint8Array {
@@ -174,7 +235,7 @@ function variableRecord(options: {
     int32(2),
     int32(options.type),
     int32(options.label ? 1 : 0),
-    int32(missingValues.length),
+    int32(options.missingValueCount ?? missingValues.length),
     int32(options.printFormat),
     int32(options.writeFormat),
     fixedText(options.name, 8),

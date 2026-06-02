@@ -23,7 +23,7 @@ export const STATISTICAL_PACKAGE_PRIVACY_WARNING =
   "SPSS and Stata files may contain confidential microdata. This app processes files locally in your browser and attempts to extract metadata only. Review your organisation's confidentiality rules before opening data files."
 
 export const STATISTICAL_PACKAGE_FALLBACK_MESSAGE =
-  'Direct metadata extraction from this file was not possible. Please export the variable dictionary from SPSS/Stata to CSV or Excel and import that dictionary instead.'
+  'Direct metadata extraction from this file was not possible. Export a metadata-only variable dictionary from SPSS or Stata to CSV/Excel, including variable names, labels, storage types, value labels, missing codes, valid ranges, and notes where available, then import that dictionary instead.'
 
 export function createPrivacyWarning(): DictionaryImportWarning {
   return {

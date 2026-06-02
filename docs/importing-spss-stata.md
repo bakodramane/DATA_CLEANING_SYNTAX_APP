@@ -35,7 +35,9 @@ It attempts to extract:
 The importer does not inspect observation records. Binary value-label table
 decoding and extended missing-value semantics are limited in this MVP. When
 those details are required, export a metadata dictionary from Stata and import
-the dictionary as CSV or Excel.
+the dictionary as CSV or Excel. See the
+[Importer Support Matrix](importer-support-matrix.md) for exact field coverage
+by format.
 
 ## SPSS SAV Support
 
@@ -62,7 +64,7 @@ is incomplete, use an exported dictionary.
 If direct metadata extraction is not possible, the app shows:
 
 ```text
-Direct metadata extraction from this file was not possible. Please export the variable dictionary from SPSS/Stata to CSV or Excel and import that dictionary instead.
+Direct metadata extraction from this file was not possible. Export a metadata-only variable dictionary from SPSS or Stata to CSV/Excel, including variable names, labels, storage types, value labels, missing codes, valid ranges, and notes where available, then import that dictionary instead.
 ```
 
 A safe exported-dictionary workflow is:

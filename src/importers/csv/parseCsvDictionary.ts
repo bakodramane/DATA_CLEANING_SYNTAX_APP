@@ -26,6 +26,11 @@ export function parseCsvDictionary(
       originalRowCount: 0,
       importedVariableCount: 0,
       rows: [],
+      sourceType: 'csv',
+      sourceMetadata: {
+        sourceName: options.sourceName,
+        recordsRead: false,
+      },
     }
   }
 

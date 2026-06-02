@@ -71,6 +71,64 @@ describe('parseStataDtaMetadata', () => {
     )
   })
 
+  it('imports MVP text value labels when present in a synthetic Stata label section', () => {
+    const result = parseStataDtaMetadata(
+      createSyntheticTaggedStataDta({
+        valueLabelsText: 'sex_lbl: 1=Male; 2=Female; 9=No response',
+      }),
+    )
+    const sex = result.variables.find((variable) => variable.name === 'sex')
+
+    expect(sex?.valueLabels).toEqual([
+      { value: 1, label: 'Male' },
+      { value: 2, label: 'Female' },
+      { value: 9, label: 'No response' },
+    ])
+    expect(result.warnings.map((warning) => warning.code)).not.toContain(
+      'unsupported_package_metadata',
+    )
+  })
+
+  it('returns fallback when tagged Stata metadata has only unnamed variables', () => {
+    const result = parseStataDtaMetadata(
+      createSyntheticTaggedStataDta({
+        variableNames: ['', '', ''],
+        valueLabelNames: ['', '', ''],
+      }),
+    )
+
+    expect(result.variables).toEqual([])
+    expect(result.warnings.map((warning) => warning.code)).toEqual(
+      expect.arrayContaining([
+        'missing_variable_name',
+        'empty_dictionary',
+        'metadata_only_fallback',
+      ]),
+    )
+  })
+
+  it('returns fallback when a required tagged Stata section is malformed', () => {
+    const result = parseStataDtaMetadata(
+      concatBytes([
+        ascii('<stata_dta>'),
+        tagText('release', '118'),
+        tagText('byteorder', 'LSF'),
+        tagBytes('K', uint16(1)),
+        tagBytes('N', uint32(0)),
+        ascii('<variable_types>'),
+        ascii('</stata_dta>'),
+      ]),
+    )
+
+    expect(result.variables).toEqual([])
+    expect(result.warnings.map((warning) => warning.code)).toEqual(
+      expect.arrayContaining([
+        'malformed_statistical_package',
+        'metadata_only_fallback',
+      ]),
+    )
+  })
+
   it('feeds imported Stata metadata into Cleaning Plan and script rendering', () => {
     const importResult = parseStataDtaMetadata(createSyntheticTaggedStataDta())
     const project = createInitialProjectMetadata()
@@ -95,12 +153,16 @@ describe('parseStataDtaMetadata', () => {
   })
 })
 
-function createSyntheticTaggedStataDta(): Uint8Array {
-  const variableNames = [
-    fixedText('household_id', 33),
-    fixedText('age', 33),
-    fixedText('sex', 33),
-  ]
+function createSyntheticTaggedStataDta(
+  options: {
+    variableNames?: string[]
+    valueLabelNames?: string[]
+    valueLabelsText?: string
+  } = {},
+): Uint8Array {
+  const variableNames = (
+    options.variableNames ?? ['household_id', 'age', 'sex']
+  ).map((name) => fixedText(name, 33))
   const variableLabels = [
     fixedText('Household identifier', 81),
     fixedText('Age in completed years', 81),
@@ -111,11 +173,9 @@ function createSyntheticTaggedStataDta(): Uint8Array {
     fixedText('%8.0g', 49),
     fixedText('%8.0g', 49),
   ]
-  const valueLabelNames = [
-    fixedText('', 33),
-    fixedText('', 33),
-    fixedText('sex_lbl', 33),
-  ]
+  const valueLabelNames = (options.valueLabelNames ?? ['', '', 'sex_lbl']).map(
+    (name) => fixedText(name, 33),
+  )
 
   return concatBytes([
     ascii('<stata_dta>'),
@@ -141,7 +201,7 @@ function createSyntheticTaggedStataDta(): Uint8Array {
     tagText('characteristics', ''),
     tagBytes('data', new Uint8Array()),
     tagBytes('strls', new Uint8Array()),
-    tagBytes('value_labels', new Uint8Array()),
+    tagBytes('value_labels', ascii(options.valueLabelsText ?? '')),
     ascii('</stata_dta>'),
   ])
 }

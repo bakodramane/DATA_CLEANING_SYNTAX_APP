@@ -71,8 +71,9 @@ to app state.
 Prefer exported metadata dictionaries when confidentiality rules prohibit
 opening full data files. The safe fallback workflow is to export a variable
 dictionary from Stata or SPSS, save it as CSV or Excel, and import that
-dictionary instead. See [Importing SPSS And Stata Metadata](importing-spss-stata.md)
-for support details and fallback guidance.
+dictionary instead. See [Importer Support Matrix](importer-support-matrix.md)
+and [Importing SPSS And Stata Metadata](importing-spss-stata.md) for support
+details and fallback guidance.
 
 Current Stata `.dta` support is conservative. The MVP parser reads tagged
 v117-v119-style metadata sections for variable names, variable labels, storage
@@ -91,7 +92,7 @@ If direct metadata extraction is not possible, the app shows this fallback
 message:
 
 ```text
-Direct metadata extraction from this file was not possible. Please export the variable dictionary from SPSS/Stata to CSV or Excel and import that dictionary instead.
+Direct metadata extraction from this file was not possible. Export a metadata-only variable dictionary from SPSS or Stata to CSV/Excel, including variable names, labels, storage types, value labels, missing codes, valid ranges, and notes where available, then import that dictionary instead.
 ```
 
 ### 8. Add Variables Manually

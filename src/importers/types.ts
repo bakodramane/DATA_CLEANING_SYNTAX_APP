@@ -67,6 +67,7 @@ export interface DictionaryImportWarning {
     | 'malformed_missing_code'
     | 'empty_dictionary'
     | 'missing_required_column'
+    | 'malformed_excel_workbook'
     | 'excel_sheet_not_found'
     | 'invalid_xml'
     | 'non_ddi_xml'

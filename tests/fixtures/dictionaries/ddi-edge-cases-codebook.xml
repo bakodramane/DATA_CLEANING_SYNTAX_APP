@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<codeBook xmlns="ddi:codebook:2_5">
+  <stdyDscr>
+    <citation>
+      <titlStmt>
+        <titl>Edge Case Metadata Fixture</titl>
+      </titlStmt>
+    </citation>
+  </stdyDscr>
+  <dataDscr>
+    <var ID="VALID_AGE" name="age">
+      <labl>Age</labl>
+      <varFormat type="numeric" />
+      <catgry>
+        <catValu>1</catValu>
+      </catgry>
+      <catgry>
+        <labl>Label without value</labl>
+      </catgry>
+    </var>
+    <var>
+      <labl>Unnamed variable should be skipped</labl>
+    </var>
+  </dataDscr>
+</codeBook>

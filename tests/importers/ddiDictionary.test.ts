@@ -122,6 +122,31 @@ describe('parseDdiXmlDictionary', () => {
     ])
   })
 
+  it('warns for incomplete DDI categories and skips unnamed variables', () => {
+    const result = parseDdiXmlDictionary(
+      readFixture('ddi-edge-cases-codebook.xml'),
+      {
+        sourceName: 'ddi-edge-cases-codebook.xml',
+      },
+    )
+    const age = findVariable(result.variables, 'age')
+
+    expect(result.importedVariableCount).toBe(1)
+    expect(result.sourceType).toBe('ddi')
+    expect(result.sourceMetadata).toMatchObject({
+      sourceName: 'ddi-edge-cases-codebook.xml',
+      studyTitle: 'Edge Case Metadata Fixture',
+      recordsRead: false,
+    })
+    expect(age.valueLabels).toEqual([])
+    expect(result.warnings.map((warning) => warning.code)).toEqual(
+      expect.arrayContaining([
+        'unsupported_ddi_metadata',
+        'missing_variable_name',
+      ]),
+    )
+  })
+
   it('feeds DDI variables into Cleaning Plan generation and syntax rendering', () => {
     const importResult = parseDdiXmlDictionary(
       readFixture('ddi-household-codebook.xml'),

@@ -49,6 +49,15 @@ export function rowsToDictionaryImportResult(
     ),
   ]
 
+  if (!columnMapping.mappedColumns.name) {
+    warnings.push({
+      code: 'missing_required_column',
+      severity: 'error',
+      message:
+        'No variable-name column was detected. Add a column such as "variable_name", "name", or "varname" before importing this dictionary.',
+    })
+  }
+
   const dictionaryRows = rows.map((raw, index) =>
     mapRawRow(raw, columnMapping, index + 2),
   )

@@ -50,6 +50,7 @@ Status below is for the current Phase 12 checkpoint.
 
 - [x] README updated.
 - [x] User guide updated.
+- [x] Importer support matrix updated.
 - [x] Architecture documentation updated.
 - [x] Methodology documentation updated.
 - [x] References checked.

@@ -128,6 +128,25 @@ function escapeXml(value: string): string {
 }
 
 describe('parseExcelDictionary', () => {
+  it('returns a structured warning for malformed workbook bytes', () => {
+    const result = parseExcelDictionary(new Uint8Array([1, 2, 3, 4]), {
+      sourceName: 'malformed.xlsx',
+    })
+
+    expect(result.variables).toEqual([])
+    expect(result.sourceType).toBe('excel')
+    expect(result.sourceMetadata).toMatchObject({
+      sourceName: 'malformed.xlsx',
+      recordsRead: false,
+    })
+    expect(result.warnings).toEqual([
+      expect.objectContaining({
+        code: 'malformed_excel_workbook',
+        severity: 'error',
+      }),
+    ])
+  })
+
   it('imports the first worksheet by default', () => {
     const result = parseExcelDictionary(createMinimalXlsx(dictionaryRows), {
       sourceName: 'household_dictionary.xlsx',
@@ -171,6 +190,18 @@ describe('parseExcelDictionary', () => {
     expect(result.warnings).toEqual([
       expect.objectContaining({
         code: 'excel_sheet_not_found',
+        severity: 'error',
+      }),
+    ])
+  })
+
+  it('reports an empty dictionary when the worksheet has no header row', () => {
+    const result = parseExcelDictionary(createMinimalXlsx([]))
+
+    expect(result.variables).toEqual([])
+    expect(result.warnings).toEqual([
+      expect.objectContaining({
+        code: 'empty_dictionary',
         severity: 'error',
       }),
     ])

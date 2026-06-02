@@ -166,6 +166,36 @@ describe('parseCsvDictionary', () => {
     expect(result.variables.map((variable) => variable.name)).toEqual(['sex'])
   })
 
+  it('reports a missing required name column before row-level skips', () => {
+    const result = parseCsvDictionary(
+      [
+        'variable_label,data_type,value_labels,missing_codes',
+        'Age,integer,malformed,-9=Refused',
+      ].join('\n'),
+    )
+
+    expect(warningCodes(result.warnings)).toEqual(
+      expect.arrayContaining([
+        'missing_required_column',
+        'missing_variable_name',
+      ]),
+    )
+    expect(result.importedVariableCount).toBe(0)
+  })
+
+  it('preserves valid labels while warning about malformed label entries', () => {
+    const result = parseCsvDictionary(
+      [
+        'variable_name,variable_label,value_labels',
+        'sex,Sex,1=Male; malformed',
+      ].join('\n'),
+    )
+    const sex = findVariable(result.variables, 'sex')
+
+    expect(sex.valueLabels).toEqual([{ value: 1, label: 'Male' }])
+    expect(warningCodes(result.warnings)).toContain('malformed_value_label')
+  })
+
   it('produces variables that can validate and render through an existing renderer', () => {
     const importResult = parseCsvDictionary(readHouseholdCsvFixture())
     const plan = createImportedPlan(importResult.variables)

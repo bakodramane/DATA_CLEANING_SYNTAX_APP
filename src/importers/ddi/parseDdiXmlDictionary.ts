@@ -203,6 +203,12 @@ export function parseDdiXmlDictionary(
     originalRowCount: variableElements.length,
     importedVariableCount: variables.length,
     rows,
+    sourceType: 'ddi',
+    sourceMetadata: {
+      sourceName: options.sourceName,
+      studyTitle,
+      recordsRead: false,
+    },
   }
 }
 
@@ -514,6 +520,10 @@ function emptyDdiResult(
     originalRowCount: 0,
     importedVariableCount: 0,
     rows: [],
+    sourceType: 'ddi',
+    sourceMetadata: {
+      recordsRead: false,
+    },
   }
 }
 

@@ -11,7 +11,36 @@ export function parseExcelDictionary(
   workbookBytes: ArrayBuffer | Uint8Array,
   options: ExcelDictionaryImportOptions = {},
 ): DictionaryImportResult {
-  const files = unzipSync(toUint8Array(workbookBytes))
+  let files: Record<string, Uint8Array>
+
+  try {
+    files = unzipSync(toUint8Array(workbookBytes))
+  } catch {
+    const columnMapping = detectColumnMapping([], options.columnMapping)
+
+    return {
+      variables: [],
+      columnMapping,
+      warnings: [
+        {
+          code: 'malformed_excel_workbook',
+          severity: 'error',
+          message:
+            'The Excel workbook could not be read. Export a metadata-only CSV or a valid .xlsx dictionary and import that file instead.',
+        },
+      ],
+      unmappedColumns: [],
+      originalRowCount: 0,
+      importedVariableCount: 0,
+      rows: [],
+      sourceType: 'excel',
+      sourceMetadata: {
+        sourceName: options.sourceName,
+        recordsRead: false,
+      },
+    }
+  }
+
   const workbookXml = readZipText(files, 'xl/workbook.xml')
   const relationshipsXml = readZipText(files, 'xl/_rels/workbook.xml.rels')
   const sharedStrings = parseSharedStrings(
@@ -41,6 +70,11 @@ export function parseExcelDictionary(
       originalRowCount: 0,
       importedVariableCount: 0,
       rows: [],
+      sourceType: 'excel',
+      sourceMetadata: {
+        sourceName: options.sourceName,
+        recordsRead: false,
+      },
     }
   }
 
@@ -65,6 +99,11 @@ export function parseExcelDictionary(
       originalRowCount: 0,
       importedVariableCount: 0,
       rows: [],
+      sourceType: 'excel',
+      sourceMetadata: {
+        sourceName: options.sourceName,
+        recordsRead: false,
+      },
     }
   }
 

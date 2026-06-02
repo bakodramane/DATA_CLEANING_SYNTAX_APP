@@ -153,6 +153,7 @@ Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), then
 see:
 
 - [User Guide](docs/user-guide.md)
+- [Importer Support Matrix](docs/importer-support-matrix.md)
 - [Importing SPSS And Stata Metadata](docs/importing-spss-stata.md)
 - [Architecture](docs/architecture.md)
 - [Methodology](docs/methodology.md)

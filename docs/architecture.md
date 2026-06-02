@@ -60,6 +60,9 @@ SAV dictionary records before the data terminator, including simple value labels
 and user-missing values where available. Unsupported or malformed files return a
 clear CSV/Excel dictionary fallback warning.
 
+The exact field coverage and known limitations are documented in the
+[Importer Support Matrix](importer-support-matrix.md).
+
 ### `src/rules`
 
 The rule engine and editable rule/citation configuration. Rules are metadata
