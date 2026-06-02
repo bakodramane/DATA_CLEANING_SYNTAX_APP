@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.1.1 - 2026-06-02
+
+### Changed
+
+- Improved rule-library reference details and verification notes.
+- Clarified methodology cautions for imputation and renderer limitations.
+- Improved GitHub Pages deployment documentation and manual workflow readiness.
+- Added post-release QA and roadmap notes.
+
+### Notes
+
+- No functional app changes.
+
 ## v0.1.0 - 2026-06-02
 
 ### Added
