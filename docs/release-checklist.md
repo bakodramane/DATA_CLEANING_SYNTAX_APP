@@ -2,7 +2,7 @@
 
 Use this checklist before tagging a public release.
 
-Status below is for the current Phase 12 checkpoint.
+Status below is for the current Phase 14 checkpoint.
 
 ## Quality Checks
 
@@ -51,6 +51,7 @@ Status below is for the current Phase 12 checkpoint.
 - [x] README updated.
 - [x] User guide updated.
 - [x] Importer support matrix updated.
+- [x] Renderer support matrix updated.
 - [x] Architecture documentation updated.
 - [x] Methodology documentation updated.
 - [x] References checked.
@@ -84,3 +85,12 @@ locally in the browser, observation-level records are not imported into app
 state, unsupported or malformed files return the CSV/Excel dictionary fallback
 message, and documentation recommends exported metadata dictionaries when
 confidentiality rules prohibit opening full data files.
+
+## Notes For Renderer Releases
+
+Renderer syntax is a reviewable draft and must not be treated as executed or
+validated output. Before release, verify that partial and unsupported behavior is
+visible in both returned renderer warnings and generated script comments, that
+full-file golden tests cover representative Cleaning Plans for SPSS v18, Stata
+v14, R, and Python, and that generated scripts do not silently delete records,
+treat outliers, impute identifiers, or impute structural missing values.

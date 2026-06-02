@@ -11,6 +11,16 @@ import type {
   UnsupportedRenderedStep,
 } from '../types'
 import {
+  conditionParameter,
+  createUnsupportedStep,
+  duplicateFlagName,
+  selectsStructuralMissing,
+  skipPatternCondition,
+  stepFlagName,
+  structuralMissingCondition,
+  translateConditionExpression,
+} from '../helpers'
+import {
   findStepVariables,
   flagName,
   formatGeneratedAt,
@@ -45,9 +55,15 @@ const SUPPORTED_R_STEP_TYPES = new Set<CleaningStepType>([
   'missing_value_declaration',
   'range_check',
   'domain_check',
+  'structural_missing_check',
+  'skip_pattern_check',
+  'consistency_check',
+  'duplicate_id_check',
   'outlier_flag',
   'missingness_diagnosis',
   'imputation',
+  'audit_log',
+  'summary_report',
 ])
 
 interface RenderContext {
@@ -100,12 +116,24 @@ function renderStep(step: CleaningStep, context: RenderContext): string {
       return renderRangeCheck(step, context)
     case 'domain_check':
       return renderDomainCheck(step, context)
+    case 'structural_missing_check':
+      return renderStructuralMissingCheck(step, context)
+    case 'skip_pattern_check':
+      return renderSkipPatternCheck(step, context)
+    case 'consistency_check':
+      return renderConsistencyCheck(step, context)
+    case 'duplicate_id_check':
+      return renderDuplicateIdCheck(step, context)
     case 'outlier_flag':
       return renderOutlierFlag(step, context)
     case 'missingness_diagnosis':
       return renderMissingnessDiagnosis(step, context)
     case 'imputation':
       return renderImputation(step, context)
+    case 'audit_log':
+      return renderAuditLog(step, context)
+    case 'summary_report':
+      return renderSummaryReport(step, context)
     default:
       return renderUnsupportedStep(step, context)
   }
@@ -115,11 +143,7 @@ function renderUnsupportedStep(
   step: CleaningStep,
   context: RenderContext,
 ): string {
-  const unsupportedStep = {
-    id: step.id,
-    type: step.type,
-    reason: `Step type "${step.type}" is not yet supported by the current R renderer.`,
-  } satisfies UnsupportedRenderedStep
+  const unsupportedStep = createUnsupportedStep(step, 'R')
 
   context.unsupportedSteps.push(unsupportedStep)
   context.warnings.push(`Step "${step.id}": ${unsupportedStep.reason}`)
@@ -284,10 +308,172 @@ function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
       return
     }
 
-    const message = `Outlier method "${method}" is not supported by the current R renderer.`
+    const message = `Outlier method "${method}" is not supported by the current R renderer; no deletion, capping, or winsorisation code was generated.`
     context.warnings.push(`Step "${step.id}": ${message}`)
     lines.push(renderWarningComment(message))
   })
+
+  return lines.join('\n')
+}
+
+function renderStructuralMissingCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const targetVariable = variables[0]
+  const lines = [renderStepComment(step)]
+  const partialMessage =
+    'R structural-missing checks are rendered as review flags only; values are not recoded or imputed.'
+
+  context.warnings.push(`Step "${step.id}": ${partialMessage}`)
+  lines.push(renderWarningComment(partialMessage))
+
+  if (!targetVariable) {
+    const message = `Structural-missing step "${step.id}" has no target variable to flag.`
+    context.warnings.push(message)
+    lines.push(renderWarningComment(message))
+    return lines.join('\n')
+  }
+
+  const condition = structuralMissingCondition(step, targetVariable)
+
+  if (!condition) {
+    const message = `Structural-missing step "${step.id}" has no condition; review the Cleaning Plan notes manually.`
+    context.warnings.push(message)
+    lines.push(renderWarningComment(message))
+    return lines.join('\n')
+  }
+
+  const translatedCondition = translateConditionExpression(
+    condition,
+    variables,
+    'r',
+    context.dataFrameName,
+  )
+
+  lines.push(
+    `# Structural-missing condition: ${condition}`,
+    `${context.dataFrameName} <- ${context.dataFrameName} %>%`,
+    '  mutate(',
+    `    ${flagName(targetVariable, 'structural_missing')} = if_else((${translatedCondition}) & !is.na(${targetVariable.name}), 1L, 0L)`,
+    '  )',
+  )
+
+  return lines.join('\n')
+}
+
+function renderSkipPatternCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const targetVariable = variables[0]
+  const lines = [renderStepComment(step)]
+  const partialMessage =
+    'R skip-pattern checks use simple applicability conditions and only flag possible routing violations.'
+
+  context.warnings.push(`Step "${step.id}": ${partialMessage}`)
+  lines.push(renderWarningComment(partialMessage))
+
+  if (!targetVariable) {
+    const message = `Skip-pattern step "${step.id}" has no target variable to flag.`
+    context.warnings.push(message)
+    lines.push(renderWarningComment(message))
+    return lines.join('\n')
+  }
+
+  const condition = skipPatternCondition(step, targetVariable)
+
+  if (!condition) {
+    const message = `Skip-pattern step "${step.id}" has no applicability condition; review the questionnaire routing manually.`
+    context.warnings.push(message)
+    lines.push(renderWarningComment(message))
+    return lines.join('\n')
+  }
+
+  const translatedCondition = translateConditionExpression(
+    condition,
+    variables,
+    'r',
+    context.dataFrameName,
+  )
+
+  lines.push(
+    `# Applicable when: ${condition}`,
+    `${context.dataFrameName} <- ${context.dataFrameName} %>%`,
+    '  mutate(',
+    `    ${flagName(targetVariable, 'skip_pattern')} = if_else(!(${translatedCondition}) & !is.na(${targetVariable.name}), 1L, 0L)`,
+    '  )',
+  )
+
+  return lines.join('\n')
+}
+
+function renderConsistencyCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const lines = [renderStepComment(step)]
+  const condition = conditionParameter(step)
+  const partialMessage =
+    'R consistency checks are rendered only when the Cleaning Plan supplies a simple flag condition.'
+
+  context.warnings.push(`Step "${step.id}": ${partialMessage}`)
+  lines.push(renderWarningComment(partialMessage))
+
+  if (!condition) {
+    const message = `Consistency check "${step.id}" has no condition; no executable flag was generated.`
+    context.warnings.push(message)
+    lines.push(renderWarningComment(message))
+    return lines.join('\n')
+  }
+
+  const translatedCondition = translateConditionExpression(
+    condition,
+    variables,
+    'r',
+    context.dataFrameName,
+  )
+
+  lines.push(
+    `# Flag condition: ${condition}`,
+    `${context.dataFrameName} <- ${context.dataFrameName} %>%`,
+    '  mutate(',
+    `    ${stepFlagName(step, 'consistency')} = if_else(${translatedCondition}, 1L, 0L)`,
+    '  )',
+  )
+
+  return lines.join('\n')
+}
+
+function renderDuplicateIdCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const lines = [renderStepComment(step)]
+
+  if (variables.length === 0) {
+    const message = `Duplicate ID check "${step.id}" has no identifier variables.`
+    context.warnings.push(message)
+    lines.push(renderWarningComment(message))
+    return lines.join('\n')
+  }
+
+  const variableNames = variables.map((variable) => variable.name)
+  const keyName = `${duplicateFlagName(step)}_key`
+  const flag = duplicateFlagName(step)
+
+  lines.push(
+    '# Duplicate identifier checks tag records; no records are deleted.',
+    `${keyName} <- ${context.dataFrameName} %>% select(all_of(${formatRCharacterVector(variableNames)}))`,
+    `${context.dataFrameName} <- ${context.dataFrameName} %>%`,
+    '  mutate(',
+    `    ${flag} = if_else(if_all(all_of(${formatRCharacterVector(variableNames)}), ~ !is.na(.x)) & (duplicated(${keyName}) | duplicated(${keyName}, fromLast = TRUE)), 1L, 0L)`,
+    '  )',
+  )
 
   return lines.join('\n')
 }
@@ -343,9 +529,10 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     '# Multiple imputation requires careful methodological review.',
     '# This MVP uses mice() with simple default methods and does not automate model selection.',
     '# Structural missing values must be excluded before imputation.',
+    '# Identifier variables are excluded from imputation methods.',
   ]
 
-  if (step.parameters.includeStructuralMissing === true) {
+  if (selectsStructuralMissing(step.parameters)) {
     const message =
       'Structural missing values were requested for imputation and have been blocked.'
     context.warnings.push(`Step "${step.id}": ${message}`)
@@ -358,6 +545,12 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
 
     if (isIdentifier) {
       const message = `Identifier variable "${variable.name}" was excluded from imputation.`
+      context.warnings.push(`Step "${step.id}": ${message}`)
+      lines.push(renderWarningComment(message))
+    }
+
+    if (['binary', 'nominal', 'ordinal'].includes(variable.type)) {
+      const message = `Categorical variable "${variable.name}" uses a mice categorical method; review category prevalence and model fit before production use.`
       context.warnings.push(`Step "${step.id}": ${message}`)
       lines.push(renderWarningComment(message))
     }
@@ -401,6 +594,45 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     '# pooled <- pool(fit)',
     '# summary(pooled)',
   )
+
+  return lines.join('\n')
+}
+
+function renderAuditLog(step: CleaningStep, context: RenderContext): string {
+  const lines = [renderStepComment(step)]
+  const message =
+    'R audit-log support is partial: this section documents review guidance but does not create a separate audit table.'
+
+  context.warnings.push(`Step "${step.id}": ${message}`)
+  lines.push(
+    renderWarningComment(message),
+    '# Review generated flag_* variables and preserve reviewer decisions outside the source variables.',
+  )
+
+  return lines.join('\n')
+}
+
+function renderSummaryReport(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const lines = [renderStepComment(step)]
+  const message =
+    'R summary-report support is partial: basic summaries are emitted for review, not a publication-ready report.'
+
+  context.warnings.push(`Step "${step.id}": ${message}`)
+  lines.push(renderWarningComment(message))
+
+  if (variables.length > 0) {
+    const variableNames = variables.map((variable) => variable.name)
+    lines.push(
+      `summary_report_variables <- ${formatRCharacterVector(variableNames)}`,
+      `print(summary(${context.dataFrameName}[summary_report_variables]))`,
+    )
+  } else {
+    lines.push('# No variables were listed for the summary report step.')
+  }
 
   return lines.join('\n')
 }

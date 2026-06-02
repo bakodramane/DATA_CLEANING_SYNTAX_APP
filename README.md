@@ -38,6 +38,9 @@ to read dictionary/header metadata locally in the browser, does not import
 observation-level records into app state, and warns users to prefer exported
 CSV/Excel dictionaries when confidentiality rules prohibit opening full data
 files.
+Renderer coverage is documented in the
+[Renderer Support Matrix](docs/renderer-support-matrix.md), including partial
+support and known limitations by Cleaning Plan step type and target language.
 
 ## Screenshots
 
@@ -144,7 +147,7 @@ optional manual deployment workflow.
 - AI-assisted interpretation, online rule-pack fetching, backend services,
   authentication, telemetry, analytics, and cloud storage are not implemented.
 - Some renderer support is partial for advanced imputation and specialist rule
-  types.
+  types. See the [Renderer Support Matrix](docs/renderer-support-matrix.md).
 - Browser install prompts and offline indicators vary by browser and platform.
 
 ## Contributing
@@ -154,6 +157,7 @@ see:
 
 - [User Guide](docs/user-guide.md)
 - [Importer Support Matrix](docs/importer-support-matrix.md)
+- [Renderer Support Matrix](docs/renderer-support-matrix.md)
 - [Importing SPSS And Stata Metadata](docs/importing-spss-stata.md)
 - [Architecture](docs/architecture.md)
 - [Methodology](docs/methodology.md)

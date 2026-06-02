@@ -74,6 +74,13 @@ and project context to recommend, block, or mark planned cleaning steps.
 Language-specific renderers that convert a valid Cleaning Plan into SPSS v18,
 Stata v14, R, or Python syntax. Renderers preserve step order, add comments and
 rationales, include citation keys, and surface partial or unsupported behavior.
+They generate scripts for human review only; the app does not execute the
+generated SPSS, Stata, R, or Python code. Full-file golden tests cover
+representative household, agricultural, and structural-missing plans so syntax
+changes are intentional and reviewable.
+
+The exact renderer coverage by Cleaning Plan step type is documented in the
+[Renderer Support Matrix](renderer-support-matrix.md).
 
 ### `src/app`
 

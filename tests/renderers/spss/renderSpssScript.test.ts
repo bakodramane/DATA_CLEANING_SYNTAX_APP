@@ -31,23 +31,23 @@ describe('renderSpssScript', () => {
     expectGoldenFragments(rendered.content, goldenFragments())
   })
 
-  it('records unsupported and partially supported SPSS warnings', () => {
+  it('records partially supported SPSS warnings', () => {
     const rendered = renderSpssScript(createRendererTestPlan(), {
       generatedAt: fixedGeneratedAt,
     })
 
-    expect(rendered.unsupportedSteps.map((step) => step.type)).toEqual(
-      expect.arrayContaining([
-        'structural_missing_check',
-        'audit_log',
-        'summary_report',
-      ]),
-    )
+    expect(rendered.unsupportedSteps).toHaveLength(0)
     expect(rendered.warnings.join('\n')).toContain(
       'SPSS v18 multiple imputation syntax requires module availability',
     )
     expect(rendered.warnings.join('\n')).toContain(
       'SPSS v18 mad outlier thresholds are emitted as a review template',
+    )
+    expect(rendered.warnings.join('\n')).toContain(
+      'SPSS structural-missing checks are rendered as review flags only',
+    )
+    expect(rendered.warnings.join('\n')).toContain(
+      'SPSS audit-log support is partial',
     )
   })
 })

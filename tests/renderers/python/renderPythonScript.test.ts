@@ -31,20 +31,20 @@ describe('renderPythonScript', () => {
     expectGoldenFragments(rendered.content, goldenFragments())
   })
 
-  it('records unsupported and imputation-review Python warnings', () => {
+  it('records partially supported and imputation-review Python warnings', () => {
     const rendered = renderPythonScript(createRendererTestPlan(), {
       generatedAt: fixedGeneratedAt,
     })
 
-    expect(rendered.unsupportedSteps.map((step) => step.type)).toEqual(
-      expect.arrayContaining([
-        'structural_missing_check',
-        'audit_log',
-        'summary_report',
-      ]),
-    )
+    expect(rendered.unsupportedSteps).toHaveLength(0)
     expect(rendered.warnings.join('\n')).toContain(
       'Python imputation uses an experimental IterativeImputer example',
+    )
+    expect(rendered.warnings.join('\n')).toContain(
+      'Python structural-missing checks are rendered as review flags only',
+    )
+    expect(rendered.warnings.join('\n')).toContain(
+      'Python audit-log support is partial',
     )
   })
 })

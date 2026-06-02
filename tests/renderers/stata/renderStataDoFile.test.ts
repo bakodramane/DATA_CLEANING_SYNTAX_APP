@@ -31,22 +31,17 @@ describe('renderStataDoFile', () => {
     expectGoldenFragments(rendered.content, goldenFragments())
   })
 
-  it('records unsupported Stata renderer steps', () => {
+  it('records partially supported Stata renderer warnings', () => {
     const rendered = renderStataDoFile(createRendererTestPlan(), {
       generatedAt: fixedGeneratedAt,
     })
 
-    expect(rendered.unsupportedSteps.map((step) => step.type)).toEqual(
-      expect.arrayContaining([
-        'structural_missing_check',
-        'audit_log',
-        'summary_report',
-      ]),
+    expect(rendered.unsupportedSteps).toHaveLength(0)
+    expect(rendered.warnings.join('\n')).toContain(
+      'Stata structural-missing checks are rendered as review flags only',
     )
-    expect(rendered.warnings).toEqual(
-      expect.arrayContaining([
-        'Step "step_income_structural_missing": Step type "structural_missing_check" is not yet supported by the current Stata v14 renderer.',
-      ]),
+    expect(rendered.warnings.join('\n')).toContain(
+      'Stata audit-log support is partial',
     )
   })
 })

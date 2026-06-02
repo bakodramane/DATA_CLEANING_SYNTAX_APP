@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap is a lightweight backlog for work after `v0.3.0`. It is not a
+This roadmap is a lightweight backlog for work after `v0.4.1`. It is not a
 commitment to implement every item in order.
 
 ## Methodology And Statistical Validation
@@ -25,10 +25,11 @@ commitment to implement every item in order.
 
 ## Renderer Depth
 
-- Improve SPSS, Stata, and Python imputation warnings and examples.
-- Add fuller golden-file tests for each renderer.
-- Expand support for structural missingness and skip-pattern comments.
-- Add clearer capability matrix reporting for unsupported steps.
+- Extend full-file golden tests with additional public metadata dictionaries.
+- Add richer renderer validation for language-specific syntax edge cases.
+- Continue improving partial-support warnings as new rule families are added.
+- Keep the [Renderer Support Matrix](renderer-support-matrix.md) aligned with
+  renderer capability metadata.
 
 ## UI Improvements
 

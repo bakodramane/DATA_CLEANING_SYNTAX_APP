@@ -53,4 +53,11 @@ completed_data_example <- complete(mice_fit, action = 1)
 # pooled <- pool(fit)
 # summary(pooled)
 ---
-# WARNING: Step type "structural_missing_check" is not yet supported by the current R renderer.
+# WARNING: R structural-missing checks are rendered as review flags only; values are not recoded or imputed.
+---
+flag_income_structural_missing = if_else((data$employment_status != 1) & !is.na(income), 1L, 0L)
+---
+# WARNING: R audit-log support is partial: this section documents review guidance but does not create a separate audit table.
+---
+summary_report_variables <- c("age", "sex", "education_level", "income", "employment_status")
+print(summary(data[summary_report_variables]))

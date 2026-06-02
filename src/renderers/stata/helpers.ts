@@ -20,6 +20,10 @@ export function quoteStataString(value: string): string {
 
 export function formatStataValue(value: VariableValue): string {
   if (typeof value === 'string') {
+    if (/^\.[a-z]$/i.test(value.trim())) {
+      return value.trim().toLowerCase()
+    }
+
     return quoteStataString(value)
   }
 

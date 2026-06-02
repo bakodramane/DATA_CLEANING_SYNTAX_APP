@@ -2,8 +2,10 @@ import type { CleaningPlan, CleaningStep, SurveyVariable } from '../../core'
 import {
   allowedDomainValues,
   canImputeVariable,
+  conditionParameter,
   createUnsupportedStep,
   defaultImputationPredictors,
+  duplicateFlagName,
   findStepVariables,
   flagName,
   indexVariables,
@@ -15,6 +17,10 @@ import {
   numberOrStringParameter,
   numberParameter,
   selectsStructuralMissing,
+  skipPatternCondition,
+  stepFlagName,
+  structuralMissingCondition,
+  translateConditionExpression,
   unique,
 } from '../helpers'
 import type {
@@ -83,12 +89,24 @@ function renderStep(step: CleaningStep, context: RenderContext): string {
       return renderRangeCheck(step, context)
     case 'domain_check':
       return renderDomainCheck(step, context)
+    case 'structural_missing_check':
+      return renderStructuralMissingCheck(step, context)
+    case 'skip_pattern_check':
+      return renderSkipPatternCheck(step, context)
+    case 'consistency_check':
+      return renderConsistencyCheck(step, context)
+    case 'duplicate_id_check':
+      return renderDuplicateIdCheck(step, context)
     case 'outlier_flag':
       return renderOutlierFlag(step, context)
     case 'missingness_diagnosis':
       return renderMissingnessDiagnosis(step, context)
     case 'imputation':
       return renderImputation(step, context)
+    case 'audit_log':
+      return renderAuditLog(step, context)
+    case 'summary_report':
+      return renderSummaryReport(step, context)
     default:
       return renderUnsupportedStep(step, context)
   }
@@ -274,10 +292,177 @@ function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
       return
     }
 
-    const message = `Outlier method "${method}" is not supported by the current Python renderer.`
+    const message = `Outlier method "${method}" is not supported by the current Python renderer; no deletion, capping, or winsorisation code was generated.`
     context.warnings.push(`Step "${step.id}": ${message}`)
     lines.push(pythonComment(`WARNING: ${message}`))
   })
+
+  return lines.join('\n')
+}
+
+function renderStructuralMissingCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const targetVariable = variables[0]
+  const lines = [renderPythonStepComment(step)]
+  const partialMessage =
+    'Python structural-missing checks are rendered as review flags only; values are not recoded or imputed.'
+
+  context.warnings.push(`Step "${step.id}": ${partialMessage}`)
+  lines.push(pythonComment(`WARNING: ${partialMessage}`))
+
+  if (!targetVariable) {
+    const message = `Structural-missing step "${step.id}" has no target variable to flag.`
+    context.warnings.push(message)
+    lines.push(pythonComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const condition = structuralMissingCondition(step, targetVariable)
+
+  if (!condition) {
+    const message = `Structural-missing step "${step.id}" has no condition; review the Cleaning Plan notes manually.`
+    context.warnings.push(message)
+    lines.push(pythonComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const translatedCondition = translateConditionExpression(
+    condition,
+    variables,
+    'python',
+    context.dataFrameName,
+  )
+
+  lines.push(
+    pythonComment(`Structural-missing condition: ${condition}`),
+    `${context.dataFrameName}[${quotePythonString(flagName(targetVariable, 'structural_missing'))}] = np.where(`,
+    `    (${translatedCondition}) & ${context.dataFrameName}[${quotePythonString(targetVariable.name)}].notna(),`,
+    '    1,',
+    '    0,',
+    ')',
+  )
+
+  return lines.join('\n')
+}
+
+function renderSkipPatternCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const targetVariable = variables[0]
+  const lines = [renderPythonStepComment(step)]
+  const partialMessage =
+    'Python skip-pattern checks use simple applicability conditions and only flag possible routing violations.'
+
+  context.warnings.push(`Step "${step.id}": ${partialMessage}`)
+  lines.push(pythonComment(`WARNING: ${partialMessage}`))
+
+  if (!targetVariable) {
+    const message = `Skip-pattern step "${step.id}" has no target variable to flag.`
+    context.warnings.push(message)
+    lines.push(pythonComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const condition = skipPatternCondition(step, targetVariable)
+
+  if (!condition) {
+    const message = `Skip-pattern step "${step.id}" has no applicability condition; review the questionnaire routing manually.`
+    context.warnings.push(message)
+    lines.push(pythonComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const translatedCondition = translateConditionExpression(
+    condition,
+    variables,
+    'python',
+    context.dataFrameName,
+  )
+
+  lines.push(
+    pythonComment(`Applicable when: ${condition}`),
+    `${context.dataFrameName}[${quotePythonString(flagName(targetVariable, 'skip_pattern'))}] = np.where(`,
+    `    ~(${translatedCondition}) & ${context.dataFrameName}[${quotePythonString(targetVariable.name)}].notna(),`,
+    '    1,',
+    '    0,',
+    ')',
+  )
+
+  return lines.join('\n')
+}
+
+function renderConsistencyCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const lines = [renderPythonStepComment(step)]
+  const condition = conditionParameter(step)
+  const partialMessage =
+    'Python consistency checks are rendered only when the Cleaning Plan supplies a simple flag condition.'
+
+  context.warnings.push(`Step "${step.id}": ${partialMessage}`)
+  lines.push(pythonComment(`WARNING: ${partialMessage}`))
+
+  if (!condition) {
+    const message = `Consistency check "${step.id}" has no condition; no executable flag was generated.`
+    context.warnings.push(message)
+    lines.push(pythonComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const translatedCondition = translateConditionExpression(
+    condition,
+    variables,
+    'python',
+    context.dataFrameName,
+  )
+
+  lines.push(
+    pythonComment(`Flag condition: ${condition}`),
+    `${context.dataFrameName}[${quotePythonString(stepFlagName(step, 'consistency'))}] = np.where(`,
+    `    ${translatedCondition},`,
+    '    1,',
+    '    0,',
+    ')',
+  )
+
+  return lines.join('\n')
+}
+
+function renderDuplicateIdCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const lines = [renderPythonStepComment(step)]
+
+  if (variables.length === 0) {
+    const message = `Duplicate ID check "${step.id}" has no identifier variables.`
+    context.warnings.push(message)
+    lines.push(pythonComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const variableNames = variables.map((variable) => variable.name)
+  const flag = duplicateFlagName(step)
+
+  lines.push(
+    pythonComment(
+      'Duplicate identifier checks tag records; no records are deleted.',
+    ),
+    `duplicate_key_${flag} = [${variableNames.map(quotePythonString).join(', ')}]`,
+    `${context.dataFrameName}[${quotePythonString(flag)}] = np.where(`,
+    `    ${context.dataFrameName}[duplicate_key_${flag}].notna().all(axis=1) & ${context.dataFrameName}.duplicated(subset=duplicate_key_${flag}, keep=False),`,
+    '    1,',
+    '    0,',
+    ')',
+  )
 
   return lines.join('\n')
 }
@@ -316,6 +501,9 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     pythonComment(
       'Use statsmodels or a specialised workflow when analysis pooling is required.',
     ),
+    pythonComment(
+      'Identifier variables and structural missing values are excluded from imputation examples.',
+    ),
   ]
   context.warnings.push(
     `Step "${step.id}": Python imputation uses an experimental IterativeImputer example and does not automate Rubin-style pooling.`,
@@ -337,6 +525,12 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
       context.warnings.push(`Step "${step.id}": ${message}`)
       lines.push(pythonComment(`WARNING: ${message}`))
       return false
+    }
+
+    if (['binary', 'nominal', 'ordinal'].includes(variable.type)) {
+      const message = `Categorical variable "${variable.name}" is included in a numeric IterativeImputer example; review encoding and model fit before production use.`
+      context.warnings.push(`Step "${step.id}": ${message}`)
+      lines.push(pythonComment(`WARNING: ${message}`))
     }
 
     return canImputeVariable(variable)
@@ -369,6 +563,50 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
       'Do not treat completed_data_example as full multiple-imputation inference.',
     ),
   )
+
+  return lines.join('\n')
+}
+
+function renderAuditLog(step: CleaningStep, context: RenderContext): string {
+  const lines = [renderPythonStepComment(step)]
+  const message =
+    'Python audit-log support is partial: this section documents review guidance but does not create a separate audit table.'
+
+  context.warnings.push(`Step "${step.id}": ${message}`)
+  lines.push(
+    pythonComment(`WARNING: ${message}`),
+    pythonComment(
+      'Review generated flag_* variables and preserve reviewer decisions outside the source variables.',
+    ),
+  )
+
+  return lines.join('\n')
+}
+
+function renderSummaryReport(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const lines = [renderPythonStepComment(step)]
+  const message =
+    'Python summary-report support is partial: basic summaries are emitted for review, not a publication-ready report.'
+
+  context.warnings.push(`Step "${step.id}": ${message}`)
+  lines.push(pythonComment(`WARNING: ${message}`))
+
+  if (variables.length > 0) {
+    const variableNames = variables.map((variable) => variable.name)
+    lines.push(
+      `summary_report_variables = [${variableNames.map(quotePythonString).join(', ')}]`,
+      `print(${context.dataFrameName}[summary_report_variables].describe(include="all"))`,
+      `print(${context.dataFrameName}[summary_report_variables].isna().sum())`,
+    )
+  } else {
+    lines.push(
+      pythonComment('No variables were listed for the summary report step.'),
+    )
+  }
 
   return lines.join('\n')
 }

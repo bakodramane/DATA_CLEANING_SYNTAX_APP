@@ -2,18 +2,25 @@ import type { CleaningPlan, CleaningStep, SurveyVariable } from '../../core'
 import {
   allowedDomainValues,
   canImputeVariable,
+  conditionParameter,
   createUnsupportedStep,
   defaultImputationPredictors,
+  duplicateFlagName,
   findStepVariables,
   flagName,
   indexVariables,
   isContinuousOutlierVariable,
   isIdentifierVariable,
+  isStataExtendedMissingValue,
   MVP_RENDERED_STEP_TYPES,
   normalizeMethodName,
   numberOrStringParameter,
   numberParameter,
   selectsStructuralMissing,
+  skipPatternCondition,
+  stepFlagName,
+  structuralMissingCondition,
+  translateConditionExpression,
   unique,
 } from '../helpers'
 import type {
@@ -79,12 +86,24 @@ function renderStep(step: CleaningStep, context: RenderContext): string {
       return renderRangeCheck(step, context)
     case 'domain_check':
       return renderDomainCheck(step, context)
+    case 'structural_missing_check':
+      return renderStructuralMissingCheck(step, context)
+    case 'skip_pattern_check':
+      return renderSkipPatternCheck(step, context)
+    case 'consistency_check':
+      return renderConsistencyCheck(step, context)
+    case 'duplicate_id_check':
+      return renderDuplicateIdCheck(step, context)
     case 'outlier_flag':
       return renderOutlierFlag(step, context)
     case 'missingness_diagnosis':
       return renderMissingnessDiagnosis(step, context)
     case 'imputation':
       return renderImputation(step, context)
+    case 'audit_log':
+      return renderAuditLog(step, context)
+    case 'summary_report':
+      return renderSummaryReport(step, context)
     default:
       return renderUnsupportedStep(step, context)
   }
@@ -162,6 +181,14 @@ function renderMissingValueDeclarations(
     }
 
     const values = missingCodes.map((missingCode) => missingCode.value)
+    const extendedMissingValues = values.filter(isStataExtendedMissingValue)
+
+    if (extendedMissingValues.length > 0) {
+      const message = `Stata extended missing values (${formatStataList(extendedMissingValues)}) were detected for "${variable.name}"; review them because mvdecode is intended for declared nonresponse codes.`
+      context.warnings.push(`Step "${step.id}": ${message}`)
+      lines.push(stataComment(`WARNING: ${message}`))
+    }
+
     lines.push(
       stataComment(
         `Declared missing codes for ${variable.name}: ${formatStataList(values)}`,
@@ -253,10 +280,165 @@ function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
       return
     }
 
-    const message = `Outlier method "${method}" is not supported by the current Stata renderer.`
+    const message = `Outlier method "${method}" is not supported by the current Stata v14 renderer; no deletion, capping, or winsorisation syntax was generated.`
     context.warnings.push(`Step "${step.id}": ${message}`)
     lines.push(stataComment(`WARNING: ${message}`))
   })
+
+  return lines.join('\n')
+}
+
+function renderStructuralMissingCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const targetVariable = variables[0]
+  const lines = [renderStataStepComment(step)]
+  const partialMessage =
+    'Stata structural-missing checks are rendered as review flags only; values are not recoded or imputed.'
+
+  context.warnings.push(`Step "${step.id}": ${partialMessage}`)
+  lines.push(stataComment(`WARNING: ${partialMessage}`))
+
+  if (!targetVariable) {
+    const message = `Structural-missing step "${step.id}" has no target variable to flag.`
+    context.warnings.push(message)
+    lines.push(stataComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const condition = structuralMissingCondition(step, targetVariable)
+
+  if (!condition) {
+    const message = `Structural-missing step "${step.id}" has no condition; review the Cleaning Plan notes manually.`
+    context.warnings.push(message)
+    lines.push(stataComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const flag = flagName(targetVariable, 'structural_missing')
+  const translatedCondition = translateConditionExpression(
+    condition,
+    variables,
+    'stata14',
+  )
+
+  lines.push(
+    stataComment(`Structural-missing condition: ${condition}`),
+    `generate byte ${flag} = (${translatedCondition}) & !missing(${targetVariable.name})`,
+    `label variable ${flag} ${quoteStataString(`Flag: ${targetVariable.name} present when structurally missing`)}`,
+  )
+
+  return lines.join('\n')
+}
+
+function renderSkipPatternCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const targetVariable = variables[0]
+  const lines = [renderStataStepComment(step)]
+  const partialMessage =
+    'Stata skip-pattern checks use simple applicability conditions and only flag possible routing violations.'
+
+  context.warnings.push(`Step "${step.id}": ${partialMessage}`)
+  lines.push(stataComment(`WARNING: ${partialMessage}`))
+
+  if (!targetVariable) {
+    const message = `Skip-pattern step "${step.id}" has no target variable to flag.`
+    context.warnings.push(message)
+    lines.push(stataComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const condition = skipPatternCondition(step, targetVariable)
+
+  if (!condition) {
+    const message = `Skip-pattern step "${step.id}" has no applicability condition; review the questionnaire routing manually.`
+    context.warnings.push(message)
+    lines.push(stataComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const flag = flagName(targetVariable, 'skip_pattern')
+  const translatedCondition = translateConditionExpression(
+    condition,
+    variables,
+    'stata14',
+  )
+
+  lines.push(
+    stataComment(`Applicable when: ${condition}`),
+    `generate byte ${flag} = !(${translatedCondition}) & !missing(${targetVariable.name})`,
+    `label variable ${flag} ${quoteStataString(`Flag: ${targetVariable.name} present outside skip pattern`)}`,
+  )
+
+  return lines.join('\n')
+}
+
+function renderConsistencyCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const lines = [renderStataStepComment(step)]
+  const condition = conditionParameter(step)
+  const partialMessage =
+    'Stata consistency checks are rendered only when the Cleaning Plan supplies a simple flag condition.'
+
+  context.warnings.push(`Step "${step.id}": ${partialMessage}`)
+  lines.push(stataComment(`WARNING: ${partialMessage}`))
+
+  if (!condition) {
+    const message = `Consistency check "${step.id}" has no condition; no executable flag was generated.`
+    context.warnings.push(message)
+    lines.push(stataComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const flag = stepFlagName(step, 'consistency').slice(0, 32)
+  const translatedCondition = translateConditionExpression(
+    condition,
+    variables,
+    'stata14',
+  )
+
+  lines.push(
+    stataComment(`Flag condition: ${condition}`),
+    `generate byte ${flag} = (${translatedCondition})`,
+    `label variable ${flag} ${quoteStataString(`Flag: consistency review for ${step.id}`)}`,
+  )
+
+  return lines.join('\n')
+}
+
+function renderDuplicateIdCheck(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const lines = [renderStataStepComment(step)]
+
+  if (variables.length === 0) {
+    const message = `Duplicate ID check "${step.id}" has no identifier variables.`
+    context.warnings.push(message)
+    lines.push(stataComment(`WARNING: ${message}`))
+    return lines.join('\n')
+  }
+
+  const byVariables = variables.map((variable) => variable.name).join(' ')
+  const flag = duplicateFlagName(step).slice(0, 32)
+
+  lines.push(
+    stataComment(
+      'Duplicate identifier checks tag records; no records are deleted.',
+    ),
+    `duplicates tag ${byVariables}, generate(${flag})`,
+    `replace ${flag} = ${flag} > 0 if !missing(${variables[0].name})`,
+    `label variable ${flag} ${quoteStataString(`Flag: duplicate identifier for ${byVariables}`)}`,
+  )
 
   return lines.join('\n')
 }
@@ -287,6 +469,9 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     stataComment('Multiple imputation model choices require analyst review'),
     stataComment(
       'Structural missing values must be excluded before imputation',
+    ),
+    stataComment(
+      'Identifier variables are excluded from mi register imputed lists',
     ),
   ]
 
@@ -335,6 +520,48 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     stataComment('Example pooling guidance, to be adapted by the analyst:'),
     stataComment('mi estimate: regress outcome income age sex'),
   )
+
+  return lines.join('\n')
+}
+
+function renderAuditLog(step: CleaningStep, context: RenderContext): string {
+  const lines = [renderStataStepComment(step)]
+  const message =
+    'Stata audit-log support is partial: this section documents review guidance but does not create a separate audit table.'
+
+  context.warnings.push(`Step "${step.id}": ${message}`)
+  lines.push(
+    stataComment(`WARNING: ${message}`),
+    stataComment(
+      'Review generated flag_* variables and preserve reviewer decisions outside the source variables.',
+    ),
+  )
+
+  return lines.join('\n')
+}
+
+function renderSummaryReport(
+  step: CleaningStep,
+  context: RenderContext,
+): string {
+  const variables = findStepVariables(step, context.variablesByName)
+  const lines = [renderStataStepComment(step)]
+  const message =
+    'Stata summary-report support is partial: basic summaries are emitted for review, not a publication-ready report.'
+
+  context.warnings.push(`Step "${step.id}": ${message}`)
+  lines.push(stataComment(`WARNING: ${message}`))
+
+  if (variables.length > 0) {
+    lines.push(
+      `summarize ${variables.map((variable) => variable.name).join(' ')}`,
+      `misstable summarize ${variables.map((variable) => variable.name).join(' ')}`,
+    )
+  } else {
+    lines.push(
+      stataComment('No variables were listed for the summary report step.'),
+    )
+  }
 
   return lines.join('\n')
 }

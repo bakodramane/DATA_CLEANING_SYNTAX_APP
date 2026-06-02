@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { CleaningPlan, CleaningStep } from '../../src/core'
 import { renderPythonScript } from '../../src/renderers/python'
 import { renderRScript } from '../../src/renderers/r'
 import { renderSpssScript } from '../../src/renderers/spss'
@@ -56,14 +57,18 @@ describe('all MVP renderers', () => {
 
   it('returns warnings and unsupported-step metadata instead of failing silently', () => {
     renderers.forEach((renderer) => {
-      const rendered = renderer.render()
+      const plan = addUnsupportedOutlierTreatment(createRendererTestPlan())
+      const rendered =
+        renderer.language === 'r'
+          ? renderRScript(plan, { generatedAt: fixedGeneratedAt })
+          : renderer.language === 'spss18'
+            ? renderSpssScript(plan, { generatedAt: fixedGeneratedAt })
+            : renderer.language === 'stata14'
+              ? renderStataDoFile(plan, { generatedAt: fixedGeneratedAt })
+              : renderPythonScript(plan, { generatedAt: fixedGeneratedAt })
 
       expect(rendered.unsupportedSteps.map((step) => step.type)).toEqual(
-        expect.arrayContaining([
-          'structural_missing_check',
-          'audit_log',
-          'summary_report',
-        ]),
+        expect.arrayContaining(['outlier_treatment']),
       )
       expect(rendered.warnings.length).toBeGreaterThan(0)
     })
@@ -86,3 +91,28 @@ describe('all MVP renderers', () => {
       })
   })
 })
+
+function addUnsupportedOutlierTreatment(plan: CleaningPlan): CleaningPlan {
+  const unsupportedStep: CleaningStep = {
+    id: 'step_unsupported_outlier_treatment',
+    type: 'outlier_treatment',
+    variables: ['income'],
+    parameters: { noSilentDeletion: true, noSilentWinsorisation: true },
+    rationale:
+      'Outlier treatment must remain an explicit reviewer action rather than generated syntax.',
+    citationKeys: ['de-waal-2011'],
+    severity: 'warning',
+    defaultAction: 'no_action',
+    isAutomatic: false,
+    requiresReview: true,
+    rendererSupport: {
+      r: { status: 'unsupported' },
+      spss18: { status: 'unsupported' },
+      stata14: { status: 'unsupported' },
+      python: { status: 'unsupported' },
+    },
+  }
+
+  plan.steps.push(unsupportedStep)
+  return plan
+}

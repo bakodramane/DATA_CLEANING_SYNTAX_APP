@@ -101,7 +101,10 @@ describe('rule engine', () => {
     expect(rendered.content).toContain('flag_age_range')
     expect(rendered.content).toContain('flag_income_outlier_tukey')
     expect(rendered.content).toContain('mice_fit <- mice(')
-    expect(rendered.unsupportedSteps.length).toBeGreaterThan(0)
+    expect(rendered.unsupportedSteps).toHaveLength(0)
+    expect(rendered.warnings.join('\n')).toContain(
+      'R audit-log support is partial',
+    )
   })
 
   it('surfaces risky and partially supported rule warnings', () => {

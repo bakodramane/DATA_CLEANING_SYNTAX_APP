@@ -1,3 +1,4 @@
+export * from './capabilities'
 export * from './python'
 export * from './r'
 export * from './spss'

@@ -158,6 +158,11 @@ Preview generated SPSS v18, Stata v14, R, and Python syntax. Syntax is heavily
 commented so analysts can see which metadata and rule rationale produced each
 step.
 
+Some renderer features are intentionally partial. The syntax preview and
+downloads include warning comments when a step is a review template or needs
+analyst adaptation. See the [Renderer Support Matrix](renderer-support-matrix.md)
+for exact support by step type and language.
+
 ### 15. Download Scripts And Reports
 
 Download generated scripts and the plain-language summary report from the Export

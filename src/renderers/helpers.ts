@@ -3,21 +3,25 @@ import type {
   CleaningStep,
   CleaningStepType,
   SurveyVariable,
-  VariableType,
   VariableValue,
+  VariableType,
 } from '../core'
+import type { TargetLanguage } from '../core/models'
+import {
+  DOCUMENTED_RENDERER_STEP_TYPES,
+  getRendererCapability,
+} from './capabilities'
 import type { UnsupportedRenderedStep } from './types'
 
-export const MVP_RENDERED_STEP_TYPES = new Set<CleaningStepType>([
-  'variable_label',
-  'value_label',
-  'missing_value_declaration',
-  'range_check',
-  'domain_check',
-  'outlier_flag',
-  'missingness_diagnosis',
-  'imputation',
-])
+export const MVP_RENDERED_STEP_TYPES = new Set<CleaningStepType>(
+  DOCUMENTED_RENDERER_STEP_TYPES.filter((stepType) =>
+    ['spss18', 'stata14', 'r', 'python'].some(
+      (language) =>
+        getRendererCapability(stepType, language as TargetLanguage).status !==
+        'unsupported',
+    ),
+  ),
+)
 
 export const IMPUTABLE_VARIABLE_TYPES = new Set<VariableType>([
   'continuous',
@@ -108,6 +112,23 @@ export function numberOrStringParameter(
   return typeof value === 'number' || typeof value === 'string'
     ? value
     : undefined
+}
+
+export function stringParameter(
+  step: CleaningStep,
+  names: string | string[],
+): string | undefined {
+  const parameterNames = Array.isArray(names) ? names : [names]
+
+  for (const name of parameterNames) {
+    const value = step.parameters[name]
+
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value.trim()
+    }
+  }
+
+  return undefined
 }
 
 export function stringArrayParameter(
@@ -202,6 +223,96 @@ export function selectsStructuralMissing(
         value.trim().toLowerCase(),
       ),
     )
+}
+
+export function conditionParameter(step: CleaningStep): string | undefined {
+  return stringParameter(step, [
+    'condition',
+    'expression',
+    'invalidCondition',
+    'checkExpression',
+    'logicalCondition',
+  ])
+}
+
+export function structuralMissingCondition(
+  step: CleaningStep,
+  variable: SurveyVariable,
+): string | undefined {
+  return (
+    conditionParameter(step) ??
+    variable.structuralMissingRules?.find((rule) => rule.condition)?.condition
+  )
+}
+
+export function skipPatternCondition(
+  step: CleaningStep,
+  variable: SurveyVariable,
+): string | undefined {
+  return (
+    conditionParameter(step) ??
+    variable.skipPatternDependencies?.find((dependency) => dependency.condition)
+      ?.condition
+  )
+}
+
+export function stepFlagName(step: CleaningStep, suffix: string): string {
+  return `flag_${step.id}_${suffix}`
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '')
+}
+
+export function duplicateFlagName(step: CleaningStep): string {
+  return stepFlagName(step, 'duplicate_id').slice(0, 48)
+}
+
+export function translateConditionExpression(
+  condition: string,
+  variables: SurveyVariable[],
+  language: TargetLanguage,
+  dataFrameName?: string,
+): string {
+  let translated = condition.trim()
+
+  if (language === 'spss18') {
+    return translated
+      .replace(/!=/g, '<>')
+      .replace(/==/g, '=')
+      .replace(/&&/g, ' AND ')
+      .replace(/\|\|/g, ' OR ')
+  }
+
+  if (language === 'r' || language === 'python') {
+    translated = translated.replace(/&&/g, ' & ').replace(/\|\|/g, ' | ')
+
+    variables
+      .map((variable) => variable.name)
+      .sort((left, right) => right.length - left.length)
+      .forEach((variableName) => {
+        const escapedName = escapeRegExp(variableName)
+        const reference =
+          language === 'r'
+            ? `${dataFrameName ?? 'data'}$${variableName}`
+            : `${dataFrameName ?? 'data'}[${JSON.stringify(variableName)}]`
+
+        translated = translated.replace(
+          new RegExp(`\\b${escapedName}\\b`, 'g'),
+          reference,
+        )
+      })
+  }
+
+  return translated
+}
+
+export function isStataExtendedMissingValue(value: VariableValue): boolean {
+  return typeof value === 'string' && /^\.[a-z]$/i.test(value.trim())
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 export function unique(values: string[]): string[] {
