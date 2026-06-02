@@ -23,13 +23,14 @@ adapt, and run in their own statistical environment.
 
 - CSV dictionary files
 - Excel `.xlsx` dictionary files
+- DDI XML Codebook metadata files
 - Pasted CSV dictionary text
 - Built-in demo household survey dictionary
 - Manual variable entry
 
 The current release focuses on metadata-driven checks, rule review, syntax
-preview, and local export. It is not a DDI XML, SPSS `.sav`, or Stata `.dta`
-metadata importer yet.
+preview, and local export. DDI XML support is an MVP Codebook importer for
+common survey metadata structures; it is not full DDI lifecycle support.
 
 ## Screenshots
 
@@ -45,8 +46,8 @@ metadata importer yet.
 
 The app is a static Progressive Web App. After one successful online load, the
 browser can cache the app shell and reopen it offline. The demo dictionary,
-pasted metadata, local CSV/XLSX uploads, rule review, Cleaning Plan generation,
-syntax previews, and downloads all run locally in the browser.
+pasted metadata, local CSV/XLSX/XML uploads, rule review, Cleaning Plan
+generation, syntax previews, and downloads all run locally in the browser.
 
 Uploaded dictionaries, generated Cleaning Plans, scripts, and reports are not
 uploaded to a server. The project has no backend service, authentication,
@@ -119,9 +120,13 @@ optional manual deployment workflow.
 
 - Generated syntax must be reviewed before production use.
 - The app generates syntax; it does not execute scripts or clean datasets.
-- DDI XML import is not implemented.
+- DDI XML import supports common DDI Codebook structures only. Users must
+  review detected variable types, roles, value labels, missing codes, valid
+  ranges, and source notes before using generated syntax.
 - SPSS `.sav` metadata import is not implemented.
 - Stata `.dta` metadata import is not implemented.
+- Full DDI lifecycle support and every DDI version or edge case are not
+  implemented.
 - Manual entry is variable-by-variable and does not yet import saved manual
   entry sessions.
 - AI-assisted interpretation, online rule-pack fetching, backend services,

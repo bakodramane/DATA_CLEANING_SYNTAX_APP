@@ -77,10 +77,10 @@ export function MetadataInputStep({
           Import pasted CSV
         </button>
         <label className="file-control">
-          <span>Upload CSV or Excel dictionary</span>
+          <span>Upload CSV, Excel, or DDI XML dictionary</span>
           <input
             type="file"
-            accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            accept=".csv,.xlsx,.xml,text/csv,application/xml,text/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             onChange={(event) => void uploadFile(event.target.files)}
           />
         </label>

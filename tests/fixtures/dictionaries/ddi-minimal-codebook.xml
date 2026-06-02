@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<codeBook>
+  <stdyDscr>
+    <citation>
+      <titlStmt>
+        <titl>Minimal household survey</titl>
+      </titlStmt>
+    </citation>
+  </stdyDscr>
+  <dataDscr>
+    <var ID="V1" name="age" type="numeric" intrvl="contin">
+      <labl xml:lang="en">Age of respondent</labl>
+      <txt>Age in completed years.</txt>
+      <valrng>
+        <range min="0" max="120" />
+      </valrng>
+    </var>
+    <var ID="V2">
+      <labl>Fallback identifier variable</labl>
+      <txt>Variable without a name attribute should use the DDI ID.</txt>
+    </var>
+  </dataDscr>
+</codeBook>

@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test'
 import { strToU8, zipSync } from 'fflate'
 import { writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 async function openMetadataStep(page: import('@playwright/test').Page) {
   await page.goto('/')
@@ -189,6 +191,43 @@ test('CSV paste and Excel upload workflows still import variables', async ({
     page.getByRole('heading', { name: 'Variable review' }),
   ).toBeVisible()
   await expect(page.getByText('sex', { exact: true })).toBeVisible()
+})
+
+test('DDI XML upload workflow reaches syntax preview', async ({ page }) => {
+  await openMetadataStep(page)
+  const fixturePath = join(
+    dirname(fileURLToPath(import.meta.url)),
+    '..',
+    'fixtures',
+    'dictionaries',
+    'ddi-household-codebook.xml',
+  )
+
+  await page.locator('input[type="file"]').setInputFiles(fixturePath)
+  await expect(
+    page.getByRole('heading', { name: 'Variable review' }),
+  ).toBeVisible()
+  await expect(page.getByText('age', { exact: true })).toBeVisible()
+  await page.getByLabel('Type for sex').selectOption('nominal')
+  await page.getByLabel('Role for household_id').selectOption('identifier')
+
+  await continueToExportFromVariables(page)
+
+  for (const language of ['SPSS v18', 'Stata v14', 'R', 'Python']) {
+    await page.getByRole('tab', { name: language }).click()
+    await expect(page.locator('.code-preview pre')).toContainText(
+      language === 'SPSS v18'
+        ? 'SPSS'
+        : language === 'Stata v14'
+          ? 'Stata'
+          : language,
+    )
+  }
+
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await expect(
+    page.getByRole('button', { name: 'Download Cleaning Plan JSON' }),
+  ).toBeVisible()
 })
 
 function createMinimalXlsx(): Buffer {

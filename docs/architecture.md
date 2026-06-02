@@ -36,11 +36,18 @@ storage, or telemetry.
 
 ### `src/importers`
 
-Dictionary importers, manual-entry conversion, value parsing, and type-detection
-helpers. The current release supports pasted CSV, uploaded CSV, uploaded Excel
-`.xlsx`, manual variable entry, and a built-in demo dictionary. Importer output
-is normalised into the core variable model while preserving source metadata
-where possible.
+Dictionary importers, manual-entry conversion, value parsing, XML parsing, and
+type-detection helpers. The current release supports pasted CSV, uploaded CSV,
+uploaded Excel `.xlsx`, uploaded DDI XML Codebook metadata, manual variable
+entry, and a built-in demo dictionary. Importer output is normalised into the
+core variable model while preserving source metadata where possible.
+
+The DDI importer is an MVP Codebook parser. It extracts common `<codeBook>`,
+`<stdyDscr>`, `<dataDscr>`, `<var>`, `<labl>`, `<txt>`, `<catgry>`,
+`<catValu>`, `<valrng>`, `<range>`, `<varFormat>`, `<universe>`, `<qstnLit>`,
+and `<varGrp>` structures without network access or external services. It keeps
+unsupported or ambiguous details in warnings and source notes so users can
+review partial metadata instead of losing it silently.
 
 ### `src/rules`
 
@@ -118,6 +125,7 @@ See [GitHub Pages Deployment](github-pages.md) for manual setup steps.
 
 ## Non-Goals In The First Release
 
-The first release does not include DDI XML import, SPSS `.sav` metadata import,
-Stata `.dta` metadata import, AI-assisted interpretation, script execution,
-backend services, authentication, telemetry, analytics, or cloud storage.
+The current release does not include full DDI lifecycle support, SPSS `.sav`
+metadata import, Stata `.dta` metadata import, AI-assisted interpretation,
+script execution, backend services, authentication, telemetry, analytics, or
+cloud storage.

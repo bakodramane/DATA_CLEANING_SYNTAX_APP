@@ -37,7 +37,30 @@ source metadata for auditability.
 Upload a local `.xlsx` dictionary when the metadata is stored in a spreadsheet.
 The app reads the workbook in the browser. The file is not uploaded to a server.
 
-### 6. Add Variables Manually
+### 6. Upload A DDI XML Codebook
+
+Upload a local `.xml` DDI Codebook file when the survey metadata is documented
+in IHSN or World Bank-style XML. The app reads the XML in the browser and does
+not upload it to a server.
+
+The MVP importer extracts common Codebook metadata: study title, variable names,
+labels, question or description text, universe notes, value labels, marked or
+conservatively inferred missing codes, valid ranges, variable groups, and DDI
+source notes. It warns when the XML is invalid, when the file does not look like
+a DDI Codebook, or when a category or variable has partial metadata.
+
+Review imported DDI variables carefully. Detected types, roles, missing codes,
+and valid ranges are metadata-derived suggestions and may need correction in
+Variable review. Missing categories marked in DDI, such as
+`<catgry missing="Y">`, are imported as declared missing codes. Labels such as
+`Don't know`, `Refused`, `Not stated`, `Not applicable`, `Missing`, and
+`No response` may be inferred as missing codes with a warning so they can be
+reviewed.
+
+This is not full DDI lifecycle support. It focuses on practical DDI Codebook
+metadata import and does not support every DDI version or edge case.
+
+### 7. Add Variables Manually
 
 Use manual variable entry when no dictionary file is available. Add each
 variable with a name, label, type, role, and optional details such as storage
@@ -65,54 +88,54 @@ where the minimum is greater than the maximum. Manual variables can be edited or
 removed from the Metadata step, and their type or role can still be corrected in
 Variable review.
 
-### 7. Review Imported Or Manual Variables
+### 8. Review Imported Or Manual Variables
 
 Review each imported variable, including name, label, detected type, detected
 role, value labels, missing codes, valid ranges, and detection notes.
 
-### 8. Correct Variable Types And Roles
+### 9. Correct Variable Types And Roles
 
 Adjust the detected type or role when needed. Corrections immediately update
 recommended rules and the generated Cleaning Plan.
 
-### 9. Review Recommended Rules
+### 10. Review Recommended Rules
 
 Recommended rules are metadata-driven checks or documentation steps. They may
 include variable labels, value labels, range checks, domain checks, missingness
 diagnosis, duplicate identifier checks, or outlier flags.
 
-### 10. Understand Blocked Rules
+### 11. Understand Blocked Rules
 
 Blocked rules are shown when a rule is not suitable for a variable. For example,
 identifier variables are protected from imputation, and survey design variables
 require specialist review before modification.
 
-### 11. Preview The Cleaning Plan
+### 12. Preview The Cleaning Plan
 
 The Cleaning Plan is a language-neutral JSON representation of the selected
 steps, variables, assumptions, warnings, citations, and renderer capability
 information. It is the audit-friendly bridge between metadata and generated
 syntax.
 
-### 12. Preview Generated Syntax
+### 13. Preview Generated Syntax
 
 Preview generated SPSS v18, Stata v14, R, and Python syntax. Syntax is heavily
 commented so analysts can see which metadata and rule rationale produced each
 step.
 
-### 13. Download Scripts And Reports
+### 14. Download Scripts And Reports
 
 Download generated scripts and the plain-language summary report from the Export
 step. Downloads are browser-generated files and are not cached as remote server
 responses.
 
-### 14. Save The Cleaning Plan JSON
+### 15. Save The Cleaning Plan JSON
 
 Save the Cleaning Plan JSON with the generated scripts. It records the selected
 rules, assumptions, warnings, citations, and renderer capability information
 used to produce the syntax.
 
-### 15. Reuse The Cleaning Plan
+### 16. Reuse The Cleaning Plan
 
 The current release exports the Cleaning Plan JSON for review and archival use.
 Future releases may add richer import or comparison workflows for saved plans.

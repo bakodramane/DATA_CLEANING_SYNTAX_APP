@@ -2,14 +2,14 @@
 
 Use this checklist before tagging a public release.
 
-Status below is for `v0.1.0`.
+Status below is for the current Phase 11 checkpoint.
 
 ## Quality Checks
 
 - [x] `npm run lint` passes.
 - [x] `npm run format` passes.
 - [x] `npm test` passes.
-- [ ] `npm run test:e2e` passes when browser-level tests are enabled.
+- [x] `npm run test:e2e` passes.
 - [x] `npm run build` passes.
 - [x] `npm audit --omit=dev` passes.
 - [x] Production build emits PWA assets, including `manifest.webmanifest` and
@@ -19,7 +19,13 @@ Status below is for `v0.1.0`.
 
 - [x] Production preview opens.
 - [x] Demo dictionary loads.
-- [ ] Manual variables can be added, edited, removed, and validated.
+- [x] CSV paste works.
+- [x] Excel upload works.
+- [x] Manual variables can be added, edited, removed, and validated.
+- [x] DDI XML upload works.
+- [x] DDI-imported variables appear in Variable review.
+- [x] Detected types and roles can be corrected.
+- [x] Rules generate from DDI-imported variables.
 - [x] Variable review works.
 - [x] Rule review works.
 - [x] Cleaning Plan preview works.
@@ -57,8 +63,9 @@ Status below is for `v0.1.0`.
 - [x] Release tag created.
 - [x] Release tag pushed.
 
-## Notes For `v0.1.0`
+## Notes For DDI XML Releases
 
-For the first release, references marked `NEEDS_VERIFICATION` are acceptable only
-if release notes clearly state that bibliographic verification remains a known
-documentation task for the next development cycle.
+DDI XML support is an MVP DDI Codebook importer. Before release, verify that
+users are told to review detected types, roles, value labels, missing codes, and
+valid ranges, and that unsupported DDI structures produce warnings or preserved
+source notes rather than silent data loss.

@@ -1,6 +1,6 @@
 # Roadmap
 
-This roadmap is a lightweight backlog for work after `v0.1.0`. It is not a
+This roadmap is a lightweight backlog for work after `v0.2.0`. It is not a
 commitment to implement every item in order.
 
 ## Methodology And Statistical Validation
@@ -14,7 +14,9 @@ commitment to implement every item in order.
 
 ## Importers
 
-- Add DDI XML import.
+- Harden DDI XML import against more real-world Codebook fixtures.
+- Explore broader DDI version and lifecycle support after the MVP Codebook
+  importer is stable.
 - Add SPSS `.sav` metadata import.
 - Add Stata `.dta` metadata import.
 - Add realistic public survey dictionary examples.

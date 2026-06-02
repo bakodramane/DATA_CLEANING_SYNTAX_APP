@@ -1,5 +1,6 @@
 export * from './columnMapping'
 export * from './csv/parseCsvDictionary'
+export * from './ddi/parseDdiXmlDictionary'
 export * from './excel/parseExcelDictionary'
 export * from './manual/createVariableFromManualEntry'
 export * from './typeDetection'

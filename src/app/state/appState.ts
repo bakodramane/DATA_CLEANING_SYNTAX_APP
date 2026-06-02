@@ -14,6 +14,7 @@ import {
 } from '../../core'
 import {
   parseCsvDictionary,
+  parseDdiXmlDictionary,
   parseExcelDictionary,
   type DictionaryImportResult,
 } from '../../importers'
@@ -102,6 +103,13 @@ export function importExcelDictionaryBytes(
   sourceName = 'uploaded Excel dictionary',
 ): DictionaryImportResult {
   return parseExcelDictionary(bytes, { sourceName })
+}
+
+export function importDdiXmlDictionaryText(
+  xmlText: string,
+  sourceName = 'uploaded DDI XML dictionary',
+): DictionaryImportResult {
+  return parseDdiXmlDictionary(xmlText, { sourceName })
 }
 
 export function updateVariableTypeRole(

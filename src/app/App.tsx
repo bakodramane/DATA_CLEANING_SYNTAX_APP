@@ -17,6 +17,7 @@ import {
   createInitialProjectMetadata,
   getRuleReviewItems,
   importCsvDictionaryText,
+  importDdiXmlDictionaryText,
   importDemoDictionary,
   importExcelDictionaryBytes,
   renderScriptsForPlan,
@@ -125,10 +126,12 @@ function App() {
 
   const importFile = async (file: File) => {
     try {
-      const isExcel = file.name.toLowerCase().endsWith('.xlsx')
-      const result = isExcel
+      const fileName = file.name.toLowerCase()
+      const result = fileName.endsWith('.xlsx')
         ? importExcelDictionaryBytes(await file.arrayBuffer(), file.name)
-        : importCsvDictionaryText(await file.text(), file.name)
+        : fileName.endsWith('.xml')
+          ? importDdiXmlDictionaryText(await file.text(), file.name)
+          : importCsvDictionaryText(await file.text(), file.name)
 
       acceptImportResult(result)
       setActiveStep('variables')

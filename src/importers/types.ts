@@ -68,6 +68,10 @@ export interface DictionaryImportWarning {
     | 'empty_dictionary'
     | 'missing_required_column'
     | 'excel_sheet_not_found'
+    | 'invalid_xml'
+    | 'non_ddi_xml'
+    | 'inferred_missing_code'
+    | 'unsupported_ddi_metadata'
   severity: 'warning' | 'error'
   message: string
   rowNumber?: number

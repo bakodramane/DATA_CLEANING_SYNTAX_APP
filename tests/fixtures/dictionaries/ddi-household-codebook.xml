@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<codeBook xmlns="ddi:codebook:2_5">
+  <stdyDscr>
+    <citation>
+      <titlStmt>
+        <titl>Household Welfare Survey 2026</titl>
+      </titlStmt>
+    </citation>
+  </stdyDscr>
+  <dataDscr>
+    <varGrp ID="demographics" var="household_id age sex">
+      <labl>Demographics</labl>
+    </varGrp>
+    <varGrp ID="economics" var="income">
+      <labl>Economic outcomes</labl>
+    </varGrp>
+    <var ID="HHID" name="household_id">
+      <labl>Household identifier</labl>
+      <txt>Unique household record identifier.</txt>
+      <varFormat type="string" />
+    </var>
+    <var ID="AGE" name="age" intrvl="contin">
+      <labl>Age of household member</labl>
+      <qstn>
+        <qstnLit>How old is this household member?</qstnLit>
+      </qstn>
+      <universe>All household members.</universe>
+      <varFormat type="numeric" />
+      <valrng>
+        <range min="0" max="120" />
+      </valrng>
+      <catgry missing="Y">
+        <catValu>-9</catValu>
+        <labl>Not stated</labl>
+      </catgry>
+    </var>
+    <var ID="SEX" name="sex">
+      <labl>Sex of household member</labl>
+      <varFormat type="numeric" />
+      <catgry>
+        <catValu>1</catValu>
+        <labl xml:lang="en">Male</labl>
+      </catgry>
+      <catgry>
+        <catValu>2</catValu>
+        <labl xml:lang="en">Female</labl>
+      </catgry>
+      <catgry missing="Y">
+        <catValu>9</catValu>
+        <labl>No response</labl>
+      </catgry>
+    </var>
+    <var ID="INC" name="income" intrvl="contin">
+      <labl>Monthly household income</labl>
+      <txt>Total income reported by the household.</txt>
+      <varFormat type="numeric" formatname="decimal" />
+      <range min="0" />
+      <catgry>
+        <catValu>-8</catValu>
+        <labl>Don't know</labl>
+      </catgry>
+      <catgry missing="Y">
+        <catValu>-9</catValu>
+        <labl>Refused</labl>
+      </catgry>
+      <notes>Income is self-reported and may require review.</notes>
+    </var>
+  </dataDscr>
+</codeBook>
