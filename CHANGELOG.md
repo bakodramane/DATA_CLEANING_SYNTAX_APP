@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.4.1 - 2026-06-02
+
+### Added
+
+- Importer support matrix documentation.
+- Exact supported fields and known limitations by format.
+- DDI edge-case fixture covering partial Codebook metadata.
+- Regression tests for CSV, Excel, DDI, SAV, and DTA import paths.
+
+### Changed
+
+- Improved fallback warnings for `.sav` and `.dta` imports.
+- Improved CSV and Excel importer warnings for malformed or partial inputs.
+- Added DDI source metadata consistency for importer results.
+
+### Notes
+
+- No new backend, telemetry, cloud storage, authentication, script execution, or
+  observation-level profiling was added.
+
 ## v0.4.0 - 2026-06-02
 
 ### Added
