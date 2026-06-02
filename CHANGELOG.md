@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.4.0 - 2026-06-02
+
+### Added
+
+- Stata `.dta` metadata-import path.
+- SPSS `.sav` metadata-import path.
+- Conservative metadata-only parsing for supported package-file structures.
+- Local browser-only processing for SPSS and Stata package-file imports.
+- No observation-level data imported into app state.
+- Visible confidentiality warnings for SPSS and Stata files.
+- Fallback guidance for unsupported or malformed `.sav` and `.dta` files.
+- New documentation for importing SPSS and Stata metadata.
+- Unit tests and Playwright coverage for package-file import paths and safe
+  fallback handling.
+- Continued support for CSV, Excel, manual entry, and DDI XML workflows.
+- Continued offline-first PWA behavior.
+
+### Notes
+
+- No backend, telemetry, cloud storage, authentication, or script execution was
+  added.
+
 ## v0.3.0 - 2026-06-02
 
 ### Added
