@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.3.0 - 2026-06-02
+
+### Added
+
+- DDI XML Codebook-style metadata import.
+- Extraction of study title, variables, labels, text/question/universe notes,
+  categories, value labels, valid ranges, variable groups, and source metadata.
+- Explicit missing-code handling from DDI missing markers.
+- Conservative inferred missing-code detection with warnings for review.
+- Invalid XML and non-DDI warning/error handling.
+- UI support for `.xml` upload.
+- DDI-imported variables integrated into Variable Review, rule recommendations,
+  Cleaning Plan generation, syntax previews, and exports.
+- DDI importer unit tests and a Playwright DDI upload workflow test.
+- Continued offline-first behavior.
+
+### Notes
+
+- No backend, telemetry, cloud storage, authentication, or script execution was
+  added.
+
 ## v0.2.0 - 2026-06-02
 
 ### Added
