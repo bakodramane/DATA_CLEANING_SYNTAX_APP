@@ -32,19 +32,49 @@ In a supported browser:
    menu.
 3. Reopen the installed app later, including when offline.
 
+Browser install prompts vary. Some browsers show an install icon in the address
+bar; others expose installation through a menu.
+
+## What Is Cached
+
+The production service worker caches the built app shell and static assets
+emitted by Vite, including HTML, JavaScript, CSS, icons, manifest files, and
+other bundled assets needed to reopen the app.
+
+## What Is Not Cached
+
+The service worker is not designed to cache user-uploaded dictionaries,
+generated Cleaning Plans, generated scripts, or summary reports as network
+responses. Downloads are created locally in the browser from the current
+in-memory workflow.
+
 ## User Data Handling
 
 Uploaded dictionaries and generated outputs stay in the browser. The app does
 not upload user dictionaries, Cleaning Plans, generated scripts, or summary
-reports to a server. Generated downloads are created as local browser blobs and
-are not cached by the service worker as remote resources.
+reports to a server. The project has no backend, authentication, telemetry,
+analytics, cloud storage, or remote logging.
+
+## Offline Indicator Limitations
+
+The app shows an Online/Offline indicator based on the browser's online status
+events. Browser offline status can be imperfect. For example, stopping a local
+preview server may prove that the cached app shell reloads, while the browser
+still reports the device as online.
+
+## Updates
+
+The service worker is configured for safe automatic update checks. When a new
+version is deployed, the browser can download the updated app shell while online
+and use it on a later load. Users may need to refresh or reopen the installed
+app depending on browser behavior.
 
 ## Optional Online Updates
 
-Phase 7 includes only a safe placeholder for future optional template or rule
-pack updates. It does not fetch remote packs, use the GitHub API, send telemetry,
-or upload user data. When offline, the app reports that optional updates are
-unavailable while core local features continue to work.
+The current release includes only a safe placeholder for future optional
+template or rule-pack updates. It does not fetch remote packs, use the GitHub
+API, send telemetry, or upload user data. When offline, the app reports that
+optional updates are unavailable while core local features continue to work.
 
 ## Static Hosting Notes
 
@@ -64,4 +94,5 @@ npm run build
 - No AI-assisted codebook interpretation.
 - No backend, authentication, cloud storage, telemetry, or analytics.
 - No execution of generated SPSS, Stata, R, or Python scripts.
-- Browser support for install prompts varies by platform.
+- Browser support for install prompts and offline indicators varies by
+  platform.

@@ -1,49 +1,121 @@
 # Architecture
 
-The application is a local-first static Progressive Web App built with React,
-Vite, and TypeScript.
+The Survey Data Cleaning Syntax Generator is a local-first static Progressive
+Web App built with React, Vite, and TypeScript.
 
-The intended flow is:
+The application flow is:
 
 ```text
 metadata importers
         |
 variable model
         |
-Cleaning Plan builder
+rule engine
         |
-rule library
+Cleaning Plan
         |
-language-specific renderers
+renderers
         |
 SPSS / Stata / R / Python scripts
+        |
+export
 ```
 
-The Cleaning Plan is the central abstraction. The core package must not depend
-on the UI, network services, telemetry, or hosted storage.
+The Cleaning Plan is the central abstraction. It records imported variables,
+selected steps, assumptions, warnings, citations, and renderer support before
+language-specific syntax is produced.
 
-## Static PWA Shell
+## Main Modules
 
-The production build is emitted to `dist/` by Vite. Phase 7 uses
-`vite-plugin-pwa` to generate:
+### `src/core`
 
-- `manifest.webmanifest` for installability metadata;
-- `sw.js` and Workbox assets for offline app-shell caching;
-- relative static asset paths so GitHub Pages subpath deployments can be
-  supported.
+Core models and validation logic. This area defines variables, cleaning plans,
+cleaning steps, target languages, citations, capabilities, and validation
+contracts. It must not depend on React, browser APIs, network services, hosted
+storage, or telemetry.
 
-The service worker precaches the built app shell and static assets. User uploads
-and generated downloads are handled in browser memory and are not remote
-network requests, so they are not cached as server responses.
+### `src/importers`
 
-For GitHub Pages, the default Vite base is relative (`./`). If a deployment
-workflow needs an explicit base path, set `VITE_BASE_PATH` during build, for
-example:
+Dictionary importers and type-detection helpers. The current release supports
+pasted CSV, uploaded CSV, uploaded Excel `.xlsx`, and a built-in demo dictionary.
+Importer output is normalised into the core variable model while preserving
+source metadata where possible.
+
+### `src/rules`
+
+The rule engine and editable rule/citation configuration. Rules are metadata
+driven: they inspect variable type, role, labels, missing codes, valid ranges,
+and project context to recommend, block, or mark planned cleaning steps.
+
+### `src/renderers`
+
+Language-specific renderers that convert a valid Cleaning Plan into SPSS v18,
+Stata v14, R, or Python syntax. Renderers preserve step order, add comments and
+rationales, include citation keys, and surface partial or unsupported behavior.
+
+### `src/app`
+
+React UI, workflow state helpers, PWA status helpers, and download components.
+The UI orchestrates the workflow but keeps cleaning rules, importers, renderers,
+and validation outside presentation components.
+
+### PWA And Offline Support
+
+`vite-plugin-pwa` generates installability metadata, `manifest.webmanifest`,
+`sw.js`, and Workbox assets during production builds. The service worker
+precaches the built app shell and static assets. User-uploaded dictionaries and
+generated downloads are handled in browser memory and are not cached as remote
+server responses.
+
+## Design Principles
+
+### Offline-First
+
+The core workflow works without a backend. After one successful online load, the
+browser can serve the cached app shell during offline reloads.
+
+### Deterministic
+
+Given the same imported metadata, selected rules, and project settings, the app
+should produce the same Cleaning Plan structure and renderer output except for
+explicit timestamps in generated metadata.
+
+### Local-Only
+
+No user dictionary, Cleaning Plan, generated script, or summary report is
+uploaded by the app. The current release has no cloud storage, telemetry,
+analytics, authentication, remote logging, or backend service.
+
+### Metadata-Driven
+
+The app recommends checks from dictionary metadata rather than inspecting or
+modifying a dataset. Generated scripts are therefore reviewable drafts, not
+automatic data-cleaning decisions.
+
+### Open Source And Modifiable
+
+Rules, citations, renderers, and importers are separated so contributors can add
+new cleaning logic, target languages, or metadata formats without changing the
+entire application.
+
+## Static Hosting And GitHub Pages
+
+The production build is emitted to `dist/` by Vite. The default Vite base is
+relative (`./`), which is safe for static hosting and GitHub Pages subpath
+deployments.
+
+If a deployment workflow needs an explicit repository base path, set
+`VITE_BASE_PATH` during build:
 
 ```powershell
 $env:VITE_BASE_PATH='/DATA_CLEANING_SYNTAX_APP/'
 npm run build
 ```
 
-No backend, authentication, telemetry, analytics, cloud storage, or script
-execution service is part of the architecture.
+See [GitHub Pages Deployment](github-pages.md) for manual setup steps.
+
+## Non-Goals In The First Release
+
+The first release does not include DDI XML import, SPSS `.sav` metadata import,
+Stata `.dta` metadata import, AI-assisted interpretation, script execution,
+backend services, authentication, telemetry, analytics, or cloud storage.

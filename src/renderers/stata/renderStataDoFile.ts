@@ -253,7 +253,7 @@ function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
       return
     }
 
-    const message = `Outlier method "${method}" is not supported by the Phase 3 Stata renderer.`
+    const message = `Outlier method "${method}" is not supported by the current Stata renderer.`
     context.warnings.push(`Step "${step.id}": ${message}`)
     lines.push(stataComment(`WARNING: ${message}`))
   })

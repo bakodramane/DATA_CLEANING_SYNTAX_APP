@@ -274,7 +274,7 @@ function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
       return
     }
 
-    const message = `Outlier method "${method}" is not supported by the Phase 3 Python renderer.`
+    const message = `Outlier method "${method}" is not supported by the current Python renderer.`
     context.warnings.push(`Step "${step.id}": ${message}`)
     lines.push(pythonComment(`WARNING: ${message}`))
   })

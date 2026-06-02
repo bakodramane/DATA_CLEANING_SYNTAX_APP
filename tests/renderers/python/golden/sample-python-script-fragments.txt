@@ -53,4 +53,4 @@ completed_data_example = data.copy()
 ---
 # Do not treat completed_data_example as full multiple-imputation inference.
 ---
-# WARNING: Step type "structural_missing_check" is not yet supported by the Phase 3 Python renderer.
+# WARNING: Step type "structural_missing_check" is not yet supported by the current Python renderer.

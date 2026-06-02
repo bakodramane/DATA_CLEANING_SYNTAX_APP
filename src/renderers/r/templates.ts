@@ -19,7 +19,7 @@ export function renderTitleBlock(
     `# Cleaning Plan: ${plan.metadata.title}`,
     `# Cleaning Plan ID: ${plan.id}`,
     `# Cleaning Plan version: ${plan.metadata.version}`,
-    '# Version note: Phase 2 R renderer MVP; review package versions before use.',
+    '# Version note: first-release R renderer; review package versions before use.',
     '#',
     '# Assumptions:',
     ...assumptions,

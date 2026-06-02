@@ -45,7 +45,7 @@ describe('renderStataDoFile', () => {
     )
     expect(rendered.warnings).toEqual(
       expect.arrayContaining([
-        'Step "step_income_structural_missing": Step type "structural_missing_check" is not yet supported by the Phase 3 Stata v14 renderer.',
+        'Step "step_income_structural_missing": Step type "structural_missing_check" is not yet supported by the current Stata v14 renderer.',
       ]),
     )
   })

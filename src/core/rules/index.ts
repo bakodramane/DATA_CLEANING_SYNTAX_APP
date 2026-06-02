@@ -1,2 +1,2 @@
-// Phase 5 will add editable cleaning rule configuration support here.
+// Shared rule extension exports can be collected here as the rule library grows.
 export {}

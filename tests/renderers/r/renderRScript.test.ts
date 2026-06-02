@@ -23,7 +23,7 @@ function readGoldenFragments(): string[] {
 }
 
 describe('renderRScript', () => {
-  it('renders a readable R script for the Phase 2 supported core steps', () => {
+  it('renders a readable R script for the supported core steps', () => {
     const plan = createRendererTestPlan()
     const rendered = renderRScript(plan, { generatedAt: fixedGeneratedAt })
 
@@ -40,7 +40,7 @@ describe('renderRScript', () => {
     })
   })
 
-  it('records unsupported Phase 2 R renderer steps instead of failing silently', () => {
+  it('records unsupported R renderer steps instead of failing silently', () => {
     const plan = createRendererTestPlan()
     const rendered = renderRScript(plan, { generatedAt: fixedGeneratedAt })
 
@@ -53,7 +53,7 @@ describe('renderRScript', () => {
     )
     expect(rendered.warnings).toEqual(
       expect.arrayContaining([
-        'Step "step_income_structural_missing": Step type "structural_missing_check" is not yet supported by the Phase 2 R renderer.',
+        'Step "step_income_structural_missing": Step type "structural_missing_check" is not yet supported by the current R renderer.',
       ]),
     )
   })

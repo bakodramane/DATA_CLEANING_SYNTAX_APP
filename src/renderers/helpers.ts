@@ -234,6 +234,6 @@ export function createUnsupportedStep(
   return {
     id: step.id,
     type: step.type,
-    reason: `Step type "${step.type}" is not yet supported by the Phase 3 ${rendererName} renderer.`,
+    reason: `Step type "${step.type}" is not yet supported by the current ${rendererName} renderer.`,
   }
 }

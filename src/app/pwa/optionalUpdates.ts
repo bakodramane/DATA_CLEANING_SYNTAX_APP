@@ -33,7 +33,7 @@ export function getOptionalUpdateStatus(
 export async function checkForOptionalUpdates(
   isOnline = getCurrentOnlineStatus(),
 ): Promise<OptionalUpdateStatus> {
-  // Phase 7 intentionally does not fetch remote rule packs or upload user data.
+  // The first release intentionally does not fetch remote rule packs or upload user data.
   return getOptionalUpdateStatus(isOnline)
 }
 

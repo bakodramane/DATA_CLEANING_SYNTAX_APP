@@ -118,7 +118,7 @@ function renderUnsupportedStep(
   const unsupportedStep = {
     id: step.id,
     type: step.type,
-    reason: `Step type "${step.type}" is not yet supported by the Phase 2 R renderer.`,
+    reason: `Step type "${step.type}" is not yet supported by the current R renderer.`,
   } satisfies UnsupportedRenderedStep
 
   context.unsupportedSteps.push(unsupportedStep)
@@ -284,7 +284,7 @@ function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
       return
     }
 
-    const message = `Outlier method "${method}" is not supported by the Phase 2 R renderer.`
+    const message = `Outlier method "${method}" is not supported by the current R renderer.`
     context.warnings.push(`Step "${step.id}": ${message}`)
     lines.push(renderWarningComment(message))
   })
