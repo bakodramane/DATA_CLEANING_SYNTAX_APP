@@ -1,4 +1,7 @@
-import type { DictionaryImportResult } from '../../importers'
+import {
+  STATISTICAL_PACKAGE_PRIVACY_WARNING,
+  type DictionaryImportResult,
+} from '../../importers'
 import type { SurveyVariable } from '../../core'
 import type {
   ManualVariableFormValues,
@@ -77,14 +80,28 @@ export function MetadataInputStep({
           Import pasted CSV
         </button>
         <label className="file-control">
-          <span>Upload CSV, Excel, or DDI XML dictionary</span>
+          <span>
+            Upload CSV, Excel, DDI XML, Stata DTA, or SPSS SAV metadata
+          </span>
           <input
             type="file"
-            accept=".csv,.xlsx,.xml,text/csv,application/xml,text/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            accept=".csv,.xlsx,.xml,.dta,.sav,text/csv,application/xml,text/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/x-stata,application/x-spss-sav"
             onChange={(event) => void uploadFile(event.target.files)}
           />
         </label>
       </div>
+
+      <section
+        className="privacy-warning"
+        aria-label="SPSS and Stata privacy warning"
+      >
+        <h3>SPSS and Stata privacy warning</h3>
+        <p>{STATISTICAL_PACKAGE_PRIVACY_WARNING}</p>
+        <p>
+          Prefer exported metadata dictionaries when confidentiality rules
+          prohibit opening full data files.
+        </p>
+      </section>
 
       {importResult ? (
         <section className="summary-band" aria-label="Import summary">

@@ -1,6 +1,7 @@
 import type {
   DictionaryColumnConcept,
   DictionaryColumnMapping,
+  DictionaryImportSourceType,
   DictionaryImportOptions,
   DictionaryImportResult,
   DictionaryImportWarning,
@@ -27,7 +28,7 @@ export function rowsToDictionaryImportResult(
   rows: Array<Record<string, string>>,
   columnMapping: DictionaryColumnMapping,
   options: DictionaryImportOptions & {
-    sourceType: 'csv' | 'excel' | 'manual'
+    sourceType: DictionaryImportSourceType
   },
 ): DictionaryImportResult {
   const warnings: DictionaryImportWarning[] = [
@@ -157,6 +158,11 @@ export function rowsToDictionaryImportResult(
     originalRowCount: rows.length,
     importedVariableCount: variables.length,
     rows: dictionaryRows,
+    sourceType: options.sourceType,
+    sourceMetadata: {
+      sourceName: options.sourceName,
+      recordsRead: false,
+    },
   }
 }
 

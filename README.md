@@ -24,13 +24,20 @@ adapt, and run in their own statistical environment.
 - CSV dictionary files
 - Excel `.xlsx` dictionary files
 - DDI XML Codebook metadata files
+- Stata `.dta` metadata paths
+- SPSS `.sav` metadata paths
 - Pasted CSV dictionary text
 - Built-in demo household survey dictionary
 - Manual variable entry
 
 The current release focuses on metadata-driven checks, rule review, syntax
 preview, and local export. DDI XML support is an MVP Codebook importer for
-common survey metadata structures; it is not full DDI lifecycle support.
+common survey metadata structures; it is not full DDI lifecycle support. SPSS
+and Stata package-file support is metadata-only and conservative: the app tries
+to read dictionary/header metadata locally in the browser, does not import
+observation-level records into app state, and warns users to prefer exported
+CSV/Excel dictionaries when confidentiality rules prohibit opening full data
+files.
 
 ## Screenshots
 
@@ -46,12 +53,12 @@ common survey metadata structures; it is not full DDI lifecycle support.
 
 The app is a static Progressive Web App. After one successful online load, the
 browser can cache the app shell and reopen it offline. The demo dictionary,
-pasted metadata, local CSV/XLSX/XML uploads, rule review, Cleaning Plan
+pasted metadata, local CSV/XLSX/XML/DTA/SAV uploads, rule review, Cleaning Plan
 generation, syntax previews, and downloads all run locally in the browser.
 
-Uploaded dictionaries, generated Cleaning Plans, scripts, and reports are not
-uploaded to a server. The project has no backend service, authentication,
-telemetry, analytics, cloud storage, or remote logging.
+Uploaded dictionaries or package files, generated Cleaning Plans, scripts, and
+reports are not uploaded to a server. The project has no backend service,
+authentication, telemetry, analytics, cloud storage, or remote logging.
 
 ## Quick Start
 
@@ -123,10 +130,15 @@ optional manual deployment workflow.
 - DDI XML import supports common DDI Codebook structures only. Users must
   review detected variable types, roles, value labels, missing codes, valid
   ranges, and source notes before using generated syntax.
-- SPSS `.sav` metadata import is not implemented.
-- Stata `.dta` metadata import is not implemented.
+- Stata `.dta` import supports conservative metadata extraction for tagged
+  v117-v119-style files. Value-label tables and extended missing semantics may
+  require an exported dictionary.
+- SPSS `.sav` import supports classic SAV dictionary metadata, including simple
+  value labels and user-missing values where present. Unsupported records return
+  warnings and a CSV/Excel fallback message.
 - Full DDI lifecycle support and every DDI version or edge case are not
   implemented.
+- Observation-level data profiling is not implemented.
 - Manual entry is variable-by-variable and does not yet import saved manual
   entry sessions.
 - AI-assisted interpretation, online rule-pack fetching, backend services,
@@ -141,6 +153,7 @@ Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), then
 see:
 
 - [User Guide](docs/user-guide.md)
+- [Importing SPSS And Stata Metadata](docs/importing-spss-stata.md)
 - [Architecture](docs/architecture.md)
 - [Methodology](docs/methodology.md)
 - [References](docs/references.md)

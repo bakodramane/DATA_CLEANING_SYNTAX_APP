@@ -230,6 +230,44 @@ test('DDI XML upload workflow reaches syntax preview', async ({ page }) => {
   ).toBeVisible()
 })
 
+test('statistical package uploads show privacy warning and safe fallback', async ({
+  page,
+}, testInfo) => {
+  await openMetadataStep(page)
+  await expect(
+    page.getByText('SPSS and Stata files may contain confidential microdata.'),
+  ).toBeVisible()
+  await expect(
+    page.getByText(
+      'Upload CSV, Excel, DDI XML, Stata DTA, or SPSS SAV metadata',
+    ),
+  ).toBeVisible()
+
+  const dtaPath = testInfo.outputPath('unsupported.dta')
+  writeFileSync(dtaPath, Buffer.from([1, 2, 3, 4]))
+  await page.locator('input[type="file"]').setInputFiles(dtaPath)
+  await expect(
+    page.getByText(
+      'Direct metadata extraction from this file was not possible.',
+    ),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Metadata input' }),
+  ).toBeVisible()
+
+  const savPath = testInfo.outputPath('unsupported.sav')
+  writeFileSync(savPath, Buffer.from([5, 6, 7, 8]))
+  await page.locator('input[type="file"]').setInputFiles(savPath)
+  await expect(
+    page.getByText(
+      'Direct metadata extraction from this file was not possible.',
+    ),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Metadata input' }),
+  ).toBeVisible()
+})
+
 function createMinimalXlsx(): Buffer {
   const rows = [
     ['variable_name', 'variable_label', 'data_type', 'role'],

@@ -297,6 +297,7 @@ button:disabled {
 
 .mapping-list,
 .warning-list,
+.privacy-warning,
 .blocked-rules,
 .manual-entry-panel,
 .manual-variable-list,
@@ -353,8 +354,18 @@ button:disabled {
   background: #fff8ef;
 }
 
-.warning-list h3 {
+.warning-list h3,
+.privacy-warning h3 {
   color: var(--warning);
+}
+
+.privacy-warning {
+  border-color: #ddb78b;
+  background: #fff8ef;
+}
+
+.privacy-warning p {
+  margin: 10px 0 0;
 }
 
 .warning-list ul,

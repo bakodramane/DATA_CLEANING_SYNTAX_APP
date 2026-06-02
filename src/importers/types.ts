@@ -72,6 +72,12 @@ export interface DictionaryImportWarning {
     | 'non_ddi_xml'
     | 'inferred_missing_code'
     | 'unsupported_ddi_metadata'
+    | 'privacy_notice'
+    | 'unsupported_statistical_package'
+    | 'malformed_statistical_package'
+    | 'unsupported_package_metadata'
+    | 'metadata_only_fallback'
+    | 'missing_metadata_review_required'
   severity: 'warning' | 'error'
   message: string
   rowNumber?: number
@@ -93,11 +99,27 @@ export interface DictionaryImportResult {
   originalRowCount: number
   importedVariableCount: number
   rows: DictionaryRow[]
+  sourceType?: DictionaryImportSourceType
+  sourceMetadata?: Record<string, string | number | boolean | undefined>
+  privacyWarning?: ImportPrivacyWarningStatus
 }
 
 export interface DictionaryImportOptions {
   sourceName?: string
   columnMapping?: Partial<Record<DictionaryColumnConcept, string>>
+}
+
+export type DictionaryImportSourceType =
+  | 'csv'
+  | 'excel'
+  | 'manual'
+  | 'ddi'
+  | 'stata_dta'
+  | 'spss_sav'
+
+export interface ImportPrivacyWarningStatus {
+  shown: boolean
+  message: string
 }
 
 export interface ManualVariableEntry {

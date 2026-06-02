@@ -60,7 +60,41 @@ reviewed.
 This is not full DDI lifecycle support. It focuses on practical DDI Codebook
 metadata import and does not support every DDI version or edge case.
 
-### 7. Add Variables Manually
+### 7. Upload Stata Or SPSS Package Files
+
+Upload a local `.dta` or `.sav` file only when your confidentiality rules allow
+the file to be opened in the browser. SPSS and Stata files may contain full
+confidential microdata. The app processes files locally, attempts to extract
+metadata only, does not upload files, and does not add observation-level values
+to app state.
+
+Prefer exported metadata dictionaries when confidentiality rules prohibit
+opening full data files. The safe fallback workflow is to export a variable
+dictionary from Stata or SPSS, save it as CSV or Excel, and import that
+dictionary instead. See [Importing SPSS And Stata Metadata](importing-spss-stata.md)
+for support details and fallback guidance.
+
+Current Stata `.dta` support is conservative. The MVP parser reads tagged
+v117-v119-style metadata sections for variable names, variable labels, storage
+types, display formats, variable order, file label, case count, and value-label
+set names. Binary value-label tables and extended missing-value semantics may
+not be fully decoded, so the app warns users to review value labels and missing
+codes manually or import an exported dictionary.
+
+Current SPSS `.sav` support reads classic SAV dictionary records before the
+data terminator. It extracts variable names, labels, storage types, display
+formats, simple value labels, simple declared user-missing values, file label,
+case count, and variable order where available. Range-based or specialised SAV
+metadata may produce warnings and require an exported dictionary.
+
+If direct metadata extraction is not possible, the app shows this fallback
+message:
+
+```text
+Direct metadata extraction from this file was not possible. Please export the variable dictionary from SPSS/Stata to CSV or Excel and import that dictionary instead.
+```
+
+### 8. Add Variables Manually
 
 Use manual variable entry when no dictionary file is available. Add each
 variable with a name, label, type, role, and optional details such as storage
@@ -88,54 +122,54 @@ where the minimum is greater than the maximum. Manual variables can be edited or
 removed from the Metadata step, and their type or role can still be corrected in
 Variable review.
 
-### 8. Review Imported Or Manual Variables
+### 9. Review Imported Or Manual Variables
 
 Review each imported variable, including name, label, detected type, detected
 role, value labels, missing codes, valid ranges, and detection notes.
 
-### 9. Correct Variable Types And Roles
+### 10. Correct Variable Types And Roles
 
 Adjust the detected type or role when needed. Corrections immediately update
 recommended rules and the generated Cleaning Plan.
 
-### 10. Review Recommended Rules
+### 11. Review Recommended Rules
 
 Recommended rules are metadata-driven checks or documentation steps. They may
 include variable labels, value labels, range checks, domain checks, missingness
 diagnosis, duplicate identifier checks, or outlier flags.
 
-### 11. Understand Blocked Rules
+### 12. Understand Blocked Rules
 
 Blocked rules are shown when a rule is not suitable for a variable. For example,
 identifier variables are protected from imputation, and survey design variables
 require specialist review before modification.
 
-### 12. Preview The Cleaning Plan
+### 13. Preview The Cleaning Plan
 
 The Cleaning Plan is a language-neutral JSON representation of the selected
 steps, variables, assumptions, warnings, citations, and renderer capability
 information. It is the audit-friendly bridge between metadata and generated
 syntax.
 
-### 13. Preview Generated Syntax
+### 14. Preview Generated Syntax
 
 Preview generated SPSS v18, Stata v14, R, and Python syntax. Syntax is heavily
 commented so analysts can see which metadata and rule rationale produced each
 step.
 
-### 14. Download Scripts And Reports
+### 15. Download Scripts And Reports
 
 Download generated scripts and the plain-language summary report from the Export
 step. Downloads are browser-generated files and are not cached as remote server
 responses.
 
-### 15. Save The Cleaning Plan JSON
+### 16. Save The Cleaning Plan JSON
 
 Save the Cleaning Plan JSON with the generated scripts. It records the selected
 rules, assumptions, warnings, citations, and renderer capability information
 used to produce the syntax.
 
-### 16. Reuse The Cleaning Plan
+### 17. Reuse The Cleaning Plan
 
 The current release exports the Cleaning Plan JSON for review and archival use.
 Future releases may add richer import or comparison workflows for saved plans.

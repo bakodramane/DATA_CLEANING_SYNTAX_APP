@@ -20,6 +20,8 @@ import {
   importDdiXmlDictionaryText,
   importDemoDictionary,
   importExcelDictionaryBytes,
+  importSpssSavMetadataBytes,
+  importStataDtaMetadataBytes,
   renderScriptsForPlan,
   toggleSelectedRule,
   updateVariableTypeRole,
@@ -131,10 +133,16 @@ function App() {
         ? importExcelDictionaryBytes(await file.arrayBuffer(), file.name)
         : fileName.endsWith('.xml')
           ? importDdiXmlDictionaryText(await file.text(), file.name)
-          : importCsvDictionaryText(await file.text(), file.name)
+          : fileName.endsWith('.dta')
+            ? importStataDtaMetadataBytes(await file.arrayBuffer(), file.name)
+            : fileName.endsWith('.sav')
+              ? importSpssSavMetadataBytes(await file.arrayBuffer(), file.name)
+              : importCsvDictionaryText(await file.text(), file.name)
 
       acceptImportResult(result)
-      setActiveStep('variables')
+      if (result.variables.length > 0) {
+        setActiveStep('variables')
+      }
     } catch (error) {
       setImportError(readErrorMessage(error))
     }

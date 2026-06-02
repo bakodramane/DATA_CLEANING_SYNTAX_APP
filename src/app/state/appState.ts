@@ -16,6 +16,8 @@ import {
   parseCsvDictionary,
   parseDdiXmlDictionary,
   parseExcelDictionary,
+  parseSpssSavMetadata,
+  parseStataDtaMetadata,
   type DictionaryImportResult,
 } from '../../importers'
 import {
@@ -110,6 +112,20 @@ export function importDdiXmlDictionaryText(
   sourceName = 'uploaded DDI XML dictionary',
 ): DictionaryImportResult {
   return parseDdiXmlDictionary(xmlText, { sourceName })
+}
+
+export function importStataDtaMetadataBytes(
+  bytes: ArrayBuffer | Uint8Array,
+  sourceName = 'uploaded Stata DTA file',
+): DictionaryImportResult {
+  return parseStataDtaMetadata(bytes, { sourceName })
+}
+
+export function importSpssSavMetadataBytes(
+  bytes: ArrayBuffer | Uint8Array,
+  sourceName = 'uploaded SPSS SAV file',
+): DictionaryImportResult {
+  return parseSpssSavMetadata(bytes, { sourceName })
 }
 
 export function updateVariableTypeRole(

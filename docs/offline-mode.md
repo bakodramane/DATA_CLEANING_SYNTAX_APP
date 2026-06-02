@@ -10,7 +10,7 @@ without internet access:
 
 - load the built-in demo household survey dictionary;
 - paste a CSV dictionary;
-- upload a local CSV or XLSX dictionary;
+- upload a local CSV, XLSX, DDI XML, Stata DTA, or SPSS SAV metadata file;
 - review and correct variable types and roles;
 - review recommended and blocked cleaning rules;
 - generate a Cleaning Plan;
@@ -50,10 +50,10 @@ in-memory workflow.
 
 ## User Data Handling
 
-Uploaded dictionaries and generated outputs stay in the browser. The app does
-not upload user dictionaries, Cleaning Plans, generated scripts, or summary
-reports to a server. The project has no backend, authentication, telemetry,
-analytics, cloud storage, or remote logging.
+Uploaded dictionaries, package files, and generated outputs stay in the
+browser. The app does not upload user dictionaries, SPSS/Stata files, Cleaning
+Plans, generated scripts, or summary reports to a server. The project has no
+backend, authentication, telemetry, analytics, cloud storage, or remote logging.
 
 ## Offline Indicator Limitations
 
@@ -90,7 +90,11 @@ npm run build
 
 ## Limitations
 
-- No DDI XML, SPSS `.sav`, or Stata `.dta` metadata import yet.
+- SPSS `.sav` and Stata `.dta` package files may contain confidential
+  microdata; use exported metadata dictionaries when confidentiality rules
+  prohibit opening full data files.
+- SPSS/Stata direct metadata import is conservative and may return a CSV/Excel
+  dictionary fallback warning for unsupported structures.
 - No AI-assisted codebook interpretation.
 - No backend, authentication, cloud storage, telemetry, or analytics.
 - No execution of generated SPSS, Stata, R, or Python scripts.

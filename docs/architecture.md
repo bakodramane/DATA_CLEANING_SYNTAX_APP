@@ -36,11 +36,13 @@ storage, or telemetry.
 
 ### `src/importers`
 
-Dictionary importers, manual-entry conversion, value parsing, XML parsing, and
-type-detection helpers. The current release supports pasted CSV, uploaded CSV,
-uploaded Excel `.xlsx`, uploaded DDI XML Codebook metadata, manual variable
-entry, and a built-in demo dictionary. Importer output is normalised into the
-core variable model while preserving source metadata where possible.
+Dictionary importers, manual-entry conversion, value parsing, XML parsing,
+package-file metadata parsing, and type-detection helpers. The current release
+supports pasted CSV, uploaded CSV, uploaded Excel `.xlsx`, uploaded DDI XML
+Codebook metadata, conservative Stata `.dta` metadata paths, SPSS `.sav`
+dictionary metadata paths, manual variable entry, and a built-in demo
+dictionary. Importer output is normalised into the core variable model while
+preserving source metadata where possible.
 
 The DDI importer is an MVP Codebook parser. It extracts common `<codeBook>`,
 `<stdyDscr>`, `<dataDscr>`, `<var>`, `<labl>`, `<txt>`, `<catgry>`,
@@ -48,6 +50,15 @@ The DDI importer is an MVP Codebook parser. It extracts common `<codeBook>`,
 and `<varGrp>` structures without network access or external services. It keeps
 unsupported or ambiguous details in warnings and source notes so users can
 review partial metadata instead of losing it silently.
+
+The statistical package importers are metadata-only and browser-safe by design.
+They do not add a parser dependency, do not call a backend, and do not import
+observation-level records into app state. The Stata importer reads tagged
+v117-v119-style metadata sections where feasible and warns for unsupported
+value-label table or extended-missing semantics. The SPSS importer reads classic
+SAV dictionary records before the data terminator, including simple value labels
+and user-missing values where available. Unsupported or malformed files return a
+clear CSV/Excel dictionary fallback warning.
 
 ### `src/rules`
 
@@ -95,6 +106,12 @@ No user dictionary, Cleaning Plan, generated script, or summary report is
 uploaded by the app. The current release has no cloud storage, telemetry,
 analytics, authentication, remote logging, or backend service.
 
+Package-file import follows the same local-only rule. SPSS `.sav` and Stata
+`.dta` uploads may contain confidential microdata, so importers must avoid
+observation-level profiling, persistence of source data, network transfer, and
+telemetry. Exported metadata dictionaries remain the recommended path when
+organisational rules prohibit opening full data files.
+
 ### Metadata-Driven
 
 The app recommends checks from dictionary metadata rather than inspecting or
@@ -125,7 +142,6 @@ See [GitHub Pages Deployment](github-pages.md) for manual setup steps.
 
 ## Non-Goals In The First Release
 
-The current release does not include full DDI lifecycle support, SPSS `.sav`
-metadata import, Stata `.dta` metadata import, AI-assisted interpretation,
-script execution, backend services, authentication, telemetry, analytics, or
-cloud storage.
+The current release does not include full DDI lifecycle support,
+observation-level data profiling, AI-assisted interpretation, script execution,
+backend services, authentication, telemetry, analytics, or cloud storage.

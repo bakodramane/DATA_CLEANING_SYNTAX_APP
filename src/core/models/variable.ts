@@ -74,7 +74,16 @@ export interface SkipPatternDependency {
 
 export interface SourceMetadata {
   sourceName?: string
-  sourceType?: 'manual' | 'csv' | 'excel' | 'ddi' | 'stata' | 'spss' | 'other'
+  sourceType?:
+    | 'manual'
+    | 'csv'
+    | 'excel'
+    | 'ddi'
+    | 'stata'
+    | 'stata_dta'
+    | 'spss'
+    | 'spss_sav'
+    | 'other'
   columnName?: string
   originalType?: string
   rowNumber?: number
