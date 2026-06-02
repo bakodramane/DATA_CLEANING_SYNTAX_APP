@@ -25,8 +25,9 @@ adapt, and run in their own statistical environment.
 - Excel `.xlsx` dictionary files
 - Pasted CSV dictionary text
 - Built-in demo household survey dictionary
+- Manual variable entry
 
-The first release focuses on metadata-driven checks, rule review, syntax
+The current release focuses on metadata-driven checks, rule review, syntax
 preview, and local export. It is not a DDI XML, SPSS `.sav`, or Stata `.dta`
 metadata importer yet.
 
@@ -71,6 +72,12 @@ Run tests:
 npm test
 ```
 
+Run browser-level workflow tests:
+
+```powershell
+npm run test:e2e
+```
+
 Build the production app:
 
 ```powershell
@@ -89,6 +96,7 @@ Recommended release checks:
 npm run lint
 npm run format
 npm test
+npm run test:e2e
 npm run build
 npm audit --omit=dev
 ```
@@ -114,7 +122,8 @@ optional manual deployment workflow.
 - DDI XML import is not implemented.
 - SPSS `.sav` metadata import is not implemented.
 - Stata `.dta` metadata import is not implemented.
-- Full manual-entry UI is not implemented.
+- Manual entry is variable-by-variable and does not yet import saved manual
+  entry sessions.
 - AI-assisted interpretation, online rule-pack fetching, backend services,
   authentication, telemetry, analytics, and cloud storage are not implemented.
 - Some renderer support is partial for advanced imputation and specialist rule

@@ -1,0 +1,6 @@
+.gitignore
+.prettierignore
+dist
+node_modules
+playwright-report
+test-results

@@ -1,23 +1,38 @@
 import type { DictionaryImportResult } from '../../importers'
+import type { SurveyVariable } from '../../core'
+import type {
+  ManualVariableFormValues,
+  ManualVariableSaveResult,
+} from '../state/manualEntry'
 import { HelpText } from './HelpText'
+import { ManualVariableEntry } from './ManualVariableEntry'
 import { WarningList } from './WarningList'
 
 interface MetadataInputStepProps {
   csvText: string
   importResult?: DictionaryImportResult
+  variables: SurveyVariable[]
   onCsvTextChange: (value: string) => void
   onImportCsv: () => void
   onLoadDemo: () => void
   onImportFile: (file: File) => Promise<void>
+  onSaveManualVariable: (
+    formValues: ManualVariableFormValues,
+    editingName?: string,
+  ) => ManualVariableSaveResult
+  onRemoveManualVariable: (variableName: string) => void
 }
 
 export function MetadataInputStep({
   csvText,
   importResult,
+  variables,
   onCsvTextChange,
   onImportCsv,
   onLoadDemo,
   onImportFile,
+  onSaveManualVariable,
+  onRemoveManualVariable,
 }: MetadataInputStepProps) {
   const uploadFile = async (fileList: FileList | null) => {
     const file = fileList?.[0]
@@ -111,6 +126,12 @@ export function MetadataInputStep({
       ) : null}
 
       <WarningList title="Import warnings" messages={warningMessages} />
+
+      <ManualVariableEntry
+        variables={variables}
+        onSaveVariable={onSaveManualVariable}
+        onRemoveVariable={onRemoveManualVariable}
+      />
     </div>
   )
 }

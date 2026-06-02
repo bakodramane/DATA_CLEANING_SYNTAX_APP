@@ -35,6 +35,9 @@ describe('createVariableFromManualEntry', () => {
       { value: 99, label: 'Refused', category: 'refusal' },
     ])
     expect(result.variable.sourceMetadata?.sourceType).toBe('manual')
+    expect(result.variable.sourceMetadata?.notes?.join(' ')).toContain(
+      'Manual value labels',
+    )
   })
 
   it('reports malformed manual value-label text', () => {

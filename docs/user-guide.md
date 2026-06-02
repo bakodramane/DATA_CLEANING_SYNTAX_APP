@@ -37,54 +37,82 @@ source metadata for auditability.
 Upload a local `.xlsx` dictionary when the metadata is stored in a spreadsheet.
 The app reads the workbook in the browser. The file is not uploaded to a server.
 
-### 6. Review Imported Variables
+### 6. Add Variables Manually
+
+Use manual variable entry when no dictionary file is available. Add each
+variable with a name, label, type, role, and optional details such as storage
+type, value labels, missing-value codes, valid range, allowed values,
+skip-pattern note, and user notes.
+
+Value labels can be typed in common formats:
+
+```text
+1=Male; 2=Female
+1: Male, 2: Female
+1 Male | 2 Female
+```
+
+Missing codes can be typed as labels or simple lists:
+
+```text
+-8=Don't know; -9=Refused
+-8, -9
+```
+
+The app validates manual entries before adding them. It reports missing names,
+invalid names, duplicate names, missing types, malformed label text, and ranges
+where the minimum is greater than the maximum. Manual variables can be edited or
+removed from the Metadata step, and their type or role can still be corrected in
+Variable review.
+
+### 7. Review Imported Or Manual Variables
 
 Review each imported variable, including name, label, detected type, detected
 role, value labels, missing codes, valid ranges, and detection notes.
 
-### 7. Correct Variable Types And Roles
+### 8. Correct Variable Types And Roles
 
 Adjust the detected type or role when needed. Corrections immediately update
 recommended rules and the generated Cleaning Plan.
 
-### 8. Review Recommended Rules
+### 9. Review Recommended Rules
 
 Recommended rules are metadata-driven checks or documentation steps. They may
 include variable labels, value labels, range checks, domain checks, missingness
 diagnosis, duplicate identifier checks, or outlier flags.
 
-### 9. Understand Blocked Rules
+### 10. Understand Blocked Rules
 
 Blocked rules are shown when a rule is not suitable for a variable. For example,
 identifier variables are protected from imputation, and survey design variables
 require specialist review before modification.
 
-### 10. Preview The Cleaning Plan
+### 11. Preview The Cleaning Plan
 
 The Cleaning Plan is a language-neutral JSON representation of the selected
 steps, variables, assumptions, warnings, citations, and renderer capability
 information. It is the audit-friendly bridge between metadata and generated
 syntax.
 
-### 11. Preview Generated Syntax
+### 12. Preview Generated Syntax
 
 Preview generated SPSS v18, Stata v14, R, and Python syntax. Syntax is heavily
 commented so analysts can see which metadata and rule rationale produced each
 step.
 
-### 12. Download Scripts And Reports
+### 13. Download Scripts And Reports
 
 Download generated scripts and the plain-language summary report from the Export
 step. Downloads are browser-generated files and are not cached as remote server
 responses.
 
-### 13. Save The Cleaning Plan JSON
+### 14. Save The Cleaning Plan JSON
 
 Save the Cleaning Plan JSON with the generated scripts. It records the selected
 rules, assumptions, warnings, citations, and renderer capability information
 used to produce the syntax.
 
-### 14. Reuse The Cleaning Plan
+### 15. Reuse The Cleaning Plan
 
 The current release exports the Cleaning Plan JSON for review and archival use.
 Future releases may add richer import or comparison workflows for saved plans.

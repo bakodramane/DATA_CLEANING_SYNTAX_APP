@@ -36,10 +36,11 @@ storage, or telemetry.
 
 ### `src/importers`
 
-Dictionary importers and type-detection helpers. The current release supports
-pasted CSV, uploaded CSV, uploaded Excel `.xlsx`, and a built-in demo dictionary.
-Importer output is normalised into the core variable model while preserving
-source metadata where possible.
+Dictionary importers, manual-entry conversion, value parsing, and type-detection
+helpers. The current release supports pasted CSV, uploaded CSV, uploaded Excel
+`.xlsx`, manual variable entry, and a built-in demo dictionary. Importer output
+is normalised into the core variable model while preserving source metadata
+where possible.
 
 ### `src/rules`
 
@@ -55,9 +56,10 @@ rationales, include citation keys, and surface partial or unsupported behavior.
 
 ### `src/app`
 
-React UI, workflow state helpers, PWA status helpers, and download components.
-The UI orchestrates the workflow but keeps cleaning rules, importers, renderers,
-and validation outside presentation components.
+React UI, workflow state helpers, manual-entry validation helpers, PWA status
+helpers, and download components. The UI orchestrates the workflow but keeps
+cleaning rules, importers, renderers, and validation outside presentation
+components.
 
 ### PWA And Offline Support
 

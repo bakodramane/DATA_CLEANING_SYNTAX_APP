@@ -9,6 +9,7 @@ Status below is for `v0.1.0`.
 - [x] `npm run lint` passes.
 - [x] `npm run format` passes.
 - [x] `npm test` passes.
+- [ ] `npm run test:e2e` passes when browser-level tests are enabled.
 - [x] `npm run build` passes.
 - [x] `npm audit --omit=dev` passes.
 - [x] Production build emits PWA assets, including `manifest.webmanifest` and
@@ -18,6 +19,7 @@ Status below is for `v0.1.0`.
 
 - [x] Production preview opens.
 - [x] Demo dictionary loads.
+- [ ] Manual variables can be added, edited, removed, and validated.
 - [x] Variable review works.
 - [x] Rule review works.
 - [x] Cleaning Plan preview works.

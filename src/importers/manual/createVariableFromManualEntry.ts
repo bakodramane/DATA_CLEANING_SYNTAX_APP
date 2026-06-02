@@ -86,6 +86,7 @@ export function createVariableFromManualEntry(
       notes: [
         `Detected type: ${typeDetection.value} (${typeDetection.confidence}) - ${typeDetection.reason}`,
         `Detected role: ${roleDetection.value} (${roleDetection.confidence}) - ${roleDetection.reason}`,
+        ...manualSourceNotes(entry),
       ],
     },
     userNotes: entry.notes,
@@ -118,4 +119,13 @@ function coerceRole(
   return typeof declaredRole === 'string' && isVariableRole(declaredRole)
     ? declaredRole
     : fallbackRole
+}
+
+function manualSourceNotes(entry: ManualVariableEntry): string[] {
+  return [
+    entry.valueLabels ? `Manual value labels: ${entry.valueLabels}` : '',
+    entry.missingCodes ? `Manual missing codes: ${entry.missingCodes}` : '',
+    entry.allowedValues ? `Manual allowed values: ${entry.allowedValues}` : '',
+    entry.skipPattern ? `Manual skip-pattern note: ${entry.skipPattern}` : '',
+  ].filter(Boolean)
 }

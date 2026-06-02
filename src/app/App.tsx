@@ -26,6 +26,11 @@ import {
   workflowSteps,
 } from './state/appState'
 import type {
+  ManualVariableFormValues,
+  ManualVariableSaveResult,
+} from './state/manualEntry'
+import { removeManualVariable, saveManualVariable } from './state/manualEntry'
+import type {
   ImportState,
   ProjectMetadata,
   WorkflowStepId,
@@ -142,6 +147,42 @@ function App() {
     setSelectedRuleIds(createDefaultSelectedRuleIds(nextVariables, context))
   }
 
+  const saveManualVariableInWorkflow = (
+    formValues: ManualVariableFormValues,
+    editingName?: string,
+  ): ManualVariableSaveResult => {
+    const result = saveManualVariable(variables, formValues, editingName)
+
+    if (result.messages.length === 0) {
+      setVariables(result.variables)
+      setSelectedRuleIds(
+        createDefaultSelectedRuleIds(result.variables, context),
+      )
+      setImportError('')
+    }
+
+    return result
+  }
+
+  const removeManualVariableFromWorkflow = (variableName: string) => {
+    const nextVariables = removeManualVariable(variables, variableName)
+
+    setVariables(nextVariables)
+    setSelectedRuleIds(createDefaultSelectedRuleIds(nextVariables, context))
+    setImportError('')
+  }
+
+  const continueWorkflow = () => {
+    if (activeStep === 'metadata' && variables.length === 0) {
+      setImportError(
+        'Add, import, or load at least one variable before continuing.',
+      )
+      return
+    }
+
+    setActiveStep(nextStep(activeStep))
+  }
+
   const body = renderStepContent(activeStep, {
     project,
     setProject,
@@ -153,6 +194,8 @@ function App() {
     importError,
     variables,
     correctVariable,
+    saveManualVariable: saveManualVariableInWorkflow,
+    removeManualVariable: removeManualVariableFromWorkflow,
     ruleReviews,
     selectedRuleIds,
     setSelectedRuleIds,
@@ -182,7 +225,7 @@ function App() {
         <button
           className="primary-button"
           type="button"
-          onClick={() => setActiveStep(nextStep(activeStep))}
+          onClick={continueWorkflow}
           disabled={activeStep === 'export'}
         >
           Continue
@@ -206,6 +249,11 @@ interface RenderStepArgs {
     variableName: string,
     patch: Partial<Pick<SurveyVariable, 'type' | 'role'>>,
   ) => void
+  saveManualVariable: (
+    formValues: ManualVariableFormValues,
+    editingName?: string,
+  ) => ManualVariableSaveResult
+  removeManualVariable: (variableName: string) => void
   ruleReviews: ReturnType<typeof getRuleReviewItems>
   selectedRuleIds: Record<string, string[]>
   setSelectedRuleIds: Dispatch<SetStateAction<Record<string, string[]>>>
@@ -229,12 +277,15 @@ function renderStepContent(step: WorkflowStepId, args: RenderStepArgs) {
           <MetadataInputStep
             csvText={args.importState.csvText}
             importResult={args.importState.result}
+            variables={args.variables}
             onCsvTextChange={(csvText) =>
               args.setImportState((current) => ({ ...current, csvText }))
             }
             onImportCsv={args.importPastedCsv}
             onImportFile={args.importFile}
             onLoadDemo={args.loadDemo}
+            onSaveManualVariable={args.saveManualVariable}
+            onRemoveManualVariable={args.removeManualVariable}
           />
           <WarningList
             title="Import error"

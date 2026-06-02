@@ -43,20 +43,31 @@ export function parseMissingCodes(
     return { values: [], warnings: [] }
   }
 
-  return parseLabelEntries(text, 'malformed_missing_code', context).reduce<
-    ParsedValueList<DeclaredMissingCode>
-  >(
+  return splitEntries(text).reduce<ParsedValueList<DeclaredMissingCode>>(
     (result, entry) => {
-      if ('warning' in entry) {
-        result.warnings.push(entry.warning)
+      const labelledEntry = parseLabelEntry(
+        entry,
+        'malformed_missing_code',
+        context,
+      )
+
+      if ('value' in labelledEntry) {
+        result.values.push({
+          value: labelledEntry.value.value,
+          label: labelledEntry.value.label,
+          category: inferMissingCategory(labelledEntry.value.label),
+        })
         return result
       }
 
-      result.values.push({
-        value: entry.value.value,
-        label: entry.value.label,
-        category: inferMissingCategory(entry.value.label),
-      })
+      const bareValue = parseBareMissingCode(entry, context)
+
+      if ('warning' in bareValue) {
+        result.warnings.push(bareValue.warning)
+        return result
+      }
+
+      result.values.push(bareValue.value)
       return result
     },
     { values: [], warnings: [] },
@@ -84,28 +95,64 @@ function parseLabelEntries(
   warningCode: 'malformed_value_label' | 'malformed_missing_code',
   context: { rowNumber?: number; columnName?: string },
 ): Array<{ value: ValueLabel } | { warning: DictionaryImportWarning }> {
-  return splitEntries(text).map((entry) => {
-    const match = entry.match(/^\s*([^:=\s]+)\s*(?:=|:|\s+)\s*(.+?)\s*$/)
+  return splitEntries(text).map((entry) =>
+    parseLabelEntry(entry, warningCode, context),
+  )
+}
 
-    if (!match) {
-      return {
-        warning: {
-          code: warningCode,
-          severity: 'warning',
-          message: `Could not parse label entry "${entry}". Original text was preserved in source metadata.`,
-          rowNumber: context.rowNumber,
-          columnName: context.columnName,
-        },
-      }
-    }
+function parseLabelEntry(
+  entry: string,
+  warningCode: 'malformed_value_label' | 'malformed_missing_code',
+  context: { rowNumber?: number; columnName?: string },
+): { value: ValueLabel } | { warning: DictionaryImportWarning } {
+  const match = entry.match(/^\s*([^:=\s]+)\s*(?:=|:|\s+)\s*(.+?)\s*$/)
 
+  if (!match) {
     return {
-      value: {
-        value: parseValueToken(match[1]),
-        label: match[2].trim(),
+      warning: {
+        code: warningCode,
+        severity: 'warning',
+        message: `Could not parse label entry "${entry}". Original text was preserved in source metadata.`,
+        rowNumber: context.rowNumber,
+        columnName: context.columnName,
       },
     }
-  })
+  }
+
+  return {
+    value: {
+      value: parseValueToken(match[1]),
+      label: match[2].trim(),
+    },
+  }
+}
+
+function parseBareMissingCode(
+  entry: string,
+  context: { rowNumber?: number; columnName?: string },
+): { value: DeclaredMissingCode } | { warning: DictionaryImportWarning } {
+  const value = parseValueToken(entry)
+
+  if (value === '') {
+    return {
+      warning: {
+        code: 'malformed_missing_code',
+        severity: 'warning',
+        message: `Could not parse missing-code entry "${entry}". Original text was preserved in source metadata.`,
+        rowNumber: context.rowNumber,
+        columnName: context.columnName,
+      },
+    }
+  }
+
+  const label = String(value)
+  return {
+    value: {
+      value,
+      label,
+      category: inferMissingCategory(label),
+    },
+  }
 }
 
 function splitEntries(text: string): string[] {

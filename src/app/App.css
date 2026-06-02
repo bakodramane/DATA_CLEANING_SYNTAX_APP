@@ -298,10 +298,33 @@ button:disabled {
 .mapping-list,
 .warning-list,
 .blocked-rules,
+.manual-entry-panel,
+.manual-variable-list,
 .script-meta {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 16px;
+}
+
+.manual-entry-panel,
+.manual-variable-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.manual-variable-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.manual-variable-row:first-of-type {
+  border-top: 0;
+  padding-top: 0;
 }
 
 .mapping-list dl {
@@ -546,6 +569,7 @@ th {
   .topbar,
   .brand-lockup,
   .download-row,
+  .manual-variable-row,
   .rule-group-heading {
     align-items: flex-start;
     flex-direction: column;

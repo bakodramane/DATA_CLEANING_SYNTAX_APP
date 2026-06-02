@@ -29,7 +29,7 @@ commitment to implement every item in order.
 
 ## UI Improvements
 
-- Add a full manual variable-entry UI.
+- Refine manual variable-entry ergonomics and saved-session support.
 - Improve import mapping review before accepting metadata.
 - Add clearer warnings for partial renderer support.
 - Explore multilingual UI support after the core workflow stabilises.
@@ -49,7 +49,7 @@ commitment to implement every item in order.
 
 ## Testing And Quality Assurance
 
-- Add browser-level UI smoke tests.
+- Expand browser-level UI smoke tests.
 - Add full-file renderer golden tests.
 - Add accessibility checks for the wizard workflow.
 - Add deployment smoke checks for GitHub Pages once enabled.

@@ -31,6 +31,16 @@ describe('dictionary value parsing', () => {
     ])
   })
 
+  it('parses bare declared missing-code lists', () => {
+    const result = parseMissingCodes('-8, -9')
+
+    expect(result.warnings).toHaveLength(0)
+    expect(result.values).toEqual([
+      { value: -8, label: '-8', category: 'other' },
+      { value: -9, label: '-9', category: 'other' },
+    ])
+  })
+
   it('reports malformed label entries without dropping the warning context', () => {
     const result = parseValueLabels('1=Valid; malformed', {
       rowNumber: 4,
