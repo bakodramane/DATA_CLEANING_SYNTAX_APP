@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.2.0 - 2026-06-02
+
+### Added
+
+- Full manual variable-entry UI for building a dictionary without uploading a
+  file.
+- Manual add, edit, and remove workflow for manually entered variables.
+- Validation feedback for manual entries, including required names, duplicate
+  names, required types, malformed label text, and invalid ranges.
+- Manual-variable integration with rule recommendations, Cleaning Plan
+  generation, syntax preview, and exports.
+- Playwright browser-level workflow tests.
+- Browser test coverage for the demo workflow, manual-entry workflow, validation
+  workflow, CSV paste, and Excel upload.
+
+### Notes
+
+- No backend, telemetry, cloud storage, authentication, or script execution was
+  added.
+
 ## v0.1.1 - 2026-06-02
 
 ### Changed
