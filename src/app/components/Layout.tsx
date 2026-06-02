@@ -30,7 +30,7 @@ export function Layout({
             <h1>Cleaning Syntax Generator</h1>
           </div>
         </div>
-        <span className="status-pill">Phase 6 wizard</span>
+        <span className="status-pill">Offline-first PWA</span>
       </header>
 
       <Stepper

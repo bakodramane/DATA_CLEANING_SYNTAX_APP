@@ -1,2 +1,2 @@
-// Phase 6 will collect reusable wizard UI components here.
+// Reusable wizard UI components can be collected here as the app grows.
 export {}
