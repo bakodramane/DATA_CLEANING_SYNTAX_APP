@@ -75,6 +75,13 @@ treats imputation as review-required. Some renderers provide partial syntax for
 common approaches, but generated imputation code must be checked by a qualified
 analyst before production use.
 
+Renderer support differs by target language. R and Stata examples are closer to
+standard multiple-imputation workflows, but still need analyst review. SPSS
+syntax may require licensed functionality. Python output uses practical
+single-workflow examples, such as scikit-learn imputation templates, and must
+not be treated as full Rubin-style multiple-imputation inference or pooled
+analysis.
+
 ## Why Flagging Is The Default
 
 Deleting or changing values without review can damage survey estimates and hide
@@ -88,3 +95,11 @@ missing values are protected because they can represent valid questionnaire
 routing. Survey design variables, including weights, strata, and primary
 sampling units, are protected because they affect design-based inference and
 require specialist review before modification.
+
+## Renderer Limitations
+
+SPSS, Stata, R, and Python renderers include warnings when a Cleaning Plan step
+is unsupported or only partially supported. Unsupported steps are documented in
+comments rather than silently skipped. Generated scripts are intended as
+transparent review drafts, not as certification that a method is statistically
+appropriate for a particular survey.

@@ -4,123 +4,156 @@ This document lists the citation keys used by the rule library and generated
 syntax. Citation keys must stay consistent with
 `src/rules/config/default-citations.json`.
 
-Several entries still need bibliographic verification before a production or
-institutional release. Those entries are marked `NEEDS_VERIFICATION` rather than
-filled with uncertain details.
+Phase 9 verified the rule-library citation keys against authoritative or
+near-authoritative sources where feasible. Remaining uncertain details are
+marked `NEEDS_VERIFICATION` instead of being guessed.
 
 ## Rule-Library Citation Keys
 
+All citation keys below are used by rules in `src/rules/config/default-rules.json`.
+No configured rule-library citation keys are currently unused.
+
 ### `UNECE_GSDEM`
 
-UNECE. Generic Statistical Data Editing Model.
+United Nations Economic Commission for Europe. (2019). _Generic Statistical Data
+Editing Model (GSDEM), Version 2.0_.
 
-Status: `NEEDS_VERIFICATION` for exact publication year, edition, and URL.
+Verified source: <https://unece.org/statistics/documents/2019/06/gsdem-v20>
 
 Used for: statistical editing framework, audit logging, summary reporting, and
 survey design variable review.
 
 ### `DE_WAAL_2011`
 
-De Waal, Pannekoek and Scholtus. Handbook of Statistical Data Editing and
-Imputation. 2011.
+de Waal, T., Pannekoek, J., & Scholtus, S. (2011). _Handbook of Statistical Data
+Editing and Imputation_. Wiley Handbooks in Survey Methodology. John Wiley &
+Sons.
 
-Status: `NEEDS_VERIFICATION` for publisher and full bibliographic details.
+Verified source:
+<https://www.wiley-vch.de/en/areas-interest/mathematics-statistics/handbook-of-statistical-data-editing-and-imputation-978-0-470-54280-4>
 
 Used for: range checks, domain checks, missing-code treatment, duplicate
 identifier review, outlier treatment cautions, and imputation cautions.
 
 ### `FELLEGI_HOLT_1976`
 
-Fellegi and Holt. A Systematic Approach to Automatic Edit and Imputation. 1976.
+Fellegi, I. P., & Holt, D. (1976). A systematic approach to automatic edit and
+imputation. _Journal of the American Statistical Association_, 71(353), 17-35.
+<https://doi.org/10.1080/01621459.1976.10481472>
 
-Status: `NEEDS_VERIFICATION` for journal issue, pages, and full bibliographic
-details.
+Verified source:
+<https://www.tandfonline.com/doi/abs/10.1080/01621459.1976.10481472>
 
 Used for: edit and imputation principles, especially consistency checks.
 
 ### `TUKEY_1977`
 
-Tukey. Exploratory Data Analysis. 1977.
+Tukey, J. W. (1977). _Exploratory Data Analysis_. Reading, Massachusetts:
+Addison-Wesley Publishing Company.
 
-Status: `NEEDS_VERIFICATION` for publisher and edition details.
+Verified source: <https://search.worldcat.org/title/03058187>
 
 Used for: Tukey boxplot outlier flagging.
 
 ### `ROUSSEEUW_CROUX_1993`
 
-Rousseeuw and Croux. Alternatives to the Median Absolute Deviation. 1993.
+Rousseeuw, P. J., & Croux, C. (1993). Alternatives to the median absolute
+deviation. _Journal of the American Statistical Association_, 88(424),
+1273-1283. <https://doi.org/10.1080/01621459.1993.10476408>
 
-Status: `NEEDS_VERIFICATION` for journal issue, pages, and full bibliographic
-details.
+Verified source:
+<https://www.tandfonline.com/doi/abs/10.1080/01621459.1993.10476408>
 
 Used for: median absolute deviation based robust outlier flagging.
 
 ### `HUBERT_VANDERVIEREN_2008`
 
-Hubert and Vandervieren. An Adjusted Boxplot for Skewed Distributions. 2008.
+Hubert, M., & Vandervieren, E. (2008). An adjusted boxplot for skewed
+distributions. _Computational Statistics & Data Analysis_, 52(12), 5186-5201.
+<https://doi.org/10.1016/j.csda.2007.11.008>
 
-Status: `NEEDS_VERIFICATION` for journal issue, pages, and full bibliographic
-details.
+Verification status: DOI, journal, volume, issue, and page range were
+cross-checked from indexed package/documentation references. The primary article
+landing page remains `NEEDS_VERIFICATION` before institutional release.
 
 Used for: planned adjusted boxplot outlier methods for skewed distributions.
 
 ### `HIDIROGLOU_BERTHELOT_1986`
 
-Hidiroglou and Berthelot. Statistical Editing and Imputation for Periodic
-Business Surveys. 1986.
+Hidiroglou, M., & Berthelot, J.-M. (1986). Statistical editing and imputation for
+periodic business surveys. _Survey Methodology_, issue 1986001.
 
-Status: `NEEDS_VERIFICATION` for publication venue and full bibliographic
-details.
+Verified source:
+<https://www150.statcan.gc.ca/n1/en/catalogue/12-001-X198600114442>
 
 Used for: planned business-survey outlier methods requiring specialist review.
 
 ### `RUBIN_1987`
 
-Rubin. Multiple Imputation for Nonresponse in Surveys. 1987.
+Rubin, D. B. (1987). _Multiple Imputation for Nonresponse in Surveys_. Wiley
+Series in Probability and Statistics. <https://doi.org/10.1002/9780470316696>
 
-Status: `NEEDS_VERIFICATION` for publisher and full bibliographic details.
+Verified sources:
+<https://www.wiley-vch.de/en/areas-interest/mathematics-statistics/statistics-16st/survey-research-methods-sampling-16st6/multiple-imputation-for-nonresponse-in-surveys-978-0-471-65574-9>
+and <https://cir.nii.ac.jp/crid/1363388844209853184>
 
 Used for: multiple imputation rationale.
 
 ### `LITTLE_RUBIN_2019`
 
-Little and Rubin. Statistical Analysis with Missing Data. 2019.
+Little, R. J. A., & Rubin, D. B. (2019). _Statistical Analysis with Missing
+Data_ (3rd ed.). Wiley Series in Probability and Statistics.
+<https://doi.org/10.1002/9781119482260>
 
-Status: `NEEDS_VERIFICATION` for edition, publisher, and full bibliographic
-details.
+Verified sources:
+<https://www.wiley-vch.de/en/areas-interest/mathematics-statistics/statistical-analysis-with-missing-data-978-0-470-52679-8>
+and <https://cir.nii.ac.jp/crid/1360855569986150528>
 
 Used for: missingness diagnosis, imputation cautions, and simple fill warnings.
 
 ### `VAN_BUUREN_2018`
 
-Van Buuren. Flexible Imputation of Missing Data. 2018.
+van Buuren, S. (2018). _Flexible Imputation of Missing Data_ (2nd ed.). Chapman
+& Hall/CRC. <https://doi.org/10.1201/9780429492259>
 
-Status: `NEEDS_VERIFICATION` for edition, publisher, and full bibliographic
-details.
+Verified source:
+<https://www.routledge.com/Flexible-Imputation-of-Missing-Data-Second-Edition/vanBuuren/p/book/9780429492259>
 
 Used for: MICE-style imputation rationale.
 
 ### `IHSN_DDI`
 
-IHSN/DDI metadata guidance.
+International Household Survey Network. _Metadata Standards and Models: Data
+Documentation Initiative (DDI)_.
 
-Status: `NEEDS_VERIFICATION` for exact document title, version, year, and URL.
+Verified source: <https://www.ihsn.org/documentation-standards>
+
+Status: `NEEDS_VERIFICATION` for the exact IHSN toolkit/checklist title, version,
+and publication year that should be cited for production documentation.
 
 Used for: variable labels, value labels, missing codes, identifiers, structural
 missingness, skip patterns, and survey design metadata.
 
-## Software Documentation To Verify
+## Software Documentation References
 
-The renderers generate syntax for the following ecosystems. The exact official
-documentation references should be verified and added before institutional use:
+These software references are general background references for generated
+syntax. They are not currently citation keys in the rule library.
 
-- SPSS Statistics command syntax documentation: `NEEDS_VERIFICATION`
-- Stata Base Reference Manual and multiple-imputation documentation:
-  `NEEDS_VERIFICATION`
-- R base documentation and package documentation for generated examples:
-  `NEEDS_VERIFICATION`
-- Python documentation for pandas, NumPy, and scikit-learn or imputation-related
-  packages used in generated examples: `NEEDS_VERIFICATION`
+- IBM SPSS Statistics command syntax documentation:
+  <https://www.ibm.com/docs/en/spss-statistics/30.0.0?topic=reference-introduction-guide-command-syntax>
+  and
+  <https://www.ibm.com/docs/en/spss-statistics/30.0.0?topic=files-syntax-rules-guidelines>.
+  The renderer targets SPSS v18-style syntax, so exact SPSS v18 command-reference
+  details remain `NEEDS_VERIFICATION`.
+- Stata Multiple-Imputation Reference Manual:
+  <https://www.stata.com/manuals/mi.pdf>. Stata v14-specific references remain
+  `NEEDS_VERIFICATION` where commands differ by release.
+- R base documentation: <https://search.r-project.org/R/refmans/base/html/base-package.html>.
+- pandas missing-data documentation:
+  <https://pandas.pydata.org/docs/user_guide/missing_data.html>.
+- scikit-learn `IterativeImputer` documentation:
+  <https://scikit-learn.org/stable/modules/generated/sklearn.impute.IterativeImputer.html>.
+- NumPy documentation: <https://numpy.org/doc/stable/>.
 
 ## Maintenance Notes
 

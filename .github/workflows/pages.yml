@@ -25,13 +25,16 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
       - name: Install dependencies
         run: npm ci
 
       - name: Build static app
         run: npm run build
         env:
-          VITE_BASE_PATH: ./
+          VITE_BASE_PATH: './'
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v4

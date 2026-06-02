@@ -1,90 +1,106 @@
 [
   {
     "key": "UNECE_GSDEM",
-    "title": "Generic Statistical Data Editing Model",
-    "authorOrOrganisation": "UNECE",
-    "year": "NEEDS_VERIFICATION",
+    "title": "Generic Statistical Data Editing Model (GSDEM), Version 2.0",
+    "authorOrOrganisation": "United Nations Economic Commission for Europe",
+    "year": 2019,
     "sourceType": "official_guidance",
-    "note": "Bibliographic details should be verified before production documentation."
+    "url": "https://unece.org/statistics/documents/2019/06/gsdem-v20",
+    "note": "Verified from UNECE GSDEM v2.0 page and UNECE Statswiki summary."
   },
   {
     "key": "DE_WAAL_2011",
     "title": "Handbook of Statistical Data Editing and Imputation",
-    "authorOrOrganisation": "De Waal, Pannekoek and Scholtus",
+    "authorOrOrganisation": "Ton de Waal, Jeroen Pannekoek and Sander Scholtus",
     "year": 2011,
     "sourceType": "book",
-    "note": "Bibliographic details should be verified before production documentation."
+    "url": "https://www.wiley-vch.de/en/areas-interest/mathematics-statistics/handbook-of-statistical-data-editing-and-imputation-978-0-470-54280-4",
+    "note": "First edition, Wiley Handbooks in Survey Methodology, John Wiley & Sons."
   },
   {
     "key": "FELLEGI_HOLT_1976",
     "title": "A Systematic Approach to Automatic Edit and Imputation",
-    "authorOrOrganisation": "Fellegi and Holt",
+    "authorOrOrganisation": "I. P. Fellegi and D. Holt",
     "year": 1976,
     "sourceType": "journal_article",
-    "note": "Bibliographic details should be verified before production documentation."
+    "url": "https://www.tandfonline.com/doi/abs/10.1080/01621459.1976.10481472",
+    "doi": "10.1080/01621459.1976.10481472",
+    "note": "Journal of the American Statistical Association, volume 71, issue 353, pages 17-35."
   },
   {
     "key": "TUKEY_1977",
     "title": "Exploratory Data Analysis",
-    "authorOrOrganisation": "Tukey",
+    "authorOrOrganisation": "John W. Tukey",
     "year": 1977,
     "sourceType": "book",
-    "note": "Bibliographic details should be verified before production documentation."
+    "url": "https://search.worldcat.org/title/03058187",
+    "note": "Addison-Wesley Publishing Company, Reading, Massachusetts."
   },
   {
     "key": "ROUSSEEUW_CROUX_1993",
     "title": "Alternatives to the Median Absolute Deviation",
-    "authorOrOrganisation": "Rousseeuw and Croux",
+    "authorOrOrganisation": "Peter J. Rousseeuw and Christophe Croux",
     "year": 1993,
     "sourceType": "journal_article",
-    "note": "Bibliographic details should be verified before production documentation."
+    "url": "https://www.tandfonline.com/doi/abs/10.1080/01621459.1993.10476408",
+    "doi": "10.1080/01621459.1993.10476408",
+    "note": "Journal of the American Statistical Association, volume 88, issue 424, pages 1273-1283."
   },
   {
     "key": "HUBERT_VANDERVIEREN_2008",
     "title": "An Adjusted Boxplot for Skewed Distributions",
-    "authorOrOrganisation": "Hubert and Vandervieren",
+    "authorOrOrganisation": "Mia Hubert and Ellen Vandervieren",
     "year": 2008,
     "sourceType": "journal_article",
-    "note": "Bibliographic details should be verified before production documentation."
+    "doi": "10.1016/j.csda.2007.11.008",
+    "note": "Computational Statistics & Data Analysis, volume 52, issue 12, pages 5186-5201. DOI verified from indexed package/documentation references; primary article landing page remains NEEDS_VERIFICATION before institutional release."
   },
   {
     "key": "HIDIROGLOU_BERTHELOT_1986",
     "title": "Statistical Editing and Imputation for Periodic Business Surveys",
-    "authorOrOrganisation": "Hidiroglou and Berthelot",
+    "authorOrOrganisation": "Mike Hidiroglou and Jean-Marie Berthelot",
     "year": 1986,
-    "sourceType": "working_paper",
-    "note": "Bibliographic details should be verified before production documentation."
+    "sourceType": "journal_article",
+    "url": "https://www150.statcan.gc.ca/n1/en/catalogue/12-001-X198600114442",
+    "note": "Survey Methodology, issue 1986001, Statistics Canada catalogue 12-001-X198600114442."
   },
   {
     "key": "RUBIN_1987",
     "title": "Multiple Imputation for Nonresponse in Surveys",
-    "authorOrOrganisation": "Rubin",
+    "authorOrOrganisation": "Donald B. Rubin",
     "year": 1987,
     "sourceType": "book",
-    "note": "Bibliographic details should be verified before production documentation."
+    "url": "https://www.wiley-vch.de/en/areas-interest/mathematics-statistics/statistics-16st/survey-research-methods-sampling-16st6/multiple-imputation-for-nonresponse-in-surveys-978-0-471-65574-9",
+    "doi": "10.1002/9780470316696",
+    "note": "Wiley Series in Probability and Statistics."
   },
   {
     "key": "LITTLE_RUBIN_2019",
     "title": "Statistical Analysis with Missing Data",
-    "authorOrOrganisation": "Little and Rubin",
+    "authorOrOrganisation": "Roderick J. A. Little and Donald B. Rubin",
     "year": 2019,
     "sourceType": "book",
-    "note": "Bibliographic details should be verified before production documentation."
+    "url": "https://www.wiley-vch.de/en/areas-interest/mathematics-statistics/statistical-analysis-with-missing-data-978-0-470-52679-8",
+    "doi": "10.1002/9781119482260",
+    "note": "Third edition, Wiley Series in Probability and Statistics."
   },
   {
     "key": "VAN_BUUREN_2018",
     "title": "Flexible Imputation of Missing Data",
-    "authorOrOrganisation": "Van Buuren",
+    "authorOrOrganisation": "Stef van Buuren",
     "year": 2018,
     "sourceType": "book",
-    "note": "Bibliographic details should be verified before production documentation."
+    "url": "https://www.routledge.com/Flexible-Imputation-of-Missing-Data-Second-Edition/vanBuuren/p/book/9780429492259",
+    "doi": "10.1201/9780429492259",
+    "note": "Second edition, Chapman & Hall/CRC."
   },
   {
     "key": "IHSN_DDI",
-    "title": "DDI metadata guidance",
-    "authorOrOrganisation": "IHSN",
+    "title": "Metadata Standards and Models: Data Documentation Initiative (DDI)",
+    "authorOrOrganisation": "International Household Survey Network",
     "year": "NEEDS_VERIFICATION",
     "sourceType": "official_guidance",
-    "note": "Bibliographic details should be verified before production documentation."
+    "url": "https://www.ihsn.org/documentation-standards",
+    "note": "IHSN page verified for DDI metadata scope. Exact IHSN toolkit/checklist title and year remain NEEDS_VERIFICATION."
   }
 ]

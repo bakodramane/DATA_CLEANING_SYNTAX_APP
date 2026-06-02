@@ -57,6 +57,15 @@ The optional Pages workflow is manual (`workflow_dispatch`) so a normal push to
 `npm run build`, uploads `dist/`, and deploys it using the standard GitHub Pages
 actions.
 
+No repository secrets are required. The workflow uses the default GitHub token
+with `pages: write` and `id-token: write` permissions for deployment. The app is
+static and does not upload user dictionaries, generated scripts, or other user
+data during deployment.
+
+The workflow has not been run as part of Phase 9. To deploy, run **Deploy GitHub
+Pages** manually from the Actions tab after enabling GitHub Pages with **GitHub
+Actions** as the source.
+
 ## Release Reminder
 
 Before running a public deployment:
@@ -65,5 +74,5 @@ Before running a public deployment:
 - verify the production preview locally;
 - confirm offline reload after first load;
 - confirm generated downloads still work;
-- verify references marked `NEEDS_VERIFICATION` are acceptable for the release
-  context.
+- verify remaining references marked `NEEDS_VERIFICATION` are acceptable for the
+  release context.
