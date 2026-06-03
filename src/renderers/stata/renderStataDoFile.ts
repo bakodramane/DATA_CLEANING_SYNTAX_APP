@@ -1,4 +1,5 @@
 import type { CleaningPlan, CleaningStep, SurveyVariable } from '../../core'
+import { rendererComment, rendererWarning, type LanguageCode } from '../../i18n'
 import {
   allowedDomainValues,
   canImputeVariable,
@@ -44,6 +45,7 @@ interface RenderContext {
   variablesByName: Map<string, SurveyVariable>
   warnings: string[]
   unsupportedSteps: UnsupportedRenderedStep[]
+  commentLanguage: LanguageCode
 }
 
 export function renderStataDoFile(
@@ -54,10 +56,15 @@ export function renderStataDoFile(
     variablesByName: indexVariables(cleaningPlan.variables),
     warnings: [],
     unsupportedSteps: [],
+    commentLanguage: options.language ?? 'en',
   }
 
   const sections = [
-    renderStataTitleBlock(cleaningPlan, options.generatedAt),
+    renderStataTitleBlock(
+      cleaningPlan,
+      options.generatedAt,
+      context.commentLanguage,
+    ),
     ...cleaningPlan.steps.map((step) => renderStep(step, context)),
   ]
 
@@ -118,8 +125,10 @@ function renderUnsupportedStep(
   context.warnings.push(`Step "${step.id}": ${unsupportedStep.reason}`)
 
   return [
-    renderStataStepComment(step),
-    stataComment(`WARNING: ${unsupportedStep.reason}`),
+    renderStataStepComment(step, context.commentLanguage),
+    stataComment(
+      rendererWarning(context.commentLanguage, unsupportedStep.reason),
+    ),
   ].join('\n')
 }
 
@@ -128,7 +137,7 @@ function renderVariableLabels(
   context: RenderContext,
 ): string {
   return [
-    renderStataStepComment(step),
+    renderStataStepComment(step, context.commentLanguage),
     ...findStepVariables(step, context.variablesByName).map(
       (variable) =>
         `label variable ${variable.name} ${quoteStataString(variable.label)}`,
@@ -137,13 +146,15 @@ function renderVariableLabels(
 }
 
 function renderValueLabels(step: CleaningStep, context: RenderContext): string {
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
 
   findStepVariables(step, context.variablesByName).forEach((variable) => {
     if (!variable.valueLabels || variable.valueLabels.length === 0) {
       const message = `Variable "${variable.name}" has no value labels to render.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(stataComment(`WARNING: ${message}`))
+      lines.push(
+        stataComment(rendererWarning(context.commentLanguage, message)),
+      )
       return
     }
 
@@ -168,7 +179,7 @@ function renderMissingValueDeclarations(
   step: CleaningStep,
   context: RenderContext,
 ): string {
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
 
   findStepVariables(step, context.variablesByName).forEach((variable) => {
     const missingCodes = variable.declaredMissingCodes ?? []
@@ -176,7 +187,9 @@ function renderMissingValueDeclarations(
     if (missingCodes.length === 0) {
       const message = `Variable "${variable.name}" has no declared missing codes to render.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(stataComment(`WARNING: ${message}`))
+      lines.push(
+        stataComment(rendererWarning(context.commentLanguage, message)),
+      )
       return
     }
 
@@ -186,15 +199,24 @@ function renderMissingValueDeclarations(
     if (extendedMissingValues.length > 0) {
       const message = `Stata extended missing values (${formatStataList(extendedMissingValues)}) were detected for "${variable.name}"; review them because mvdecode is intended for declared nonresponse codes.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(stataComment(`WARNING: ${message}`))
+      lines.push(
+        stataComment(rendererWarning(context.commentLanguage, message)),
+      )
     }
 
     lines.push(
       stataComment(
-        `Declared missing codes for ${variable.name}: ${formatStataList(values)}`,
+        rendererComment(
+          context.commentLanguage,
+          'comment.declaredMissingCodes',
+          {
+            variable: variable.name,
+            values: formatStataList(values),
+          },
+        ),
       ),
       stataComment(
-        'mvdecode converts declared nonresponse codes to Stata system missing; review before running',
+        rendererComment(context.commentLanguage, 'comment.stataMvdecode'),
       ),
       `mvdecode ${variable.name}, mv(${formatStataList(values)})`,
     )
@@ -204,7 +226,7 @@ function renderMissingValueDeclarations(
 }
 
 function renderRangeCheck(step: CleaningStep, context: RenderContext): string {
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
 
   findStepVariables(step, context.variablesByName).forEach((variable) => {
     const min = numberOrStringParameter(step, 'min') ?? variable.validRange?.min
@@ -221,7 +243,9 @@ function renderRangeCheck(step: CleaningStep, context: RenderContext): string {
     if (conditions.length === 0) {
       const message = `Range check "${step.id}" has no min or max for "${variable.name}".`
       context.warnings.push(message)
-      lines.push(stataComment(`WARNING: ${message}`))
+      lines.push(
+        stataComment(rendererWarning(context.commentLanguage, message)),
+      )
       return
     }
 
@@ -236,7 +260,7 @@ function renderRangeCheck(step: CleaningStep, context: RenderContext): string {
 }
 
 function renderDomainCheck(step: CleaningStep, context: RenderContext): string {
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
 
   findStepVariables(step, context.variablesByName).forEach((variable) => {
     const allowedValues = allowedDomainValues(step, variable)
@@ -244,7 +268,9 @@ function renderDomainCheck(step: CleaningStep, context: RenderContext): string {
     if (allowedValues.length === 0) {
       const message = `Domain check "${step.id}" has no allowed values for "${variable.name}".`
       context.warnings.push(message)
-      lines.push(stataComment(`WARNING: ${message}`))
+      lines.push(
+        stataComment(rendererWarning(context.commentLanguage, message)),
+      )
       return
     }
 
@@ -260,13 +286,15 @@ function renderDomainCheck(step: CleaningStep, context: RenderContext): string {
 
 function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
   const method = normalizeMethodName(step.parameters.method) ?? 'tukey'
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
 
   findStepVariables(step, context.variablesByName).forEach((variable) => {
     if (!isContinuousOutlierVariable(variable)) {
       const message = `Outlier method "${method}" is only rendered for continuous or count variables; "${variable.name}" is ${variable.type}.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(stataComment(`WARNING: ${message}`))
+      lines.push(
+        stataComment(rendererWarning(context.commentLanguage, message)),
+      )
       return
     }
 
@@ -282,7 +310,7 @@ function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
 
     const message = `Outlier method "${method}" is not supported by the current Stata v14 renderer; no deletion, capping, or winsorisation syntax was generated.`
     context.warnings.push(`Step "${step.id}": ${message}`)
-    lines.push(stataComment(`WARNING: ${message}`))
+    lines.push(stataComment(rendererWarning(context.commentLanguage, message)))
   })
 
   return lines.join('\n')
@@ -294,17 +322,19 @@ function renderStructuralMissingCheck(
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
   const targetVariable = variables[0]
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
   const partialMessage =
     'Stata structural-missing checks are rendered as review flags only; values are not recoded or imputed.'
 
   context.warnings.push(`Step "${step.id}": ${partialMessage}`)
-  lines.push(stataComment(`WARNING: ${partialMessage}`))
+  lines.push(
+    stataComment(rendererWarning(context.commentLanguage, partialMessage)),
+  )
 
   if (!targetVariable) {
     const message = `Structural-missing step "${step.id}" has no target variable to flag.`
     context.warnings.push(message)
-    lines.push(stataComment(`WARNING: ${message}`))
+    lines.push(stataComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -313,7 +343,7 @@ function renderStructuralMissingCheck(
   if (!condition) {
     const message = `Structural-missing step "${step.id}" has no condition; review the Cleaning Plan notes manually.`
     context.warnings.push(message)
-    lines.push(stataComment(`WARNING: ${message}`))
+    lines.push(stataComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -325,7 +355,11 @@ function renderStructuralMissingCheck(
   )
 
   lines.push(
-    stataComment(`Structural-missing condition: ${condition}`),
+    stataComment(
+      rendererComment(context.commentLanguage, 'comment.structuralCondition', {
+        condition,
+      }),
+    ),
     `generate byte ${flag} = (${translatedCondition}) & !missing(${targetVariable.name})`,
     `label variable ${flag} ${quoteStataString(`Flag: ${targetVariable.name} present when structurally missing`)}`,
   )
@@ -339,17 +373,19 @@ function renderSkipPatternCheck(
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
   const targetVariable = variables[0]
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
   const partialMessage =
     'Stata skip-pattern checks use simple applicability conditions and only flag possible routing violations.'
 
   context.warnings.push(`Step "${step.id}": ${partialMessage}`)
-  lines.push(stataComment(`WARNING: ${partialMessage}`))
+  lines.push(
+    stataComment(rendererWarning(context.commentLanguage, partialMessage)),
+  )
 
   if (!targetVariable) {
     const message = `Skip-pattern step "${step.id}" has no target variable to flag.`
     context.warnings.push(message)
-    lines.push(stataComment(`WARNING: ${message}`))
+    lines.push(stataComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -358,7 +394,7 @@ function renderSkipPatternCheck(
   if (!condition) {
     const message = `Skip-pattern step "${step.id}" has no applicability condition; review the questionnaire routing manually.`
     context.warnings.push(message)
-    lines.push(stataComment(`WARNING: ${message}`))
+    lines.push(stataComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -370,7 +406,11 @@ function renderSkipPatternCheck(
   )
 
   lines.push(
-    stataComment(`Applicable when: ${condition}`),
+    stataComment(
+      rendererComment(context.commentLanguage, 'comment.applicableWhen', {
+        condition,
+      }),
+    ),
     `generate byte ${flag} = !(${translatedCondition}) & !missing(${targetVariable.name})`,
     `label variable ${flag} ${quoteStataString(`Flag: ${targetVariable.name} present outside skip pattern`)}`,
   )
@@ -383,18 +423,20 @@ function renderConsistencyCheck(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
   const condition = conditionParameter(step)
   const partialMessage =
     'Stata consistency checks are rendered only when the Cleaning Plan supplies a simple flag condition.'
 
   context.warnings.push(`Step "${step.id}": ${partialMessage}`)
-  lines.push(stataComment(`WARNING: ${partialMessage}`))
+  lines.push(
+    stataComment(rendererWarning(context.commentLanguage, partialMessage)),
+  )
 
   if (!condition) {
     const message = `Consistency check "${step.id}" has no condition; no executable flag was generated.`
     context.warnings.push(message)
-    lines.push(stataComment(`WARNING: ${message}`))
+    lines.push(stataComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -406,7 +448,11 @@ function renderConsistencyCheck(
   )
 
   lines.push(
-    stataComment(`Flag condition: ${condition}`),
+    stataComment(
+      rendererComment(context.commentLanguage, 'comment.flagCondition', {
+        condition,
+      }),
+    ),
     `generate byte ${flag} = (${translatedCondition})`,
     `label variable ${flag} ${quoteStataString(`Flag: consistency review for ${step.id}`)}`,
   )
@@ -419,12 +465,12 @@ function renderDuplicateIdCheck(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
 
   if (variables.length === 0) {
     const message = `Duplicate ID check "${step.id}" has no identifier variables.`
     context.warnings.push(message)
-    lines.push(stataComment(`WARNING: ${message}`))
+    lines.push(stataComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -433,7 +479,7 @@ function renderDuplicateIdCheck(
 
   lines.push(
     stataComment(
-      'Duplicate identifier checks tag records; no records are deleted.',
+      rendererComment(context.commentLanguage, 'comment.duplicateNoDelete'),
     ),
     `duplicates tag ${byVariables}, generate(${flag})`,
     `replace ${flag} = ${flag} > 0 if !missing(${variables[0].name})`,
@@ -449,7 +495,7 @@ function renderMissingnessDiagnosis(
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
   const lines = [
-    renderStataStepComment(step),
+    renderStataStepComment(step, context.commentLanguage),
     `misstable summarize ${variables.map((variable) => variable.name).join(' ')}`,
   ]
 
@@ -465,13 +511,21 @@ function renderMissingnessDiagnosis(
 
 function renderImputation(step: CleaningStep, context: RenderContext): string {
   const lines = [
-    renderStataStepComment(step),
-    stataComment('Multiple imputation model choices require analyst review'),
+    renderStataStepComment(step, context.commentLanguage),
     stataComment(
-      'Structural missing values must be excluded before imputation',
+      rendererComment(context.commentLanguage, 'comment.stataImputationReview'),
     ),
     stataComment(
-      'Identifier variables are excluded from mi register imputed lists',
+      rendererComment(
+        context.commentLanguage,
+        'comment.stataStructuralExclusion',
+      ),
+    ),
+    stataComment(
+      rendererComment(
+        context.commentLanguage,
+        'comment.stataIdentifierExclusion',
+      ),
     ),
   ]
 
@@ -479,7 +533,7 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     const message =
       'Structural missing values were requested for imputation and have been blocked.'
     context.warnings.push(`Step "${step.id}": ${message}`)
-    lines.push(stataComment(`WARNING: ${message}`))
+    lines.push(stataComment(rendererWarning(context.commentLanguage, message)))
   }
 
   const imputedVariables = findStepVariables(
@@ -489,7 +543,9 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     if (isIdentifierVariable(variable)) {
       const message = `Identifier variable "${variable.name}" was excluded from imputation.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(stataComment(`WARNING: ${message}`))
+      lines.push(
+        stataComment(rendererWarning(context.commentLanguage, message)),
+      )
       return false
     }
 
@@ -499,7 +555,7 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
   if (imputedVariables.length === 0) {
     const message = `Imputation step "${step.id}" has no variables suitable for Stata mi imputation.`
     context.warnings.push(message)
-    lines.push(stataComment(`WARNING: ${message}`))
+    lines.push(stataComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -517,7 +573,9 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     `mi register imputed ${imputedVariables.map((variable) => variable.name).join(' ')}`,
     `mi register regular ${predictors.join(' ')}`,
     `mi impute chained ${imputationTerms} = ${predictors.join(' ')}, add(20) rseed(12345)`,
-    stataComment('Example pooling guidance, to be adapted by the analyst:'),
+    stataComment(
+      rendererComment(context.commentLanguage, 'comment.stataPoolingGuidance'),
+    ),
     stataComment('mi estimate: regress outcome income age sex'),
   )
 
@@ -525,15 +583,15 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
 }
 
 function renderAuditLog(step: CleaningStep, context: RenderContext): string {
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
   const message =
     'Stata audit-log support is partial: this section documents review guidance but does not create a separate audit table.'
 
   context.warnings.push(`Step "${step.id}": ${message}`)
   lines.push(
-    stataComment(`WARNING: ${message}`),
+    stataComment(rendererWarning(context.commentLanguage, message)),
     stataComment(
-      'Review generated flag_* variables and preserve reviewer decisions outside the source variables.',
+      rendererComment(context.commentLanguage, 'comment.reviewGeneratedFlags'),
     ),
   )
 
@@ -545,12 +603,12 @@ function renderSummaryReport(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStataStepComment(step)]
+  const lines = [renderStataStepComment(step, context.commentLanguage)]
   const message =
     'Stata summary-report support is partial: basic summaries are emitted for review, not a publication-ready report.'
 
   context.warnings.push(`Step "${step.id}": ${message}`)
-  lines.push(stataComment(`WARNING: ${message}`))
+  lines.push(stataComment(rendererWarning(context.commentLanguage, message)))
 
   if (variables.length > 0) {
     lines.push(
@@ -559,7 +617,9 @@ function renderSummaryReport(
     )
   } else {
     lines.push(
-      stataComment('No variables were listed for the summary report step.'),
+      stataComment(
+        rendererComment(context.commentLanguage, 'comment.noSummaryVariables'),
+      ),
     )
   }
 

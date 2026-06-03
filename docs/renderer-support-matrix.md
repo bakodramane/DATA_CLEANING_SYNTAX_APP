@@ -5,6 +5,12 @@ emit for each current Cleaning Plan step type. The app generates reviewable
 scripts only. It does not execute scripts, inspect observation-level data, or
 silently modify a dataset.
 
+Generated comments follow the selected English/French UI language where local
+renderer-comment translations exist. Executable syntax is intentionally not
+translated: variable names, commands, package names, function names, citation
+keys, and user-entered labels or value labels remain unchanged. Generated
+scripts are UTF-8 text outputs.
+
 Status labels:
 
 - **Supported**: executable or directly usable syntax is generated for the
@@ -66,3 +72,9 @@ The golden tests also check that unsupported steps are visible, partial support
 produces warnings, records are not silently deleted, outliers are not silently
 treated, identifiers are not imputed, and structural missing values are blocked
 from imputation examples.
+
+Language-aware renderer tests additionally compare English and French outputs
+with full-line comments removed, so executable lines remain stable while
+comment text changes. They also verify that citation keys, variable names, and
+source value labels remain unchanged, and that unsupported-step comments appear
+in French when French is selected.

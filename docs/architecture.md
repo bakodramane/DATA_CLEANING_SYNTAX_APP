@@ -79,6 +79,14 @@ generated SPSS, Stata, R, or Python code. Full-file golden tests cover
 representative household, agricultural, and structural-missing plans so syntax
 changes are intentional and reviewable.
 
+Renderer options accept the selected UI language for generated comments.
+English is the default. French localizes title blocks, step headings, rationale
+and citation labels, warning comments, unsupported-step comments, and
+partial-support guidance while leaving executable syntax unchanged. Variable
+names, software commands, package names, function names, citation keys, and
+user-entered labels/value labels are not translated. Generated scripts are
+UTF-8 text outputs.
+
 The exact renderer coverage by Cleaning Plan step type is documented in the
 [Renderer Support Matrix](renderer-support-matrix.md).
 
@@ -101,8 +109,10 @@ This layer translates core visible UI labels, help text, common warnings,
 buttons, workflow step labels, rule-review labels/descriptions/rationales,
 blocked-rule explanations, Cleaning Plan preview rationales, and
 plain-language summary report headings and reviewer text. It does not translate
-generated SPSS, Stata, R, or Python syntax comments in this phase; renderer
-output remains deterministic and language-neutral from the Cleaning Plan.
+executable SPSS, Stata, R, or Python syntax. Renderer-comment translations live
+in `src/i18n/rendererComments.ts`, use the same English/French fallback
+principle, and are local dictionary lookups only. No external translation API,
+AI-assisted translation, backend service, telemetry, or cloud storage is used.
 
 ### PWA And Offline Support
 

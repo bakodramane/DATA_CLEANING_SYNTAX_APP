@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { CleaningPlan, CleaningStep } from '../../src/core'
+import type { LanguageCode } from '../../src/i18n'
 import { renderPythonScript } from '../../src/renderers/python'
 import { renderRScript } from '../../src/renderers/r'
 import { renderSpssScript } from '../../src/renderers/spss'
@@ -10,30 +11,34 @@ import { createRendererTestPlan, fixedGeneratedAt } from './rendererTestFixture'
 const renderers = [
   {
     language: 'r',
-    render: () =>
-      renderRScript(createRendererTestPlan(), {
+    render: (plan = createRendererTestPlan(), language?: LanguageCode) =>
+      renderRScript(plan, {
         generatedAt: fixedGeneratedAt,
+        language,
       }),
   },
   {
     language: 'spss18',
-    render: () =>
-      renderSpssScript(createRendererTestPlan(), {
+    render: (plan = createRendererTestPlan(), language?: LanguageCode) =>
+      renderSpssScript(plan, {
         generatedAt: fixedGeneratedAt,
+        language,
       }),
   },
   {
     language: 'stata14',
-    render: () =>
-      renderStataDoFile(createRendererTestPlan(), {
+    render: (plan = createRendererTestPlan(), language?: LanguageCode) =>
+      renderStataDoFile(plan, {
         generatedAt: fixedGeneratedAt,
+        language,
       }),
   },
   {
     language: 'python',
-    render: () =>
-      renderPythonScript(createRendererTestPlan(), {
+    render: (plan = createRendererTestPlan(), language?: LanguageCode) =>
+      renderPythonScript(plan, {
         generatedAt: fixedGeneratedAt,
+        language,
       }),
   },
 ] as const
@@ -90,6 +95,40 @@ describe('all MVP renderers', () => {
         })
       })
   })
+
+  it('localises generated comments to French without changing executable syntax', () => {
+    renderers.forEach((renderer) => {
+      const english = renderer.render(createRendererTestPlan(), 'en')
+      const french = renderer.render(createRendererTestPlan(), 'fr')
+
+      expect(executableLines(english.content, renderer.language)).toStrictEqual(
+        executableLines(french.content, renderer.language),
+      )
+      expect(commentLines(french.content, renderer.language)).not.toStrictEqual(
+        commentLines(english.content, renderer.language),
+      )
+      expect(french.content).toContain("Syntaxe d'apurement")
+      expect(french.content).toContain('Justification')
+      expect(french.content).toContain('IHSN_DDI')
+      expect(french.content).toContain('income')
+      expect(french.content).toContain('Male')
+      expect(french.content).toContain('Female')
+      expect(english.content).toContain('Survey Microdata Cleaning Syntax')
+    })
+  })
+
+  it('renders unsupported-step warnings in French comments', () => {
+    renderers.forEach((renderer) => {
+      const plan = addUnsupportedOutlierTreatment(createRendererTestPlan())
+      const rendered = renderer.render(plan, 'fr')
+
+      expect(rendered.unsupportedSteps.map((step) => step.type)).toContain(
+        'outlier_treatment',
+      )
+      expect(rendered.content).toContain('Étape non prise en charge')
+      expect(rendered.content).toContain('outlier_treatment')
+    })
+  })
 })
 
 function addUnsupportedOutlierTreatment(plan: CleaningPlan): CleaningPlan {
@@ -115,4 +154,34 @@ function addUnsupportedOutlierTreatment(plan: CleaningPlan): CleaningPlan {
 
   plan.steps.push(unsupportedStep)
   return plan
+}
+
+function executableLines(
+  content: string,
+  rendererLanguage: (typeof renderers)[number]['language'],
+): string[] {
+  return content
+    .split('\n')
+    .filter((line) => line.trim().length > 0)
+    .filter((line) => !isFullLineComment(line, rendererLanguage))
+}
+
+function commentLines(
+  content: string,
+  rendererLanguage: (typeof renderers)[number]['language'],
+): string[] {
+  return content
+    .split('\n')
+    .filter((line) => isFullLineComment(line, rendererLanguage))
+}
+
+function isFullLineComment(
+  line: string,
+  rendererLanguage: (typeof renderers)[number]['language'],
+): boolean {
+  const trimmed = line.trimStart()
+
+  return rendererLanguage === 'spss18' || rendererLanguage === 'stata14'
+    ? trimmed.startsWith('*')
+    : trimmed.startsWith('#')
 }

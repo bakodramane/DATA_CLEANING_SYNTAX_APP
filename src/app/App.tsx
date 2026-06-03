@@ -78,9 +78,9 @@ function App() {
   const renderedScripts = useMemo(
     () =>
       cleaningPlan && validation?.valid
-        ? renderScriptsForPlan(cleaningPlan, project.targetLanguages)
+        ? renderScriptsForPlan(cleaningPlan, project.targetLanguages, language)
         : {},
-    [cleaningPlan, project.targetLanguages, validation?.valid],
+    [cleaningPlan, language, project.targetLanguages, validation?.valid],
   )
   const downloads = useMemo(
     () =>

@@ -1,74 +1,106 @@
 import type { CleaningPlan, CleaningStep } from '../../core'
+import {
+  rendererCitationKeys,
+  rendererComment,
+  rendererReviewRequirement,
+  rendererStepRationale,
+  rendererWarning,
+  type LanguageCode,
+} from '../../i18n'
 import type { UnsupportedRenderedStep } from '../types'
-import { formatCitationKeys } from './helpers'
 
 export function renderTitleBlock(
   plan: CleaningPlan,
   generatedAt: string,
+  language: LanguageCode = 'en',
 ): string {
   const assumptions =
     plan.metadata.assumptions.length > 0
       ? plan.metadata.assumptions.map((assumption) => `# - ${assumption}`)
-      : ['# - No assumptions were recorded in the Cleaning Plan.']
+      : [`# - ${rendererComment(language, 'title.noAssumptions')}.`]
 
   return [
     '# =============================================================================',
-    '# Survey Microdata Cleaning Syntax',
-    '# Generated target: R',
-    `# Generation timestamp: ${generatedAt}`,
-    `# Cleaning Plan: ${plan.metadata.title}`,
-    `# Cleaning Plan ID: ${plan.id}`,
-    `# Cleaning Plan version: ${plan.metadata.version}`,
-    '# Version note: first-release R renderer; review package versions before use.',
+    `# ${rendererComment(language, 'title.name')}`,
+    `# ${rendererComment(language, 'title.target.r')}`,
+    `# ${rendererComment(language, 'title.timestamp', { generatedAt })}`,
+    `# ${rendererComment(language, 'title.plan', { title: plan.metadata.title })}`,
+    `# ${rendererComment(language, 'title.planId', { id: plan.id })}`,
+    `# ${rendererComment(language, 'title.planVersion', {
+      version: plan.metadata.version,
+    })}`,
+    `# ${rendererComment(language, 'title.versionNote.r')}`,
     '#',
-    '# Assumptions:',
+    `# ${rendererComment(language, 'title.assumptions')}`,
     ...assumptions,
     '#',
-    '# WARNING: Review this generated syntax before production use.',
-    '# The script flags and documents issues; it must not be treated as a black box.',
+    `# ${rendererWarning(
+      language,
+      rendererComment(language, 'title.reviewWarning'),
+    )}.`,
+    `# ${rendererComment(language, 'title.rBlackBox')}`,
     '# =============================================================================',
   ].join('\n')
 }
 
-export function renderPackageSection(dataFrameName: string): string {
+export function renderPackageSection(
+  dataFrameName: string,
+  language: LanguageCode = 'en',
+): string {
   return [
-    '# Required packages:',
-    '# install.packages(c("dplyr", "labelled", "mice"))',
+    `# ${rendererComment(language, 'packages.required')}`,
+    `# ${rendererComment(language, 'packages.rInstall')}`,
     'library(dplyr)',
     'library(labelled)',
     'library(mice)',
     '',
-    `# Expected input: a data frame named \`${dataFrameName}\`.`,
-    '# Rename your imported survey dataset to this object before running the script,',
-    '# or regenerate the script with a different data frame name.',
+    `# ${rendererComment(language, 'packages.expectedInput.r', {
+      dataFrameName,
+    })}`,
+    `# ${rendererComment(language, 'packages.rename.r')}`,
+    `# ${rendererComment(language, 'packages.regenerate.r')}`,
   ].join('\n')
 }
 
-export function renderStepComment(step: CleaningStep): string {
+export function renderStepComment(
+  step: CleaningStep,
+  language: LanguageCode = 'en',
+): string {
   return [
     '# -----------------------------------------------------------------------------',
-    `# Step ID: ${step.id}`,
-    `# Step type: ${step.type}`,
-    `# Variables: ${step.variables.join(', ') || 'None'}`,
-    `# Rationale: ${step.rationale}`,
-    `# Citation: ${formatCitationKeys(step.citationKeys)}`,
-    `# Review requirement: ${
-      step.requiresReview ? 'Requires user review' : 'Automatic step'
-    }`,
+    `# ${rendererComment(language, 'step.id', { id: step.id })}`,
+    `# ${rendererComment(language, 'step.type', { type: step.type })}`,
+    `# ${rendererComment(language, 'step.variables', {
+      variables:
+        step.variables.join(', ') || rendererComment(language, 'step.none'),
+    })}`,
+    `# ${rendererComment(language, 'step.rationale', {
+      rationale: rendererStepRationale(language, step),
+    })}`,
+    `# ${rendererComment(language, 'step.citation', {
+      citations: rendererCitationKeys(language, step.citationKeys),
+    })}`,
+    `# ${rendererComment(language, 'step.reviewRequirement', {
+      requirement: rendererReviewRequirement(language, step.requiresReview),
+    })}`,
     '# -----------------------------------------------------------------------------',
   ].join('\n')
 }
 
-export function renderWarningComment(message: string): string {
-  return `# WARNING: ${message}`
+export function renderWarningComment(
+  message: string,
+  language: LanguageCode = 'en',
+): string {
+  return `# ${rendererWarning(language, message)}`
 }
 
 export function renderUnsupportedStepComment(
   step: CleaningStep,
   unsupportedStep: UnsupportedRenderedStep,
+  language: LanguageCode = 'en',
 ): string {
   return [
-    renderStepComment(step),
-    renderWarningComment(unsupportedStep.reason),
+    renderStepComment(step, language),
+    renderWarningComment(unsupportedStep.reason, language),
   ].join('\n')
 }

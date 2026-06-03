@@ -29,9 +29,11 @@ plain-language summary report headings immediately, and stores the selected
 language in browser local storage. No translation API, backend service,
 telemetry, or AI-assisted translation is used.
 
-Generated SPSS, Stata, R, and Python executable syntax is unchanged by language
-selection, and generated syntax comments may remain English in this phase.
-Future work can extend generated comments after statistical terminology review.
+Generated SPSS, Stata, R, and Python comments and reviewer guidance follow the
+selected language where local English/French renderer-comment text exists.
+Executable syntax is not translated: variable names, commands, package names,
+function names, citation keys, and user-entered labels or value labels remain
+unchanged. Generated outputs are UTF-8 text files.
 
 ## Metadata Inputs
 
@@ -167,11 +169,13 @@ the latest public-demo validation result.
 - Manual entry is variable-by-variable and does not yet import saved manual
   entry sessions.
 - French support covers the main workflow, common warnings, rule review text,
-  blocked-rule explanations, Cleaning Plan preview rationales, and summary
-  report headings. Generated syntax comments and some dynamic parser details may
-  remain English.
+  blocked-rule explanations, Cleaning Plan preview rationales, summary report
+  headings, and generated SPSS/Stata/R/Python comments where local renderer
+  comment translations exist. Executable syntax and user metadata are not
+  machine-translated.
 - AI-assisted interpretation, online rule-pack fetching, backend services,
-  authentication, telemetry, analytics, and cloud storage are not implemented.
+  authentication, telemetry, analytics, cloud storage, external translation
+  APIs, and AI-assisted translation are not implemented.
 - Some renderer support is partial for advanced imputation and specialist rule
   types. See the [Renderer Support Matrix](docs/renderer-support-matrix.md).
 - Browser install prompts and offline indicators vary by browser and platform.

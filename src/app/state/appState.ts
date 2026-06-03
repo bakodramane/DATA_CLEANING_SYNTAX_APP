@@ -281,9 +281,13 @@ export function validatePlanForPreview(
 export function renderScriptsForPlan(
   plan: CleaningPlan,
   targetLanguages: TargetLanguage[],
+  language: LanguageCode = 'en',
 ): RenderedScriptsByLanguage {
   return Object.fromEntries(
-    targetLanguages.map((language) => [language, renderScript(plan, language)]),
+    targetLanguages.map((targetLanguage) => [
+      targetLanguage,
+      renderScript(plan, targetLanguage, language),
+    ]),
   )
 }
 
@@ -479,18 +483,19 @@ export function detectionNotes(
 function renderScript(
   plan: CleaningPlan,
   language: TargetLanguage,
+  commentLanguage: LanguageCode = 'en',
 ): RenderedScript {
   switch (language) {
     case 'spss18':
-      return renderSpssScript(plan)
+      return renderSpssScript(plan, { language: commentLanguage })
     case 'stata14':
-      return renderStataDoFile(plan)
+      return renderStataDoFile(plan, { language: commentLanguage })
     case 'r':
-      return renderRScript(plan)
+      return renderRScript(plan, { language: commentLanguage })
     case 'python':
-      return renderPythonScript(plan)
+      return renderPythonScript(plan, { language: commentLanguage })
     default:
-      return renderRScript(plan)
+      return renderRScript(plan, { language: commentLanguage })
   }
 }
 

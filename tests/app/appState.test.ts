@@ -153,6 +153,34 @@ describe('workflow state helpers', () => {
     ).toContain('Generated target: R')
   })
 
+  it('renders selected-language comments into script downloads', () => {
+    const project = createInitialProjectMetadata()
+    const variables = importDemoDictionary().variables
+    const context = buildRuleEngineContext(project)
+    const plan = createCleaningPlanFromSelectedRules(
+      project,
+      variables,
+      createDefaultSelectedRuleIds(variables, context),
+      context,
+    )
+    const validation = validatePlanForPreview(plan)
+    const renderedScripts = renderScriptsForPlan(plan, ['r'], 'fr')
+    const downloads = createDownloadArtifacts(
+      project,
+      variables,
+      plan,
+      validation,
+      renderedScripts,
+      'fr',
+    )
+    const script = downloads.find((download) => download.id === 'r-script')
+
+    expect(script?.content).toContain("Syntaxe d'apurement")
+    expect(script?.content).toContain('Justification')
+    expect(script?.content).toContain('income')
+    expect(script?.content).not.toContain('Survey Microdata Cleaning Syntax')
+  })
+
   it('creates French reviewer-facing summary report content', () => {
     const project = createInitialProjectMetadata()
     const variables = importDemoDictionary().variables

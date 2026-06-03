@@ -333,7 +333,19 @@ test('French language selection persists and preserves demo workflow state', asy
           ? 'Stata'
           : language,
     )
+    await expect(page.locator('.code-preview pre')).toContainText(
+      "Syntaxe d'apurement",
+    )
+    await expect(page.locator('.code-preview pre')).toContainText(
+      'Justification',
+    )
   }
+
+  await page.getByLabel("Langue de l'interface").selectOption('en')
+  await expect(page.locator('.code-preview pre')).toContainText(
+    'Survey Microdata Cleaning Syntax',
+  )
+  await expect(page.locator('.code-preview pre')).toContainText('Rationale')
 })
 
 function createMinimalXlsx(): Buffer {

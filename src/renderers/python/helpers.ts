@@ -1,9 +1,13 @@
 import type { CleaningPlan, CleaningStep, VariableValue } from '../../core'
 import {
-  formatCitationKeys,
-  formatGeneratedAt,
-  makeScriptFilename,
-} from '../helpers'
+  rendererCitationKeys,
+  rendererComment,
+  rendererReviewRequirement,
+  rendererStepRationale,
+  rendererWarning,
+  type LanguageCode,
+} from '../../i18n'
+import { formatGeneratedAt, makeScriptFilename } from '../helpers'
 
 export function makePythonFilename(plan: CleaningPlan): string {
   return makeScriptFilename(plan, 'python-cleaning-script', 'py')
@@ -36,69 +40,96 @@ export function pythonComment(message: string): string {
 export function renderPythonTitleBlock(
   plan: CleaningPlan,
   generatedAt?: Date | string,
+  language: LanguageCode = 'en',
 ): string {
   const assumptions =
     plan.metadata.assumptions.length > 0
       ? plan.metadata.assumptions.map((assumption) =>
           pythonComment(`- ${assumption}`),
         )
-      : [pythonComment('- No assumptions were recorded in the Cleaning Plan')]
+      : [pythonComment(`- ${rendererComment(language, 'title.noAssumptions')}`)]
 
   return [
+    pythonComment(rendererComment(language, 'title.banner')),
+    pythonComment(rendererComment(language, 'title.name')),
+    pythonComment(rendererComment(language, 'title.target.python')),
     pythonComment(
-      '=============================================================================',
+      rendererComment(language, 'title.timestamp', {
+        generatedAt: formatGeneratedAt(generatedAt),
+      }),
     ),
-    pythonComment('Survey Microdata Cleaning Syntax'),
-    pythonComment('Generated target: Python script'),
-    pythonComment(`Generation timestamp: ${formatGeneratedAt(generatedAt)}`),
-    pythonComment(`Cleaning Plan: ${plan.metadata.title}`),
-    pythonComment(`Cleaning Plan ID: ${plan.id}`),
-    pythonComment(`Cleaning Plan version: ${plan.metadata.version}`),
     pythonComment(
-      'Version assumption: pandas/numpy plus scikit-learn for practical imputation',
+      rendererComment(language, 'title.plan', { title: plan.metadata.title }),
     ),
-    pythonComment('Assumptions:'),
+    pythonComment(rendererComment(language, 'title.planId', { id: plan.id })),
+    pythonComment(
+      rendererComment(language, 'title.planVersion', {
+        version: plan.metadata.version,
+      }),
+    ),
+    pythonComment(rendererComment(language, 'title.versionAssumption.python')),
+    pythonComment(rendererComment(language, 'title.assumptions')),
     ...assumptions,
     pythonComment(
-      'WARNING: Review this generated syntax before production use',
+      rendererWarning(
+        language,
+        rendererComment(language, 'title.reviewWarning'),
+      ),
     ),
-    pythonComment(
-      'No records are deleted and validation checks write flag variables',
-    ),
-    pythonComment(
-      '=============================================================================',
-    ),
+    pythonComment(rendererComment(language, 'title.noOverwrite.flags')),
+    pythonComment(rendererComment(language, 'title.banner')),
   ].join('\n')
 }
 
-export function renderPythonPackageSection(dataFrameName: string): string {
+export function renderPythonPackageSection(
+  dataFrameName: string,
+  language: LanguageCode = 'en',
+): string {
   return [
-    pythonComment('Required packages:'),
-    pythonComment('pip install pandas numpy scikit-learn statsmodels'),
+    pythonComment(rendererComment(language, 'packages.required')),
+    pythonComment(rendererComment(language, 'packages.pythonInstall')),
     'import numpy as np',
     'import pandas as pd',
     'from sklearn.experimental import enable_iterative_imputer  # noqa: F401',
     'from sklearn.impute import IterativeImputer',
     '',
-    pythonComment(`Expected input: a pandas DataFrame named ${dataFrameName}.`),
+    pythonComment(
+      rendererComment(language, 'packages.expectedInput.python', {
+        dataFrameName,
+      }),
+    ),
   ].join('\n')
 }
 
-export function renderPythonStepComment(step: CleaningStep): string {
+export function renderPythonStepComment(
+  step: CleaningStep,
+  language: LanguageCode = 'en',
+): string {
   return [
+    pythonComment(rendererComment(language, 'step.separator')),
+    pythonComment(rendererComment(language, 'step.id', { id: step.id })),
+    pythonComment(rendererComment(language, 'step.type', { type: step.type })),
     pythonComment(
-      '-----------------------------------------------------------------------------',
-    ),
-    pythonComment(`Step ID: ${step.id}`),
-    pythonComment(`Step type: ${step.type}`),
-    pythonComment(`Variables: ${step.variables.join(', ') || 'None'}`),
-    pythonComment(`Rationale: ${step.rationale}`),
-    pythonComment(`Citation: ${formatCitationKeys(step.citationKeys)}`),
-    pythonComment(
-      `Review requirement: ${step.requiresReview ? 'Requires user review' : 'Automatic step'}`,
+      rendererComment(language, 'step.variables', {
+        variables:
+          step.variables.join(', ') || rendererComment(language, 'step.none'),
+      }),
     ),
     pythonComment(
-      '-----------------------------------------------------------------------------',
+      rendererComment(language, 'step.rationale', {
+        rationale: rendererStepRationale(language, step),
+      }),
     ),
+    pythonComment(
+      rendererComment(language, 'step.citation', {
+        citations: rendererCitationKeys(language, step.citationKeys),
+      }),
+    ),
+    pythonComment(
+      rendererComment(language, 'step.reviewRequirement', {
+        requirement: rendererReviewRequirement(language, step.requiresReview),
+      }),
+    ),
+    pythonComment(rendererComment(language, 'step.separator')),
   ].join('\n')
 }

@@ -90,3 +90,4 @@ export type {
   Translator,
 } from './types'
 export * from './ruleText'
+export * from './rendererComments'

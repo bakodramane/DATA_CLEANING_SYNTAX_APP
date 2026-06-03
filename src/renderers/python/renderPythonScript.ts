@@ -1,4 +1,5 @@
 import type { CleaningPlan, CleaningStep, SurveyVariable } from '../../core'
+import { rendererComment, rendererWarning, type LanguageCode } from '../../i18n'
 import {
   allowedDomainValues,
   canImputeVariable,
@@ -44,6 +45,7 @@ interface RenderContext {
   variablesByName: Map<string, SurveyVariable>
   warnings: string[]
   unsupportedSteps: UnsupportedRenderedStep[]
+  commentLanguage: LanguageCode
 }
 
 export function renderPythonScript(
@@ -56,11 +58,16 @@ export function renderPythonScript(
     variablesByName: indexVariables(cleaningPlan.variables),
     warnings: [],
     unsupportedSteps: [],
+    commentLanguage: options.language ?? 'en',
   }
 
   const sections = [
-    renderPythonTitleBlock(cleaningPlan, options.generatedAt),
-    renderPythonPackageSection(dataFrameName),
+    renderPythonTitleBlock(
+      cleaningPlan,
+      options.generatedAt,
+      context.commentLanguage,
+    ),
+    renderPythonPackageSection(dataFrameName, context.commentLanguage),
     ...cleaningPlan.steps.map((step) => renderStep(step, context)),
   ]
 
@@ -121,8 +128,10 @@ function renderUnsupportedStep(
   context.warnings.push(`Step "${step.id}": ${unsupportedStep.reason}`)
 
   return [
-    renderPythonStepComment(step),
-    pythonComment(`WARNING: ${unsupportedStep.reason}`),
+    renderPythonStepComment(step, context.commentLanguage),
+    pythonComment(
+      rendererWarning(context.commentLanguage, unsupportedStep.reason),
+    ),
   ].join('\n')
 }
 
@@ -133,9 +142,9 @@ function renderVariableLabels(
   const variables = findStepVariables(step, context.variablesByName)
 
   return [
-    renderPythonStepComment(step),
+    renderPythonStepComment(step, context.commentLanguage),
     pythonComment(
-      'pandas does not preserve SPSS/Stata-style variable labels natively; labels are stored in a dictionary.',
+      rendererComment(context.commentLanguage, 'comment.pythonVariableLabels'),
     ),
     'variable_labels = globals().get("variable_labels", {})',
     'variable_labels.update({',
@@ -149,9 +158,9 @@ function renderVariableLabels(
 
 function renderValueLabels(step: CleaningStep, context: RenderContext): string {
   const lines = [
-    renderPythonStepComment(step),
+    renderPythonStepComment(step, context.commentLanguage),
     pythonComment(
-      'pandas category/value labels are stored here as metadata dictionaries for analyst review.',
+      rendererComment(context.commentLanguage, 'comment.pythonValueLabels'),
     ),
     'value_labels = globals().get("value_labels", {})',
     'value_labels.update({',
@@ -161,7 +170,7 @@ function renderValueLabels(step: CleaningStep, context: RenderContext): string {
     if (!variable.valueLabels || variable.valueLabels.length === 0) {
       const message = `Variable "${variable.name}" has no value labels to render.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(`    # WARNING: ${message}`)
+      lines.push(`    # ${rendererWarning(context.commentLanguage, message)}`)
       return
     }
 
@@ -182,7 +191,7 @@ function renderMissingValueDeclarations(
   step: CleaningStep,
   context: RenderContext,
 ): string {
-  const lines = [renderPythonStepComment(step)]
+  const lines = [renderPythonStepComment(step, context.commentLanguage)]
 
   findStepVariables(step, context.variablesByName).forEach((variable) => {
     const missingCodes = variable.declaredMissingCodes ?? []
@@ -190,17 +199,29 @@ function renderMissingValueDeclarations(
     if (missingCodes.length === 0) {
       const message = `Variable "${variable.name}" has no declared missing codes to render.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(pythonComment(`WARNING: ${message}`))
+      lines.push(
+        pythonComment(rendererWarning(context.commentLanguage, message)),
+      )
       return
     }
 
     const values = missingCodes.map((missingCode) => missingCode.value)
     lines.push(
       pythonComment(
-        `Declared missing codes for ${variable.name}: ${values.map(formatPythonValue).join(', ')}`,
+        rendererComment(
+          context.commentLanguage,
+          'comment.declaredMissingCodes',
+          {
+            variable: variable.name,
+            values: values.map(formatPythonValue).join(', '),
+          },
+        ),
       ),
       pythonComment(
-        'These are recoded to np.nan for Python analysis. Review before running.',
+        rendererComment(
+          context.commentLanguage,
+          'comment.pythonRecodedMissing',
+        ),
       ),
       `${context.dataFrameName}[${quotePythonString(variable.name)}] = ${context.dataFrameName}[${quotePythonString(variable.name)}].replace(${formatPythonList(values)}, np.nan)`,
     )
@@ -210,7 +231,7 @@ function renderMissingValueDeclarations(
 }
 
 function renderRangeCheck(step: CleaningStep, context: RenderContext): string {
-  const lines = [renderPythonStepComment(step)]
+  const lines = [renderPythonStepComment(step, context.commentLanguage)]
 
   findStepVariables(step, context.variablesByName).forEach((variable) => {
     const min = numberOrStringParameter(step, 'min') ?? variable.validRange?.min
@@ -227,7 +248,9 @@ function renderRangeCheck(step: CleaningStep, context: RenderContext): string {
     if (conditions.length === 0) {
       const message = `Range check "${step.id}" has no min or max for "${variable.name}".`
       context.warnings.push(message)
-      lines.push(pythonComment(`WARNING: ${message}`))
+      lines.push(
+        pythonComment(rendererWarning(context.commentLanguage, message)),
+      )
       return
     }
 
@@ -245,7 +268,7 @@ function renderRangeCheck(step: CleaningStep, context: RenderContext): string {
 }
 
 function renderDomainCheck(step: CleaningStep, context: RenderContext): string {
-  const lines = [renderPythonStepComment(step)]
+  const lines = [renderPythonStepComment(step, context.commentLanguage)]
 
   findStepVariables(step, context.variablesByName).forEach((variable) => {
     const allowedValues = allowedDomainValues(step, variable)
@@ -253,7 +276,9 @@ function renderDomainCheck(step: CleaningStep, context: RenderContext): string {
     if (allowedValues.length === 0) {
       const message = `Domain check "${step.id}" has no allowed values for "${variable.name}".`
       context.warnings.push(message)
-      lines.push(pythonComment(`WARNING: ${message}`))
+      lines.push(
+        pythonComment(rendererWarning(context.commentLanguage, message)),
+      )
       return
     }
 
@@ -272,13 +297,15 @@ function renderDomainCheck(step: CleaningStep, context: RenderContext): string {
 
 function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
   const method = normalizeMethodName(step.parameters.method) ?? 'tukey'
-  const lines = [renderPythonStepComment(step)]
+  const lines = [renderPythonStepComment(step, context.commentLanguage)]
 
   findStepVariables(step, context.variablesByName).forEach((variable) => {
     if (!isContinuousOutlierVariable(variable)) {
       const message = `Outlier method "${method}" is only rendered for continuous or count variables; "${variable.name}" is ${variable.type}.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(pythonComment(`WARNING: ${message}`))
+      lines.push(
+        pythonComment(rendererWarning(context.commentLanguage, message)),
+      )
       return
     }
 
@@ -294,7 +321,7 @@ function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
 
     const message = `Outlier method "${method}" is not supported by the current Python renderer; no deletion, capping, or winsorisation code was generated.`
     context.warnings.push(`Step "${step.id}": ${message}`)
-    lines.push(pythonComment(`WARNING: ${message}`))
+    lines.push(pythonComment(rendererWarning(context.commentLanguage, message)))
   })
 
   return lines.join('\n')
@@ -306,17 +333,19 @@ function renderStructuralMissingCheck(
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
   const targetVariable = variables[0]
-  const lines = [renderPythonStepComment(step)]
+  const lines = [renderPythonStepComment(step, context.commentLanguage)]
   const partialMessage =
     'Python structural-missing checks are rendered as review flags only; values are not recoded or imputed.'
 
   context.warnings.push(`Step "${step.id}": ${partialMessage}`)
-  lines.push(pythonComment(`WARNING: ${partialMessage}`))
+  lines.push(
+    pythonComment(rendererWarning(context.commentLanguage, partialMessage)),
+  )
 
   if (!targetVariable) {
     const message = `Structural-missing step "${step.id}" has no target variable to flag.`
     context.warnings.push(message)
-    lines.push(pythonComment(`WARNING: ${message}`))
+    lines.push(pythonComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -325,7 +354,7 @@ function renderStructuralMissingCheck(
   if (!condition) {
     const message = `Structural-missing step "${step.id}" has no condition; review the Cleaning Plan notes manually.`
     context.warnings.push(message)
-    lines.push(pythonComment(`WARNING: ${message}`))
+    lines.push(pythonComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -337,7 +366,11 @@ function renderStructuralMissingCheck(
   )
 
   lines.push(
-    pythonComment(`Structural-missing condition: ${condition}`),
+    pythonComment(
+      rendererComment(context.commentLanguage, 'comment.structuralCondition', {
+        condition,
+      }),
+    ),
     `${context.dataFrameName}[${quotePythonString(flagName(targetVariable, 'structural_missing'))}] = np.where(`,
     `    (${translatedCondition}) & ${context.dataFrameName}[${quotePythonString(targetVariable.name)}].notna(),`,
     '    1,',
@@ -354,17 +387,19 @@ function renderSkipPatternCheck(
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
   const targetVariable = variables[0]
-  const lines = [renderPythonStepComment(step)]
+  const lines = [renderPythonStepComment(step, context.commentLanguage)]
   const partialMessage =
     'Python skip-pattern checks use simple applicability conditions and only flag possible routing violations.'
 
   context.warnings.push(`Step "${step.id}": ${partialMessage}`)
-  lines.push(pythonComment(`WARNING: ${partialMessage}`))
+  lines.push(
+    pythonComment(rendererWarning(context.commentLanguage, partialMessage)),
+  )
 
   if (!targetVariable) {
     const message = `Skip-pattern step "${step.id}" has no target variable to flag.`
     context.warnings.push(message)
-    lines.push(pythonComment(`WARNING: ${message}`))
+    lines.push(pythonComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -373,7 +408,7 @@ function renderSkipPatternCheck(
   if (!condition) {
     const message = `Skip-pattern step "${step.id}" has no applicability condition; review the questionnaire routing manually.`
     context.warnings.push(message)
-    lines.push(pythonComment(`WARNING: ${message}`))
+    lines.push(pythonComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -385,7 +420,11 @@ function renderSkipPatternCheck(
   )
 
   lines.push(
-    pythonComment(`Applicable when: ${condition}`),
+    pythonComment(
+      rendererComment(context.commentLanguage, 'comment.applicableWhen', {
+        condition,
+      }),
+    ),
     `${context.dataFrameName}[${quotePythonString(flagName(targetVariable, 'skip_pattern'))}] = np.where(`,
     `    ~(${translatedCondition}) & ${context.dataFrameName}[${quotePythonString(targetVariable.name)}].notna(),`,
     '    1,',
@@ -401,18 +440,20 @@ function renderConsistencyCheck(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderPythonStepComment(step)]
+  const lines = [renderPythonStepComment(step, context.commentLanguage)]
   const condition = conditionParameter(step)
   const partialMessage =
     'Python consistency checks are rendered only when the Cleaning Plan supplies a simple flag condition.'
 
   context.warnings.push(`Step "${step.id}": ${partialMessage}`)
-  lines.push(pythonComment(`WARNING: ${partialMessage}`))
+  lines.push(
+    pythonComment(rendererWarning(context.commentLanguage, partialMessage)),
+  )
 
   if (!condition) {
     const message = `Consistency check "${step.id}" has no condition; no executable flag was generated.`
     context.warnings.push(message)
-    lines.push(pythonComment(`WARNING: ${message}`))
+    lines.push(pythonComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -424,7 +465,11 @@ function renderConsistencyCheck(
   )
 
   lines.push(
-    pythonComment(`Flag condition: ${condition}`),
+    pythonComment(
+      rendererComment(context.commentLanguage, 'comment.flagCondition', {
+        condition,
+      }),
+    ),
     `${context.dataFrameName}[${quotePythonString(stepFlagName(step, 'consistency'))}] = np.where(`,
     `    ${translatedCondition},`,
     '    1,',
@@ -440,12 +485,12 @@ function renderDuplicateIdCheck(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderPythonStepComment(step)]
+  const lines = [renderPythonStepComment(step, context.commentLanguage)]
 
   if (variables.length === 0) {
     const message = `Duplicate ID check "${step.id}" has no identifier variables.`
     context.warnings.push(message)
-    lines.push(pythonComment(`WARNING: ${message}`))
+    lines.push(pythonComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -454,7 +499,7 @@ function renderDuplicateIdCheck(
 
   lines.push(
     pythonComment(
-      'Duplicate identifier checks tag records; no records are deleted.',
+      rendererComment(context.commentLanguage, 'comment.duplicateNoDelete'),
     ),
     `duplicate_key_${flag} = [${variableNames.map(quotePythonString).join(', ')}]`,
     `${context.dataFrameName}[${quotePythonString(flag)}] = np.where(`,
@@ -474,7 +519,7 @@ function renderMissingnessDiagnosis(
   const variables = findStepVariables(step, context.variablesByName)
   const variableNames = variables.map((variable) => variable.name)
   const lines = [
-    renderPythonStepComment(step),
+    renderPythonStepComment(step, context.commentLanguage),
     `missing_summary = ${context.dataFrameName}[${JSON.stringify(variableNames)}].isna().sum().to_frame("n_missing")`,
     `missing_summary["pct_missing"] = missing_summary["n_missing"] / len(${context.dataFrameName}) * 100`,
     'print(missing_summary)',
@@ -491,18 +536,24 @@ function renderMissingnessDiagnosis(
 
 function renderImputation(step: CleaningStep, context: RenderContext): string {
   const lines = [
-    renderPythonStepComment(step),
+    renderPythonStepComment(step, context.commentLanguage),
     pythonComment(
-      'WARNING: IterativeImputer is experimental in scikit-learn and must be reviewed before production use.',
+      rendererWarning(
+        context.commentLanguage,
+        'IterativeImputer is experimental in scikit-learn and must be reviewed before production use.',
+      ),
     ),
     pythonComment(
-      'A single completed Python dataset is not equivalent to full Rubin-style multiple-imputation inference.',
+      rendererComment(context.commentLanguage, 'comment.pythonSingleDataset'),
     ),
     pythonComment(
-      'Use statsmodels or a specialised workflow when analysis pooling is required.',
+      rendererComment(context.commentLanguage, 'comment.pythonPoolingWorkflow'),
     ),
     pythonComment(
-      'Identifier variables and structural missing values are excluded from imputation examples.',
+      rendererComment(
+        context.commentLanguage,
+        'comment.pythonImputationExclusions',
+      ),
     ),
   ]
   context.warnings.push(
@@ -513,7 +564,7 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     const message =
       'Structural missing values were requested for imputation and have been blocked.'
     context.warnings.push(`Step "${step.id}": ${message}`)
-    lines.push(pythonComment(`WARNING: ${message}`))
+    lines.push(pythonComment(rendererWarning(context.commentLanguage, message)))
   }
 
   const imputedVariables = findStepVariables(
@@ -523,14 +574,18 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     if (isIdentifierVariable(variable)) {
       const message = `Identifier variable "${variable.name}" was excluded from imputation.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(pythonComment(`WARNING: ${message}`))
+      lines.push(
+        pythonComment(rendererWarning(context.commentLanguage, message)),
+      )
       return false
     }
 
     if (['binary', 'nominal', 'ordinal'].includes(variable.type)) {
       const message = `Categorical variable "${variable.name}" is included in a numeric IterativeImputer example; review encoding and model fit before production use.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(pythonComment(`WARNING: ${message}`))
+      lines.push(
+        pythonComment(rendererWarning(context.commentLanguage, message)),
+      )
     }
 
     return canImputeVariable(variable)
@@ -539,7 +594,7 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
   if (imputedVariables.length === 0) {
     const message = `Imputation step "${step.id}" has no variables suitable for Python imputation.`
     context.warnings.push(message)
-    lines.push(pythonComment(`WARNING: ${message}`))
+    lines.push(pythonComment(rendererWarning(context.commentLanguage, message)))
     return lines.join('\n')
   }
 
@@ -557,10 +612,10 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     'completed_data_example[imputation_variables] = imputed_array',
     '',
     pythonComment(
-      'Pooling guidance: fit models separately across multiple imputations and pool estimates.',
+      rendererComment(context.commentLanguage, 'comment.pythonPoolingGuidance'),
     ),
     pythonComment(
-      'Do not treat completed_data_example as full multiple-imputation inference.',
+      rendererComment(context.commentLanguage, 'comment.pythonNotFullMi'),
     ),
   )
 
@@ -568,15 +623,15 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
 }
 
 function renderAuditLog(step: CleaningStep, context: RenderContext): string {
-  const lines = [renderPythonStepComment(step)]
+  const lines = [renderPythonStepComment(step, context.commentLanguage)]
   const message =
     'Python audit-log support is partial: this section documents review guidance but does not create a separate audit table.'
 
   context.warnings.push(`Step "${step.id}": ${message}`)
   lines.push(
-    pythonComment(`WARNING: ${message}`),
+    pythonComment(rendererWarning(context.commentLanguage, message)),
     pythonComment(
-      'Review generated flag_* variables and preserve reviewer decisions outside the source variables.',
+      rendererComment(context.commentLanguage, 'comment.reviewGeneratedFlags'),
     ),
   )
 
@@ -588,12 +643,12 @@ function renderSummaryReport(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderPythonStepComment(step)]
+  const lines = [renderPythonStepComment(step, context.commentLanguage)]
   const message =
     'Python summary-report support is partial: basic summaries are emitted for review, not a publication-ready report.'
 
   context.warnings.push(`Step "${step.id}": ${message}`)
-  lines.push(pythonComment(`WARNING: ${message}`))
+  lines.push(pythonComment(rendererWarning(context.commentLanguage, message)))
 
   if (variables.length > 0) {
     const variableNames = variables.map((variable) => variable.name)
@@ -604,7 +659,9 @@ function renderSummaryReport(
     )
   } else {
     lines.push(
-      pythonComment('No variables were listed for the summary report step.'),
+      pythonComment(
+        rendererComment(context.commentLanguage, 'comment.noSummaryVariables'),
+      ),
     )
   }
 

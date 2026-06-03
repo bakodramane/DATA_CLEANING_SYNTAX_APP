@@ -19,9 +19,13 @@ Status below is for the current v0.4.2 deployment checkpoint.
 
 - [x] Production preview opens.
 - [ ] Default UI language is English.
+- [ ] Default English syntax comments appear.
 - [ ] Language selector switches to French.
 - [ ] Selected UI language persists after reload.
 - [ ] Workflow state is preserved when switching language.
+- [ ] Syntax preview comments switch to French.
+- [ ] Generated executable syntax remains stable across language switching.
+- [ ] Script downloads use selected-language comments.
 - [x] Demo dictionary loads.
 - [x] CSV paste works.
 - [x] Excel upload works.
@@ -57,8 +61,10 @@ text appears in the main workflow, the selected language is stored locally in
 the browser, French rule/reviewer text appears in rule review, Cleaning Plan
 preview, and the summary report, and no backend, telemetry, external
 translation API, or AI-assisted translation is introduced. Generated SPSS,
-Stata, R, and Python syntax comments may remain English until a later
-terminology-review phase.
+Stata, R, and Python comments should follow the selected UI language where
+local renderer-comment translations exist. Executable syntax, variable names,
+commands, package names, function names, citation keys, and user-entered labels
+or value labels must remain unchanged. Generated script files should be UTF-8.
 
 ## Public Demo Smoke Check
 
@@ -123,3 +129,6 @@ visible in both returned renderer warnings and generated script comments, that
 full-file golden tests cover representative Cleaning Plans for SPSS v18, Stata
 v14, R, and Python, and that generated scripts do not silently delete records,
 treat outliers, impute identifiers, or impute structural missing values.
+For multilingual renderer releases, also verify that English and French outputs
+only differ in generated full-line comments where practical, and that
+unsupported-step comments appear in the selected language.

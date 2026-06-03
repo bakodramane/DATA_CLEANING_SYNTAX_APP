@@ -5,10 +5,14 @@ import type {
   VariableValue,
 } from '../../core'
 import {
-  formatCitationKeys,
-  formatGeneratedAt,
-  makeScriptFilename,
-} from '../helpers'
+  rendererCitationKeys,
+  rendererComment,
+  rendererReviewRequirement,
+  rendererStepRationale,
+  rendererWarning,
+  type LanguageCode,
+} from '../../i18n'
+import { formatGeneratedAt, makeScriptFilename } from '../helpers'
 
 export function makeStataFilename(plan: CleaningPlan): string {
   return makeScriptFilename(plan, 'stata14-cleaning-script', 'do')
@@ -49,53 +53,77 @@ export function stataComment(message: string): string {
 export function renderStataTitleBlock(
   plan: CleaningPlan,
   generatedAt?: Date | string,
+  language: LanguageCode = 'en',
 ): string {
   const assumptions =
     plan.metadata.assumptions.length > 0
       ? plan.metadata.assumptions.map((assumption) =>
           stataComment(`- ${assumption}`),
         )
-      : [stataComment('- No assumptions were recorded in the Cleaning Plan')]
+      : [stataComment(`- ${rendererComment(language, 'title.noAssumptions')}`)]
 
   return [
+    stataComment(rendererComment(language, 'title.banner')),
+    stataComment(rendererComment(language, 'title.name')),
+    stataComment(rendererComment(language, 'title.target.stata')),
     stataComment(
-      '=============================================================================',
+      rendererComment(language, 'title.timestamp', {
+        generatedAt: formatGeneratedAt(generatedAt),
+      }),
     ),
-    stataComment('Survey Microdata Cleaning Syntax'),
-    stataComment('Generated target: Stata v14 do-file syntax'),
-    stataComment(`Generation timestamp: ${formatGeneratedAt(generatedAt)}`),
-    stataComment(`Cleaning Plan: ${plan.metadata.title}`),
-    stataComment(`Cleaning Plan ID: ${plan.id}`),
-    stataComment(`Cleaning Plan version: ${plan.metadata.version}`),
-    stataComment('Version assumption: Stata v14'),
-    stataComment('Assumptions:'),
+    stataComment(
+      rendererComment(language, 'title.plan', { title: plan.metadata.title }),
+    ),
+    stataComment(rendererComment(language, 'title.planId', { id: plan.id })),
+    stataComment(
+      rendererComment(language, 'title.planVersion', {
+        version: plan.metadata.version,
+      }),
+    ),
+    stataComment(rendererComment(language, 'title.versionAssumption.stata')),
+    stataComment(rendererComment(language, 'title.assumptions')),
     ...assumptions,
-    stataComment('WARNING: Review this generated syntax before production use'),
     stataComment(
-      'No records are deleted and validation checks write flag variables',
+      rendererWarning(
+        language,
+        rendererComment(language, 'title.reviewWarning'),
+      ),
     ),
-    stataComment(
-      '=============================================================================',
-    ),
+    stataComment(rendererComment(language, 'title.noOverwrite.flags')),
+    stataComment(rendererComment(language, 'title.banner')),
   ].join('\n')
 }
 
-export function renderStataStepComment(step: CleaningStep): string {
+export function renderStataStepComment(
+  step: CleaningStep,
+  language: LanguageCode = 'en',
+): string {
   return [
+    stataComment(rendererComment(language, 'step.separator')),
+    stataComment(rendererComment(language, 'step.id', { id: step.id })),
+    stataComment(rendererComment(language, 'step.type', { type: step.type })),
     stataComment(
-      '-----------------------------------------------------------------------------',
-    ),
-    stataComment(`Step ID: ${step.id}`),
-    stataComment(`Step type: ${step.type}`),
-    stataComment(`Variables: ${step.variables.join(', ') || 'None'}`),
-    stataComment(`Rationale: ${step.rationale}`),
-    stataComment(`Citation: ${formatCitationKeys(step.citationKeys)}`),
-    stataComment(
-      `Review requirement: ${step.requiresReview ? 'Requires user review' : 'Automatic step'}`,
+      rendererComment(language, 'step.variables', {
+        variables:
+          step.variables.join(', ') || rendererComment(language, 'step.none'),
+      }),
     ),
     stataComment(
-      '-----------------------------------------------------------------------------',
+      rendererComment(language, 'step.rationale', {
+        rationale: rendererStepRationale(language, step),
+      }),
     ),
+    stataComment(
+      rendererComment(language, 'step.citation', {
+        citations: rendererCitationKeys(language, step.citationKeys),
+      }),
+    ),
+    stataComment(
+      rendererComment(language, 'step.reviewRequirement', {
+        requirement: rendererReviewRequirement(language, step.requiresReview),
+      }),
+    ),
+    stataComment(rendererComment(language, 'step.separator')),
   ].join('\n')
 }
 

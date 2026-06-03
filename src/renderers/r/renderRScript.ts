@@ -5,6 +5,7 @@ import type {
   SurveyVariable,
   VariableValue,
 } from '../../core'
+import { rendererComment, type LanguageCode } from '../../i18n'
 import type {
   RenderedScript,
   RenderOptions,
@@ -71,6 +72,7 @@ interface RenderContext {
   variablesByName: Map<string, SurveyVariable>
   warnings: string[]
   unsupportedSteps: UnsupportedRenderedStep[]
+  commentLanguage: LanguageCode
 }
 
 export function renderRScript(
@@ -83,11 +85,16 @@ export function renderRScript(
     variablesByName: indexVariables(cleaningPlan.variables),
     warnings: [],
     unsupportedSteps: [],
+    commentLanguage: options.language ?? 'en',
   }
 
   const sections = [
-    renderTitleBlock(cleaningPlan, formatGeneratedAt(options.generatedAt)),
-    renderPackageSection(dataFrameName),
+    renderTitleBlock(
+      cleaningPlan,
+      formatGeneratedAt(options.generatedAt),
+      context.commentLanguage,
+    ),
+    renderPackageSection(dataFrameName, context.commentLanguage),
     ...cleaningPlan.steps.map((step) => renderStep(step, context)),
   ]
 
@@ -148,7 +155,11 @@ function renderUnsupportedStep(
   context.unsupportedSteps.push(unsupportedStep)
   context.warnings.push(`Step "${step.id}": ${unsupportedStep.reason}`)
 
-  return renderUnsupportedStepComment(step, unsupportedStep)
+  return renderUnsupportedStepComment(
+    step,
+    unsupportedStep,
+    context.commentLanguage,
+  )
 }
 
 function renderVariableLabels(
@@ -156,11 +167,13 @@ function renderVariableLabels(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
 
   variables.forEach((variable) => {
     lines.push(
-      `# Variable label: ${variable.name}`,
+      `# ${rendererComment(context.commentLanguage, 'comment.variableLabel', {
+        variable: variable.name,
+      })}`,
       `var_label(${rVariableReference(context.dataFrameName, variable.name)}) <- ${quoteRString(variable.label)}`,
     )
   })
@@ -170,13 +183,13 @@ function renderVariableLabels(
 
 function renderValueLabels(step: CleaningStep, context: RenderContext): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
 
   variables.forEach((variable) => {
     if (!variable.valueLabels || variable.valueLabels.length === 0) {
       const message = `Variable "${variable.name}" has no value labels to render.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(renderWarningComment(message))
+      lines.push(renderWarningComment(message, context.commentLanguage))
       return
     }
 
@@ -188,7 +201,9 @@ function renderValueLabels(step: CleaningStep, context: RenderContext): string {
       .join(', ')
 
     lines.push(
-      `# Value labels: ${variable.name}`,
+      `# ${rendererComment(context.commentLanguage, 'comment.valueLabels', {
+        variable: variable.name,
+      })}`,
       `val_labels(${rVariableReference(context.dataFrameName, variable.name)}) <- c(${labelPairs})`,
     )
   })
@@ -201,7 +216,7 @@ function renderMissingValueDeclarations(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
 
   variables.forEach((variable) => {
     const missingCodes = variable.declaredMissingCodes ?? []
@@ -209,15 +224,22 @@ function renderMissingValueDeclarations(
     if (missingCodes.length === 0) {
       const message = `Variable "${variable.name}" has no declared missing codes to recode.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(renderWarningComment(message))
+      lines.push(renderWarningComment(message, context.commentLanguage))
       return
     }
 
     const codes = missingCodes.map((missingCode) => missingCode.value)
 
     lines.push(
-      `# Declared missing codes for ${variable.name}: ${codes.map(formatRValue).join(', ')}`,
-      '# These are recoded to NA for R analysis. Review before running.',
+      `# ${rendererComment(
+        context.commentLanguage,
+        'comment.declaredMissingCodes',
+        {
+          variable: variable.name,
+          values: codes.map(formatRValue).join(', '),
+        },
+      )}`,
+      `# ${rendererComment(context.commentLanguage, 'comment.rRecodedMissing')}`,
       `${context.dataFrameName} <- ${context.dataFrameName} %>%`,
       '  mutate(',
       `    ${variable.name} = if_else(${variable.name} %in% ${formatRVector(codes)}, ${naLiteralForVariable(variable)}, ${variable.name})`,
@@ -230,7 +252,7 @@ function renderMissingValueDeclarations(
 
 function renderRangeCheck(step: CleaningStep, context: RenderContext): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
 
   variables.forEach((variable) => {
     const min = numberOrStringParameter(step, 'min') ?? variable.validRange?.min
@@ -243,7 +265,7 @@ function renderRangeCheck(step: CleaningStep, context: RenderContext): string {
     if (conditions.length === 0) {
       const message = `Range check "${step.id}" has no min or max for "${variable.name}".`
       context.warnings.push(message)
-      lines.push(renderWarningComment(message))
+      lines.push(renderWarningComment(message, context.commentLanguage))
       return
     }
 
@@ -260,7 +282,7 @@ function renderRangeCheck(step: CleaningStep, context: RenderContext): string {
 
 function renderDomainCheck(step: CleaningStep, context: RenderContext): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
 
   variables.forEach((variable) => {
     const allowedValues = allowedDomainValues(step, variable)
@@ -268,7 +290,7 @@ function renderDomainCheck(step: CleaningStep, context: RenderContext): string {
     if (allowedValues.length === 0) {
       const message = `Domain check "${step.id}" has no allowed values for "${variable.name}".`
       context.warnings.push(message)
-      lines.push(renderWarningComment(message))
+      lines.push(renderWarningComment(message, context.commentLanguage))
       return
     }
 
@@ -286,13 +308,13 @@ function renderDomainCheck(step: CleaningStep, context: RenderContext): string {
 function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
   const variables = findStepVariables(step, context.variablesByName)
   const method = normalizeMethodName(step.parameters.method) ?? 'tukey'
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
 
   variables.forEach((variable) => {
     if (!isContinuousOutlierVariable(variable)) {
       const message = `Outlier method "${method}" is only rendered for continuous or count variables; "${variable.name}" is ${variable.type}.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(renderWarningComment(message))
+      lines.push(renderWarningComment(message, context.commentLanguage))
       return
     }
 
@@ -310,7 +332,7 @@ function renderOutlierFlag(step: CleaningStep, context: RenderContext): string {
 
     const message = `Outlier method "${method}" is not supported by the current R renderer; no deletion, capping, or winsorisation code was generated.`
     context.warnings.push(`Step "${step.id}": ${message}`)
-    lines.push(renderWarningComment(message))
+    lines.push(renderWarningComment(message, context.commentLanguage))
   })
 
   return lines.join('\n')
@@ -322,17 +344,17 @@ function renderStructuralMissingCheck(
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
   const targetVariable = variables[0]
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
   const partialMessage =
     'R structural-missing checks are rendered as review flags only; values are not recoded or imputed.'
 
   context.warnings.push(`Step "${step.id}": ${partialMessage}`)
-  lines.push(renderWarningComment(partialMessage))
+  lines.push(renderWarningComment(partialMessage, context.commentLanguage))
 
   if (!targetVariable) {
     const message = `Structural-missing step "${step.id}" has no target variable to flag.`
     context.warnings.push(message)
-    lines.push(renderWarningComment(message))
+    lines.push(renderWarningComment(message, context.commentLanguage))
     return lines.join('\n')
   }
 
@@ -341,7 +363,7 @@ function renderStructuralMissingCheck(
   if (!condition) {
     const message = `Structural-missing step "${step.id}" has no condition; review the Cleaning Plan notes manually.`
     context.warnings.push(message)
-    lines.push(renderWarningComment(message))
+    lines.push(renderWarningComment(message, context.commentLanguage))
     return lines.join('\n')
   }
 
@@ -353,7 +375,13 @@ function renderStructuralMissingCheck(
   )
 
   lines.push(
-    `# Structural-missing condition: ${condition}`,
+    `# ${rendererComment(
+      context.commentLanguage,
+      'comment.structuralCondition',
+      {
+        condition,
+      },
+    )}`,
     `${context.dataFrameName} <- ${context.dataFrameName} %>%`,
     '  mutate(',
     `    ${flagName(targetVariable, 'structural_missing')} = if_else((${translatedCondition}) & !is.na(${targetVariable.name}), 1L, 0L)`,
@@ -369,17 +397,17 @@ function renderSkipPatternCheck(
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
   const targetVariable = variables[0]
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
   const partialMessage =
     'R skip-pattern checks use simple applicability conditions and only flag possible routing violations.'
 
   context.warnings.push(`Step "${step.id}": ${partialMessage}`)
-  lines.push(renderWarningComment(partialMessage))
+  lines.push(renderWarningComment(partialMessage, context.commentLanguage))
 
   if (!targetVariable) {
     const message = `Skip-pattern step "${step.id}" has no target variable to flag.`
     context.warnings.push(message)
-    lines.push(renderWarningComment(message))
+    lines.push(renderWarningComment(message, context.commentLanguage))
     return lines.join('\n')
   }
 
@@ -388,7 +416,7 @@ function renderSkipPatternCheck(
   if (!condition) {
     const message = `Skip-pattern step "${step.id}" has no applicability condition; review the questionnaire routing manually.`
     context.warnings.push(message)
-    lines.push(renderWarningComment(message))
+    lines.push(renderWarningComment(message, context.commentLanguage))
     return lines.join('\n')
   }
 
@@ -400,7 +428,9 @@ function renderSkipPatternCheck(
   )
 
   lines.push(
-    `# Applicable when: ${condition}`,
+    `# ${rendererComment(context.commentLanguage, 'comment.applicableWhen', {
+      condition,
+    })}`,
     `${context.dataFrameName} <- ${context.dataFrameName} %>%`,
     '  mutate(',
     `    ${flagName(targetVariable, 'skip_pattern')} = if_else(!(${translatedCondition}) & !is.na(${targetVariable.name}), 1L, 0L)`,
@@ -415,18 +445,18 @@ function renderConsistencyCheck(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
   const condition = conditionParameter(step)
   const partialMessage =
     'R consistency checks are rendered only when the Cleaning Plan supplies a simple flag condition.'
 
   context.warnings.push(`Step "${step.id}": ${partialMessage}`)
-  lines.push(renderWarningComment(partialMessage))
+  lines.push(renderWarningComment(partialMessage, context.commentLanguage))
 
   if (!condition) {
     const message = `Consistency check "${step.id}" has no condition; no executable flag was generated.`
     context.warnings.push(message)
-    lines.push(renderWarningComment(message))
+    lines.push(renderWarningComment(message, context.commentLanguage))
     return lines.join('\n')
   }
 
@@ -438,7 +468,9 @@ function renderConsistencyCheck(
   )
 
   lines.push(
-    `# Flag condition: ${condition}`,
+    `# ${rendererComment(context.commentLanguage, 'comment.flagCondition', {
+      condition,
+    })}`,
     `${context.dataFrameName} <- ${context.dataFrameName} %>%`,
     '  mutate(',
     `    ${stepFlagName(step, 'consistency')} = if_else(${translatedCondition}, 1L, 0L)`,
@@ -453,12 +485,12 @@ function renderDuplicateIdCheck(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
 
   if (variables.length === 0) {
     const message = `Duplicate ID check "${step.id}" has no identifier variables.`
     context.warnings.push(message)
-    lines.push(renderWarningComment(message))
+    lines.push(renderWarningComment(message, context.commentLanguage))
     return lines.join('\n')
   }
 
@@ -467,7 +499,7 @@ function renderDuplicateIdCheck(
   const flag = duplicateFlagName(step)
 
   lines.push(
-    '# Duplicate identifier checks tag records; no records are deleted.',
+    `# ${rendererComment(context.commentLanguage, 'comment.duplicateNoDelete')}`,
     `${keyName} <- ${context.dataFrameName} %>% select(all_of(${formatRCharacterVector(variableNames)}))`,
     `${context.dataFrameName} <- ${context.dataFrameName} %>%`,
     '  mutate(',
@@ -486,7 +518,7 @@ function renderMissingnessDiagnosis(
   const createIndicators =
     step.parameters.createIndicators === true ||
     step.parameters.createIndicatorVariables === true
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
 
   const summaries = variables.map((variable) =>
     [
@@ -525,18 +557,18 @@ function renderMissingnessDiagnosis(
 function renderImputation(step: CleaningStep, context: RenderContext): string {
   const requestedVariables = findStepVariables(step, context.variablesByName)
   const lines = [
-    renderStepComment(step),
-    '# Multiple imputation requires careful methodological review.',
-    '# This MVP uses mice() with simple default methods and does not automate model selection.',
-    '# Structural missing values must be excluded before imputation.',
-    '# Identifier variables are excluded from imputation methods.',
+    renderStepComment(step, context.commentLanguage),
+    `# ${rendererComment(context.commentLanguage, 'comment.rImputationReview')}`,
+    `# ${rendererComment(context.commentLanguage, 'comment.rMiceDefaults')}`,
+    `# ${rendererComment(context.commentLanguage, 'comment.rStructuralExclusion')}`,
+    `# ${rendererComment(context.commentLanguage, 'comment.rIdentifierExclusion')}`,
   ]
 
   if (selectsStructuralMissing(step.parameters)) {
     const message =
       'Structural missing values were requested for imputation and have been blocked.'
     context.warnings.push(`Step "${step.id}": ${message}`)
-    lines.push(renderWarningComment(message))
+    lines.push(renderWarningComment(message, context.commentLanguage))
   }
 
   const imputedVariables = requestedVariables.filter((variable) => {
@@ -546,13 +578,13 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     if (isIdentifier) {
       const message = `Identifier variable "${variable.name}" was excluded from imputation.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(renderWarningComment(message))
+      lines.push(renderWarningComment(message, context.commentLanguage))
     }
 
     if (['binary', 'nominal', 'ordinal'].includes(variable.type)) {
       const message = `Categorical variable "${variable.name}" uses a mice categorical method; review category prevalence and model fit before production use.`
       context.warnings.push(`Step "${step.id}": ${message}`)
-      lines.push(renderWarningComment(message))
+      lines.push(renderWarningComment(message, context.commentLanguage))
     }
 
     return !isIdentifier && methodForMice(variable) !== ''
@@ -561,7 +593,7 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
   if (imputedVariables.length === 0) {
     const message = `Imputation step "${step.id}" has no variables that can be rendered for mice().`
     context.warnings.push(message)
-    lines.push(renderWarningComment(message))
+    lines.push(renderWarningComment(message, context.commentLanguage))
     return lines.join('\n')
   }
 
@@ -589,7 +621,7 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
     'mice_fit <- mice(imputation_data, m = 5, method = mice_methods, maxit = 10, seed = 12345)',
     'completed_data_example <- complete(mice_fit, action = 1)',
     '',
-    '# Example analysis and pooling guidance, to be adapted by the analyst:',
+    `# ${rendererComment(context.commentLanguage, 'comment.rAnalysisGuidance')}`,
     '# fit <- with(mice_fit, lm(outcome ~ income + age + sex))',
     '# pooled <- pool(fit)',
     '# summary(pooled)',
@@ -599,14 +631,14 @@ function renderImputation(step: CleaningStep, context: RenderContext): string {
 }
 
 function renderAuditLog(step: CleaningStep, context: RenderContext): string {
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
   const message =
     'R audit-log support is partial: this section documents review guidance but does not create a separate audit table.'
 
   context.warnings.push(`Step "${step.id}": ${message}`)
   lines.push(
-    renderWarningComment(message),
-    '# Review generated flag_* variables and preserve reviewer decisions outside the source variables.',
+    renderWarningComment(message, context.commentLanguage),
+    `# ${rendererComment(context.commentLanguage, 'comment.reviewGeneratedFlags')}`,
   )
 
   return lines.join('\n')
@@ -617,12 +649,12 @@ function renderSummaryReport(
   context: RenderContext,
 ): string {
   const variables = findStepVariables(step, context.variablesByName)
-  const lines = [renderStepComment(step)]
+  const lines = [renderStepComment(step, context.commentLanguage)]
   const message =
     'R summary-report support is partial: basic summaries are emitted for review, not a publication-ready report.'
 
   context.warnings.push(`Step "${step.id}": ${message}`)
-  lines.push(renderWarningComment(message))
+  lines.push(renderWarningComment(message, context.commentLanguage))
 
   if (variables.length > 0) {
     const variableNames = variables.map((variable) => variable.name)
@@ -631,7 +663,9 @@ function renderSummaryReport(
       `print(summary(${context.dataFrameName}[summary_report_variables]))`,
     )
   } else {
-    lines.push('# No variables were listed for the summary report step.')
+    lines.push(
+      `# ${rendererComment(context.commentLanguage, 'comment.noSummaryVariables')}`,
+    )
   }
 
   return lines.join('\n')

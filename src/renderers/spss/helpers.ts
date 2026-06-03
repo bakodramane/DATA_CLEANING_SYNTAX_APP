@@ -5,10 +5,14 @@ import type {
   VariableValue,
 } from '../../core'
 import {
-  formatCitationKeys,
-  formatGeneratedAt,
-  makeScriptFilename,
-} from '../helpers'
+  rendererCitationKeys,
+  rendererComment,
+  rendererReviewRequirement,
+  rendererStepRationale,
+  rendererWarning,
+  type LanguageCode,
+} from '../../i18n'
+import { formatGeneratedAt, makeScriptFilename } from '../helpers'
 
 export function makeSpssFilename(plan: CleaningPlan): string {
   return makeScriptFilename(plan, 'spss18-cleaning-script', 'sps')
@@ -44,53 +48,77 @@ export function spssComment(message: string): string {
 export function renderSpssTitleBlock(
   plan: CleaningPlan,
   generatedAt?: Date | string,
+  language: LanguageCode = 'en',
 ): string {
   const assumptions =
     plan.metadata.assumptions.length > 0
       ? plan.metadata.assumptions.map((assumption) =>
           spssComment(`- ${assumption}`),
         )
-      : [spssComment('- No assumptions were recorded in the Cleaning Plan')]
+      : [spssComment(`- ${rendererComment(language, 'title.noAssumptions')}`)]
 
   return [
+    spssComment(rendererComment(language, 'title.banner')),
+    spssComment(rendererComment(language, 'title.name')),
+    spssComment(rendererComment(language, 'title.target.spss')),
     spssComment(
-      '=============================================================================',
+      rendererComment(language, 'title.timestamp', {
+        generatedAt: formatGeneratedAt(generatedAt),
+      }),
     ),
-    spssComment('Survey Microdata Cleaning Syntax'),
-    spssComment('Generated target: SPSS v18 command syntax'),
-    spssComment(`Generation timestamp: ${formatGeneratedAt(generatedAt)}`),
-    spssComment(`Cleaning Plan: ${plan.metadata.title}`),
-    spssComment(`Cleaning Plan ID: ${plan.id}`),
-    spssComment(`Cleaning Plan version: ${plan.metadata.version}`),
-    spssComment('Version assumption: IBM SPSS Statistics v18 command syntax'),
-    spssComment('Assumptions:'),
+    spssComment(
+      rendererComment(language, 'title.plan', { title: plan.metadata.title }),
+    ),
+    spssComment(rendererComment(language, 'title.planId', { id: plan.id })),
+    spssComment(
+      rendererComment(language, 'title.planVersion', {
+        version: plan.metadata.version,
+      }),
+    ),
+    spssComment(rendererComment(language, 'title.versionAssumption.spss')),
+    spssComment(rendererComment(language, 'title.assumptions')),
     ...assumptions,
-    spssComment('WARNING: Review this generated syntax before production use'),
     spssComment(
-      'No records are deleted and source variables are not overwritten by validation checks',
+      rendererWarning(
+        language,
+        rendererComment(language, 'title.reviewWarning'),
+      ),
     ),
-    spssComment(
-      '=============================================================================',
-    ),
+    spssComment(rendererComment(language, 'title.noOverwrite.spss')),
+    spssComment(rendererComment(language, 'title.banner')),
   ].join('\n')
 }
 
-export function renderSpssStepComment(step: CleaningStep): string {
+export function renderSpssStepComment(
+  step: CleaningStep,
+  language: LanguageCode = 'en',
+): string {
   return [
+    spssComment(rendererComment(language, 'step.separator')),
+    spssComment(rendererComment(language, 'step.id', { id: step.id })),
+    spssComment(rendererComment(language, 'step.type', { type: step.type })),
     spssComment(
-      '-----------------------------------------------------------------------------',
-    ),
-    spssComment(`Step ID: ${step.id}`),
-    spssComment(`Step type: ${step.type}`),
-    spssComment(`Variables: ${step.variables.join(', ') || 'None'}`),
-    spssComment(`Rationale: ${step.rationale}`),
-    spssComment(`Citation: ${formatCitationKeys(step.citationKeys)}`),
-    spssComment(
-      `Review requirement: ${step.requiresReview ? 'Requires user review' : 'Automatic step'}`,
+      rendererComment(language, 'step.variables', {
+        variables:
+          step.variables.join(', ') || rendererComment(language, 'step.none'),
+      }),
     ),
     spssComment(
-      '-----------------------------------------------------------------------------',
+      rendererComment(language, 'step.rationale', {
+        rationale: rendererStepRationale(language, step),
+      }),
     ),
+    spssComment(
+      rendererComment(language, 'step.citation', {
+        citations: rendererCitationKeys(language, step.citationKeys),
+      }),
+    ),
+    spssComment(
+      rendererComment(language, 'step.reviewRequirement', {
+        requirement: rendererReviewRequirement(language, step.requiresReview),
+      }),
+    ),
+    spssComment(rendererComment(language, 'step.separator')),
   ].join('\n')
 }
 

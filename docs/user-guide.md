@@ -30,10 +30,12 @@ preview state.
 French covers the core workflow, importer privacy warnings, rule labels,
 descriptions, rationales, blocked-rule explanations, Cleaning Plan preview
 rationales, and the plain-language summary report. Variable names, citation
-keys, package names, and generated SPSS, Stata, R, and Python executable syntax
-remain unchanged. Generated syntax comments may remain English in this phase.
-The app does not use AI-assisted translation, external translation services,
-telemetry, or a backend.
+keys, package names, software commands, function names, and generated SPSS,
+Stata, R, and Python executable syntax remain unchanged. Generated script
+comments and reviewer guidance follow the selected language where local
+English/French renderer-comment text exists. User-entered labels, value labels,
+and notes are not machine-translated. The app does not use AI-assisted
+translation, external translation services, telemetry, or a backend.
 
 ### 3. Enter Project Information
 
@@ -187,7 +189,11 @@ syntax.
 
 Preview generated SPSS v18, Stata v14, R, and Python syntax. Syntax is heavily
 commented so analysts can see which metadata and rule rationale produced each
-step.
+step. When English or French is selected, generated comment headings, rationale
+labels, citation labels, reviewer warnings, unsupported-step notes, and
+partial-support guidance use that selected language. The executable syntax,
+variable names, package names, function names, citation keys, and user-entered
+codebook text stay unchanged.
 
 Some renderer features are intentionally partial. The syntax preview and
 downloads include warning comments when a step is a review template or needs
@@ -202,7 +208,8 @@ responses.
 The summary report follows the selected interface language for reviewer-facing
 headings, selected rule names, step type labels, rationales, and translated rule
 warnings. Generated scripts keep technical syntax stable across language
-selection.
+selection while generated comments use the selected language where local
+renderer-comment translations exist. Script downloads are UTF-8 text files.
 
 ### 17. Save The Cleaning Plan JSON
 

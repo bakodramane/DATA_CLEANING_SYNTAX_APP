@@ -36,8 +36,9 @@ commitment to implement every item in order.
 - Refine manual variable-entry ergonomics and saved-session support.
 - Improve import mapping review before accepting metadata.
 - Add clearer warnings for partial renderer support.
-- Extend English/French coverage to generated-comment terminology and deeper
-  methodology text after statistical terminology review.
+- Continue terminology review for English/French generated comments and deeper
+  methodology text now that generated script comments follow the selected UI
+  language.
 - Consider additional interface languages once English/French terminology and
   workflow coverage are stable.
 - Improve import warnings for partial package-file metadata extraction.
