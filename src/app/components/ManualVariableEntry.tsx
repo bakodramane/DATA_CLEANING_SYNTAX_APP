@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent } from 'react'
 import type { SurveyVariable } from '../../core'
+import { useI18n } from '../../i18n/useI18n'
 import {
   createManualVariableFormValues,
   emptyManualVariableForm,
@@ -28,6 +29,7 @@ export function ManualVariableEntry({
   onSaveVariable,
   onRemoveVariable,
 }: ManualVariableEntryProps) {
+  const { t } = useI18n()
   const [formValues, setFormValues] = useState<ManualVariableFormValues>({
     ...emptyManualVariableForm,
   })
@@ -72,19 +74,15 @@ export function ManualVariableEntry({
   }
 
   return (
-    <section className="manual-entry-panel" aria-label="Manual variable entry">
+    <section className="manual-entry-panel" aria-label={t('manual.aria')}>
       <div className="step-heading">
-        <h3>Manual variable entry</h3>
-        <HelpText>
-          Add variables one by one when no dictionary file is available. Value
-          labels and missing codes accept entries like 1=Male; 2=Female or
-          -8=Don't know; -9=Refused.
-        </HelpText>
+        <h3>{t('manual.title')}</h3>
+        <HelpText>{t('manual.help')}</HelpText>
       </div>
 
       <div className="form-grid">
         <label>
-          <span>Variable name</span>
+          <span>{t('manual.variableName')}</span>
           <input
             type="text"
             value={formValues.name}
@@ -94,7 +92,7 @@ export function ManualVariableEntry({
         </label>
 
         <label>
-          <span>Variable label</span>
+          <span>{t('manual.variableLabel')}</span>
           <input
             type="text"
             value={formValues.label}
@@ -104,30 +102,30 @@ export function ManualVariableEntry({
         </label>
 
         <label>
-          <span>Variable type</span>
+          <span>{t('manual.variableType')}</span>
           <select value={formValues.type} onChange={updateField('type')}>
-            <option value="">Select type</option>
+            <option value="">{t('manual.selectType')}</option>
             {supportedVariableTypes.map((type) => (
               <option key={type} value={type}>
-                {type}
+                {t(`type.${type}`)}
               </option>
             ))}
           </select>
         </label>
 
         <label>
-          <span>Variable role</span>
+          <span>{t('manual.variableRole')}</span>
           <select value={formValues.role} onChange={updateField('role')}>
             {supportedVariableRoles.map((role) => (
               <option key={role} value={role}>
-                {role}
+                {t(`role.${role}`)}
               </option>
             ))}
           </select>
         </label>
 
         <label>
-          <span>Storage type</span>
+          <span>{t('manual.storageType')}</span>
           <input
             type="text"
             value={formValues.storageType}
@@ -137,7 +135,7 @@ export function ManualVariableEntry({
         </label>
 
         <label>
-          <span>Allowed values</span>
+          <span>{t('manual.allowedValues')}</span>
           <input
             type="text"
             value={formValues.allowedValues}
@@ -147,7 +145,7 @@ export function ManualVariableEntry({
         </label>
 
         <label className="wide-field">
-          <span>Value labels</span>
+          <span>{t('manual.valueLabels')}</span>
           <input
             type="text"
             value={formValues.valueLabels}
@@ -157,7 +155,7 @@ export function ManualVariableEntry({
         </label>
 
         <label className="wide-field">
-          <span>Missing-value codes</span>
+          <span>{t('manual.missingCodes')}</span>
           <input
             type="text"
             value={formValues.missingCodes}
@@ -167,7 +165,7 @@ export function ManualVariableEntry({
         </label>
 
         <label>
-          <span>Valid minimum</span>
+          <span>{t('manual.validMinimum')}</span>
           <input
             type="text"
             value={formValues.validMin}
@@ -177,7 +175,7 @@ export function ManualVariableEntry({
         </label>
 
         <label>
-          <span>Valid maximum</span>
+          <span>{t('manual.validMaximum')}</span>
           <input
             type="text"
             value={formValues.validMax}
@@ -187,7 +185,7 @@ export function ManualVariableEntry({
         </label>
 
         <label className="wide-field">
-          <span>Skip-pattern note</span>
+          <span>{t('manual.skipPatternNote')}</span>
           <input
             type="text"
             value={formValues.skipPattern}
@@ -197,7 +195,7 @@ export function ManualVariableEntry({
         </label>
 
         <label className="wide-field">
-          <span>User notes</span>
+          <span>{t('manual.userNotes')}</span>
           <textarea
             rows={3}
             value={formValues.notes}
@@ -209,7 +207,7 @@ export function ManualVariableEntry({
 
       <div className="action-row">
         <button className="primary-button" type="button" onClick={saveVariable}>
-          {editingName ? 'Update manual variable' : 'Add manual variable'}
+          {editingName ? t('manual.updateVariable') : t('manual.addVariable')}
         </button>
         {editingName ? (
           <button
@@ -217,22 +215,23 @@ export function ManualVariableEntry({
             type="button"
             onClick={cancelEdit}
           >
-            Cancel edit
+            {t('manual.cancelEdit')}
           </button>
         ) : null}
       </div>
 
-      <WarningList title="Manual-entry validation" messages={messages} />
+      <WarningList title={t('manual.validationTitle')} messages={messages} />
 
       {manualVariables.length > 0 ? (
         <div className="manual-variable-list">
-          <h3>Manual variables</h3>
+          <h3>{t('manual.variables')}</h3>
           {manualVariables.map((variable) => (
             <article className="manual-variable-row" key={variable.name}>
               <div>
                 <strong>{variable.name}</strong>
                 <p>
-                  {variable.label} · {variable.type} · {variable.role}
+                  {variable.label} · {t(`type.${variable.type}`)} ·{' '}
+                  {t(`role.${variable.role}`)}
                 </p>
               </div>
               <div className="action-row">
@@ -241,14 +240,14 @@ export function ManualVariableEntry({
                   type="button"
                   onClick={() => editVariable(variable)}
                 >
-                  Edit
+                  {t('common.edit')}
                 </button>
                 <button
                   className="secondary-button"
                   type="button"
                   onClick={() => onRemoveVariable(variable.name)}
                 >
-                  Remove
+                  {t('common.remove')}
                 </button>
               </div>
             </article>

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { TargetLanguage, ValidationResult } from '../../core'
+import { useI18n } from '../../i18n/useI18n'
 import { languageLabels, scriptExtensions } from '../state/appState'
 import type {
   DownloadArtifact,
@@ -23,6 +24,7 @@ export function SyntaxPreviewStep({
   validation,
   downloads,
 }: SyntaxPreviewStepProps) {
+  const { t } = useI18n()
   const [activeLanguage, setActiveLanguage] = useState<TargetLanguage>(
     targetLanguages[0] ?? 'r',
   )
@@ -43,12 +45,10 @@ export function SyntaxPreviewStep({
     return (
       <div className="step-content">
         <div className="step-heading">
-          <p className="eyebrow">Step 6</p>
-          <h2>Syntax preview</h2>
+          <p className="eyebrow">{t('workflow.step', { number: 6 })}</p>
+          <h2>{t('syntax.title')}</h2>
         </div>
-        <p className="empty-state">
-          Resolve Cleaning Plan validation errors before exporting syntax.
-        </p>
+        <p className="empty-state">{t('syntax.invalid')}</p>
       </div>
     )
   }
@@ -56,15 +56,16 @@ export function SyntaxPreviewStep({
   return (
     <div className="step-content">
       <div className="step-heading">
-        <p className="eyebrow">Step 6</p>
-        <h2>Syntax preview</h2>
-        <HelpText>
-          Each script is generated from the same Cleaning Plan. Review warnings
-          before using any syntax in production.
-        </HelpText>
+        <p className="eyebrow">{t('workflow.step', { number: 6 })}</p>
+        <h2>{t('syntax.title')}</h2>
+        <HelpText>{t('syntax.help')}</HelpText>
       </div>
 
-      <div className="tab-row" role="tablist" aria-label="Syntax languages">
+      <div
+        className="tab-row"
+        role="tablist"
+        aria-label={t('syntax.languages')}
+      >
         {availableLanguages.map((language) => (
           <button
             type="button"
@@ -83,11 +84,15 @@ export function SyntaxPreviewStep({
       {activeScript ? (
         <>
           <section className="script-meta">
-            <span>Filename: {activeScript.filename}</span>
-            <span>Extension: .{scriptExtensions[activeLanguage]}</span>
+            <span>
+              {t('common.filename')}: {activeScript.filename}
+            </span>
+            <span>
+              {t('common.extension')}: .{scriptExtensions[activeLanguage]}
+            </span>
           </section>
           <WarningList
-            title="Renderer warnings"
+            title={t('syntax.rendererWarnings')}
             messages={[
               ...activeScript.warnings,
               ...activeScript.unsupportedSteps.map(
@@ -96,13 +101,15 @@ export function SyntaxPreviewStep({
             ]}
           />
           <CodePreview
-            label={`${languageLabels[activeLanguage]} generated script`}
+            label={t('syntax.generatedScript', {
+              language: languageLabels[activeLanguage],
+            })}
             content={activeScript.content}
           />
           {scriptDownload ? <DownloadButton artifact={scriptDownload} /> : null}
         </>
       ) : (
-        <p className="empty-state">No script has been generated yet.</p>
+        <p className="empty-state">{t('syntax.empty')}</p>
       )}
     </div>
   )

@@ -1,3 +1,4 @@
+import { useI18n } from '../../i18n/useI18n'
 import type { WorkflowStep, WorkflowStepId } from '../state/workflowTypes'
 
 interface StepperProps {
@@ -13,8 +14,10 @@ export function Stepper({
   completedSteps,
   onSelectStep,
 }: StepperProps) {
+  const { t } = useI18n()
+
   return (
-    <nav className="stepper" aria-label="Workflow steps">
+    <nav className="stepper" aria-label={t('workflow.aria')}>
       {steps.map((step, index) => {
         const isActive = step.id === activeStep
         const isComplete = completedSteps.includes(step.id)
@@ -30,7 +33,7 @@ export function Stepper({
             onClick={() => onSelectStep(step.id)}
           >
             <span className="stepper-number">{index + 1}</span>
-            <span>{step.label}</span>
+            <span>{t(`workflow.${step.id}`)}</span>
           </button>
         )
       })}

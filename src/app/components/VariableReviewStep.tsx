@@ -1,4 +1,5 @@
 import type { SurveyVariable, VariableRole, VariableType } from '../../core'
+import { useI18n } from '../../i18n/useI18n'
 import {
   detectionNotes,
   supportedVariableRoles,
@@ -21,34 +22,31 @@ export function VariableReviewStep({
   variables,
   onCorrectVariable,
 }: VariableReviewStepProps) {
+  const { t } = useI18n()
+
   return (
     <div className="step-content">
       <div className="step-heading">
-        <p className="eyebrow">Step 3</p>
-        <h2>Variable review</h2>
-        <HelpText>
-          Check the detected type and role. Corrections immediately update rule
-          recommendations and generated syntax.
-        </HelpText>
+        <p className="eyebrow">{t('workflow.step', { number: 3 })}</p>
+        <h2>{t('variables.title')}</h2>
+        <HelpText>{t('variables.help')}</HelpText>
       </div>
 
       {variables.length === 0 ? (
-        <p className="empty-state">
-          Import metadata before reviewing variables.
-        </p>
+        <p className="empty-state">{t('variables.empty')}</p>
       ) : (
         <div className="table-scroll">
           <table>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Label</th>
-                <th>Type</th>
-                <th>Role</th>
-                <th>Value labels</th>
-                <th>Missing codes</th>
-                <th>Valid range</th>
-                <th>Detection note</th>
+                <th>{t('variables.name')}</th>
+                <th>{t('variables.label')}</th>
+                <th>{t('variables.type')}</th>
+                <th>{t('variables.role')}</th>
+                <th>{t('variables.valueLabels')}</th>
+                <th>{t('variables.missingCodes')}</th>
+                <th>{t('variables.validRange')}</th>
+                <th>{t('variables.detectionNote')}</th>
               </tr>
             </thead>
             <tbody>
@@ -63,7 +61,7 @@ export function VariableReviewStep({
                       className="sr-only"
                       htmlFor={`${variable.name}-type`}
                     >
-                      Type for {variable.name}
+                      {t('variables.typeFor', { name: variable.name })}
                     </label>
                     <select
                       id={`${variable.name}-type`}
@@ -76,7 +74,7 @@ export function VariableReviewStep({
                     >
                       {supportedVariableTypes.map((type) => (
                         <option key={type} value={type}>
-                          {type}
+                          {t(`type.${type}`)}
                         </option>
                       ))}
                     </select>
@@ -86,7 +84,7 @@ export function VariableReviewStep({
                       className="sr-only"
                       htmlFor={`${variable.name}-role`}
                     >
-                      Role for {variable.name}
+                      {t('variables.roleFor', { name: variable.name })}
                     </label>
                     <select
                       id={`${variable.name}-role`}
@@ -99,15 +97,15 @@ export function VariableReviewStep({
                     >
                       {supportedVariableRoles.map((role) => (
                         <option key={role} value={role}>
-                          {role}
+                          {t(`role.${role}`)}
                         </option>
                       ))}
                     </select>
                   </td>
-                  <td>{summarizeValueLabels(variable)}</td>
-                  <td>{summarizeMissingCodes(variable)}</td>
-                  <td>{summarizeValidRange(variable)}</td>
-                  <td>{detectionNotes(variable)}</td>
+                  <td>{summarizeValueLabels(variable, t)}</td>
+                  <td>{summarizeMissingCodes(variable, t)}</td>
+                  <td>{summarizeValidRange(variable, t)}</td>
+                  <td>{detectionNotes(variable, t)}</td>
                 </tr>
               ))}
             </tbody>

@@ -1,4 +1,5 @@
 import type { TargetLanguage } from '../../core'
+import { useI18n } from '../../i18n/useI18n'
 import { languageLabels } from '../state/appState'
 import type { ProjectMetadata } from '../state/workflowTypes'
 import { HelpText } from './HelpText'
@@ -9,6 +10,7 @@ interface ProjectInfoStepProps {
 }
 
 export function ProjectInfoStep({ project, onChange }: ProjectInfoStepProps) {
+  const { t } = useI18n()
   const updateField = (field: keyof ProjectMetadata, value: string) => {
     onChange({ ...project, [field]: value })
   }
@@ -24,24 +26,21 @@ export function ProjectInfoStep({ project, onChange }: ProjectInfoStepProps) {
   return (
     <div className="step-content">
       <div className="step-heading">
-        <p className="eyebrow">Step 1</p>
-        <h2>Project information</h2>
-        <HelpText>
-          These details appear in the Cleaning Plan, generated scripts, and
-          summary report.
-        </HelpText>
+        <p className="eyebrow">{t('workflow.step', { number: 1 })}</p>
+        <h2>{t('project.title')}</h2>
+        <HelpText>{t('project.help')}</HelpText>
       </div>
 
       <div className="form-grid">
         <label>
-          <span>Survey or project name</span>
+          <span>{t('project.surveyName')}</span>
           <input
             value={project.surveyName}
             onChange={(event) => updateField('surveyName', event.target.value)}
           />
         </label>
         <label>
-          <span>Country or organisation</span>
+          <span>{t('project.country')}</span>
           <input
             value={project.countryOrOrganisation}
             onChange={(event) =>
@@ -50,14 +49,14 @@ export function ProjectInfoStep({ project, onChange }: ProjectInfoStepProps) {
           />
         </label>
         <label>
-          <span>Survey year</span>
+          <span>{t('project.year')}</span>
           <input
             value={project.surveyYear}
             onChange={(event) => updateField('surveyYear', event.target.value)}
           />
         </label>
         <label className="wide-field">
-          <span>Project notes</span>
+          <span>{t('project.notes')}</span>
           <textarea
             rows={4}
             value={project.notes}
@@ -67,7 +66,7 @@ export function ProjectInfoStep({ project, onChange }: ProjectInfoStepProps) {
       </div>
 
       <fieldset className="language-selector">
-        <legend>Target syntax languages</legend>
+        <legend>{t('project.targetLanguages')}</legend>
         {(Object.keys(languageLabels) as TargetLanguage[]).map((language) => (
           <label className="checkbox-row" key={language}>
             <input

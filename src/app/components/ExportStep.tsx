@@ -1,4 +1,6 @@
 import type { ValidationResult } from '../../core'
+import { useI18n } from '../../i18n/useI18n'
+import { languageLabels } from '../state/appState'
 import type { DownloadArtifact } from '../state/workflowTypes'
 import { DownloadButton } from './DownloadButton'
 import { HelpText } from './HelpText'
@@ -9,35 +11,29 @@ interface ExportStepProps {
 }
 
 export function ExportStep({ downloads, validation }: ExportStepProps) {
+  const { t } = useI18n()
   const syntaxBlocked = validation !== undefined && !validation.valid
 
   return (
     <div className="step-content">
       <div className="step-heading">
-        <p className="eyebrow">Step 7</p>
-        <h2>Export and download</h2>
-        <HelpText>
-          Download the Cleaning Plan, generated syntax, and a plain-language
-          summary for review.
-        </HelpText>
+        <p className="eyebrow">{t('workflow.step', { number: 7 })}</p>
+        <h2>{t('export.title')}</h2>
+        <HelpText>{t('export.help')}</HelpText>
       </div>
 
       {syntaxBlocked ? (
-        <p className="blocked-export">
-          Syntax downloads are blocked until validation errors are resolved.
-        </p>
+        <p className="blocked-export">{t('export.blocked')}</p>
       ) : null}
 
       {downloads.length === 0 ? (
-        <p className="empty-state">
-          Generate a Cleaning Plan before exporting.
-        </p>
+        <p className="empty-state">{t('export.empty')}</p>
       ) : (
         <div className="download-list">
           {downloads.map((artifact) => (
             <article className="download-row" key={artifact.id}>
               <div>
-                <h3>{artifact.label}</h3>
+                <h3>{translatedDownloadLabel(artifact, t)}</h3>
                 <p>{artifact.filename}</p>
               </div>
               <DownloadButton artifact={artifact} />
@@ -47,4 +43,22 @@ export function ExportStep({ downloads, validation }: ExportStepProps) {
       )}
     </div>
   )
+}
+
+function translatedDownloadLabel(
+  artifact: DownloadArtifact,
+  t: ReturnType<typeof useI18n>['t'],
+): string {
+  if (artifact.id === 'cleaning-plan-json') {
+    return t('download.cleaningPlanJson')
+  }
+
+  if (artifact.id === 'summary-report') {
+    return t('download.summaryReport')
+  }
+
+  const language = artifact.id.replace(/-script$/, '')
+  const label = languageLabels[language as keyof typeof languageLabels]
+
+  return label ? t('download.script', { language: label }) : artifact.label
 }

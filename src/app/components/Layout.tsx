@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import { useI18n } from '../../i18n/useI18n'
+import { LanguageSelector } from './LanguageSelector'
 import { OfflineStatusIndicator } from './OfflineStatusIndicator'
 import { Stepper } from './Stepper'
 import type { WorkflowStep, WorkflowStepId } from '../state/workflowTypes'
@@ -18,19 +20,24 @@ export function Layout({
   onSelectStep,
   children,
 }: LayoutProps) {
+  const { t } = useI18n()
+
   return (
     <main className="app-shell">
-      <header className="topbar" aria-label="Application header">
+      <header className="topbar" aria-label={t('app.title')}>
         <div className="brand-lockup">
           <span className="brand-mark" aria-hidden="true">
             DC
           </span>
           <div>
-            <p className="eyebrow">Survey data-cleaning workflow</p>
-            <h1>Cleaning Syntax Generator</h1>
+            <p className="eyebrow">{t('app.subtitle')}</p>
+            <h1>{t('app.title')}</h1>
           </div>
         </div>
-        <span className="status-pill">Offline-first PWA</span>
+        <div className="topbar-actions">
+          <LanguageSelector />
+          <span className="status-pill">{t('app.offlineFirst')}</span>
+        </div>
       </header>
 
       <Stepper

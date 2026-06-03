@@ -19,6 +19,18 @@ adapt, and run in their own statistical environment.
 - Cleaning Plan JSON
 - Plain-language summary reports
 
+## Multilingual UI
+
+The app supports an English/French user-interface foundation. The language
+selector in the header switches core workflow labels, help text, warnings, and
+buttons immediately, and stores the selected language in browser local storage.
+No translation API, backend service, telemetry, or AI-assisted translation is
+used.
+
+Generated SPSS, Stata, R, and Python syntax comments may remain English in this
+phase. Future work can extend translations to methodology text, rule-library
+rationales, and generated comments after statistical terminology review.
+
 ## Metadata Inputs
 
 - CSV dictionary files
@@ -152,6 +164,8 @@ the latest public-demo validation result.
 - Observation-level data profiling is not implemented.
 - Manual entry is variable-by-variable and does not yet import saved manual
   entry sessions.
+- French UI support covers the main workflow and common warnings, but generated
+  syntax comments and some dynamic parser details may remain English.
 - AI-assisted interpretation, online rule-pack fetching, backend services,
   authentication, telemetry, analytics, and cloud storage are not implemented.
 - Some renderer support is partial for advanced imputation and specialist rule

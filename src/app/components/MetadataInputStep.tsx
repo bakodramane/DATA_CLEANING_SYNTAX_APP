@@ -1,8 +1,6 @@
-import {
-  STATISTICAL_PACKAGE_PRIVACY_WARNING,
-  type DictionaryImportResult,
-} from '../../importers'
+import type { DictionaryImportResult } from '../../importers'
 import type { SurveyVariable } from '../../core'
+import { useI18n } from '../../i18n/useI18n'
 import type {
   ManualVariableFormValues,
   ManualVariableSaveResult,
@@ -37,6 +35,7 @@ export function MetadataInputStep({
   onSaveManualVariable,
   onRemoveManualVariable,
 }: MetadataInputStepProps) {
+  const { t } = useI18n()
   const uploadFile = async (fileList: FileList | null) => {
     const file = fileList?.[0]
 
@@ -51,22 +50,19 @@ export function MetadataInputStep({
   return (
     <div className="step-content">
       <div className="step-heading">
-        <p className="eyebrow">Step 2</p>
-        <h2>Metadata input</h2>
-        <HelpText>
-          Paste or upload a data dictionary. Unknown columns are kept with the
-          imported metadata instead of being discarded.
-        </HelpText>
+        <p className="eyebrow">{t('workflow.step', { number: 2 })}</p>
+        <h2>{t('metadata.title')}</h2>
+        <HelpText>{t('metadata.help')}</HelpText>
       </div>
 
       <div className="action-row">
         <button className="primary-button" type="button" onClick={onLoadDemo}>
-          Load demo household survey dictionary
+          {t('metadata.loadDemo')}
         </button>
       </div>
 
       <label className="wide-field">
-        <span>Paste CSV dictionary text</span>
+        <span>{t('metadata.pasteCsv')}</span>
         <textarea
           rows={10}
           value={csvText}
@@ -77,12 +73,10 @@ export function MetadataInputStep({
 
       <div className="action-row">
         <button className="primary-button" type="button" onClick={onImportCsv}>
-          Import pasted CSV
+          {t('metadata.importPastedCsv')}
         </button>
         <label className="file-control">
-          <span>
-            Upload CSV, Excel, DDI XML, Stata DTA, or SPSS SAV metadata
-          </span>
+          <span>{t('metadata.uploadLabel')}</span>
           <input
             type="file"
             accept=".csv,.xlsx,.xml,.dta,.sav,text/csv,application/xml,text/xml,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/x-stata,application/x-spss-sav"
@@ -93,42 +87,49 @@ export function MetadataInputStep({
 
       <section
         className="privacy-warning"
-        aria-label="SPSS and Stata privacy warning"
+        aria-label={t('metadata.privacyAria')}
       >
-        <h3>SPSS and Stata privacy warning</h3>
-        <p>{STATISTICAL_PACKAGE_PRIVACY_WARNING}</p>
-        <p>
-          Prefer exported metadata dictionaries when confidentiality rules
-          prohibit opening full data files.
-        </p>
+        <h3>{t('metadata.privacyTitle')}</h3>
+        <p>{t('metadata.privacyWarning')}</p>
+        <p>{t('metadata.privacyPreference')}</p>
       </section>
 
       {importResult ? (
-        <section className="summary-band" aria-label="Import summary">
+        <section
+          className="summary-band"
+          aria-label={t('metadata.importSummary')}
+        >
           <div>
             <span className="metric-value">
               {importResult.importedVariableCount}
             </span>
-            <span className="metric-label">Imported variables</span>
+            <span className="metric-label">
+              {t('metadata.importedVariables')}
+            </span>
           </div>
           <div>
             <span className="metric-value">
               {importResult.originalRowCount}
             </span>
-            <span className="metric-label">Dictionary rows</span>
+            <span className="metric-label">{t('metadata.dictionaryRows')}</span>
           </div>
           <div>
             <span className="metric-value">
               {importResult.unmappedColumns.length}
             </span>
-            <span className="metric-label">Unmapped columns preserved</span>
+            <span className="metric-label">
+              {t('metadata.unmappedColumns')}
+            </span>
           </div>
         </section>
       ) : null}
 
       {importResult ? (
-        <section className="mapping-list" aria-label="Detected column mapping">
-          <h3>Detected column mapping</h3>
+        <section
+          className="mapping-list"
+          aria-label={t('metadata.mappingTitle')}
+        >
+          <h3>{t('metadata.mappingTitle')}</h3>
           <dl>
             {Object.entries(importResult.columnMapping.mappedColumns).map(
               ([concept, columnName]) => (
@@ -142,7 +143,10 @@ export function MetadataInputStep({
         </section>
       ) : null}
 
-      <WarningList title="Import warnings" messages={warningMessages} />
+      <WarningList
+        title={t('metadata.importWarnings')}
+        messages={warningMessages}
+      />
 
       <ManualVariableEntry
         variables={variables}

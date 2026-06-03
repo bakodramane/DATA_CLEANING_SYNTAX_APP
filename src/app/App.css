@@ -15,6 +15,22 @@
   padding-bottom: 18px;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ui-language-selector {
+  min-width: 160px;
+  font-size: 0.88rem;
+}
+
+.ui-language-selector select {
+  min-height: 36px;
+  padding: 6px 10px;
+}
+
 .brand-lockup {
   display: flex;
   align-items: center;
@@ -578,6 +594,7 @@ th {
   }
 
   .topbar,
+  .topbar-actions,
   .brand-lockup,
   .download-row,
   .manual-variable-row,

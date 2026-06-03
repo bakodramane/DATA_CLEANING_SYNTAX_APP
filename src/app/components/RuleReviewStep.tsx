@@ -1,4 +1,6 @@
 import type { RuleReviewItem } from '../state/workflowTypes'
+import { translateKnownMessage } from '../../i18n'
+import { useI18n } from '../../i18n/useI18n'
 import { HelpText } from './HelpText'
 
 interface RuleReviewStepProps {
@@ -11,19 +13,18 @@ interface RuleReviewStepProps {
 }
 
 export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
+  const { language, t, tf } = useI18n()
+
   return (
     <div className="step-content">
       <div className="step-heading">
-        <p className="eyebrow">Step 4</p>
-        <h2>Rule recommendation review</h2>
-        <HelpText>
-          Recommended rules prefer flagging and review. Imputation means filling
-          in missing values using a documented statistical method.
-        </HelpText>
+        <p className="eyebrow">{t('workflow.step', { number: 4 })}</p>
+        <h2>{t('rules.title')}</h2>
+        <HelpText>{t('rules.help')}</HelpText>
       </div>
 
       {items.length === 0 ? (
-        <p className="empty-state">Import variables before reviewing rules.</p>
+        <p className="empty-state">{t('rules.empty')}</p>
       ) : (
         <div className="rule-review-list">
           {items.map((item) => (
@@ -33,8 +34,10 @@ export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
                   <code>{item.variable.name}</code>
                 </h3>
                 <span>
-                  {item.recommendedRules.length} recommended,{' '}
-                  {item.blockedRules.length} blocked
+                  {t('rules.groupSummary', {
+                    recommended: item.recommendedRules.length,
+                    blocked: item.blockedRules.length,
+                  })}
                 </span>
               </div>
 
@@ -53,17 +56,21 @@ export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
                       }
                     />
                     <span>
-                      <strong>{rule.label}</strong>
-                      <small>{rule.rationale}</small>
-                      <small>Citations: {rule.citationKeys.join(', ')}</small>
+                      <strong>{tf(`rule.${rule.id}.label`, rule.label)}</strong>
+                      <small>
+                        {tf(`rule.${rule.id}.rationale`, rule.rationale)}
+                      </small>
+                      <small>
+                        {t('common.citations')}: {rule.citationKeys.join(', ')}
+                      </small>
                       {rule.requiresReview ? (
                         <small className="review-needed">
-                          User review needed
+                          {t('rules.userReviewNeeded')}
                         </small>
                       ) : null}
                       {rule.warnings?.map((warning) => (
                         <small className="inline-warning" key={warning.code}>
-                          {warning.message}
+                          {translateKnownMessage(language, warning.message)}
                         </small>
                       ))}
                     </span>
@@ -73,11 +80,17 @@ export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
 
               {item.blockedRules.length > 0 ? (
                 <details className="blocked-rules">
-                  <summary>View blocked rules and explanations</summary>
+                  <summary>{t('rules.viewBlocked')}</summary>
                   <ul>
                     {item.blockedRules.map((blockedRule) => (
                       <li key={`${blockedRule.rule.id}-${blockedRule.code}`}>
-                        <strong>{blockedRule.rule.label}:</strong>{' '}
+                        <strong>
+                          {tf(
+                            `rule.${blockedRule.rule.id}.label`,
+                            blockedRule.rule.label,
+                          )}
+                          :
+                        </strong>{' '}
                         {blockedRule.reason}
                       </li>
                     ))}

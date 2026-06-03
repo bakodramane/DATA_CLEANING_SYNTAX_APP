@@ -1,5 +1,7 @@
 import { useMemo, useState, type Dispatch, type SetStateAction } from 'react'
 import './App.css'
+import type { Translator } from '../i18n'
+import { useI18n } from '../i18n/useI18n'
 import { CleaningPlanPreviewStep } from './components/CleaningPlanPreviewStep'
 import { ExportStep } from './components/ExportStep'
 import { Layout } from './components/Layout'
@@ -41,6 +43,7 @@ import type {
 import type { SurveyVariable } from '../core'
 
 function App() {
+  const { t } = useI18n()
   const [activeStep, setActiveStep] = useState<WorkflowStepId>('project')
   const [project, setProject] = useState<ProjectMetadata>(
     createInitialProjectMetadata,
@@ -185,9 +188,7 @@ function App() {
 
   const continueWorkflow = () => {
     if (activeStep === 'metadata' && variables.length === 0) {
-      setImportError(
-        'Add, import, or load at least one variable before continuing.',
-      )
+      setImportError(t('metadata.continueWithoutVariables'))
       return
     }
 
@@ -214,6 +215,7 @@ function App() {
     validation,
     renderedScripts,
     downloads,
+    t,
   })
 
   return (
@@ -231,7 +233,7 @@ function App() {
           onClick={() => setActiveStep(previousStep(activeStep))}
           disabled={activeStep === 'project'}
         >
-          Back
+          {t('common.back')}
         </button>
         <button
           className="primary-button"
@@ -239,7 +241,7 @@ function App() {
           onClick={continueWorkflow}
           disabled={activeStep === 'export'}
         >
-          Continue
+          {t('common.continue')}
         </button>
       </div>
     </Layout>
@@ -274,6 +276,7 @@ interface RenderStepArgs {
   validation: ReturnType<typeof validatePlanForPreview>
   renderedScripts: ReturnType<typeof renderScriptsForPlan>
   downloads: ReturnType<typeof createDownloadArtifacts>
+  t: Translator
 }
 
 function renderStepContent(step: WorkflowStepId, args: RenderStepArgs) {
@@ -299,7 +302,7 @@ function renderStepContent(step: WorkflowStepId, args: RenderStepArgs) {
             onRemoveManualVariable={args.removeManualVariable}
           />
           <WarningList
-            title="Import error"
+            title={args.t('metadata.importError')}
             messages={args.importError ? [args.importError] : []}
           />
         </>

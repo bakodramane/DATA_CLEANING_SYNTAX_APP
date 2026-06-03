@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useI18n } from '../../i18n/useI18n'
 
 interface CodePreviewProps {
   content: string
@@ -6,6 +7,7 @@ interface CodePreviewProps {
 }
 
 export function CodePreview({ content, label }: CodePreviewProps) {
+  const { t } = useI18n()
   const [copied, setCopied] = useState(false)
 
   const copyContent = async () => {
@@ -25,7 +27,7 @@ export function CodePreview({ content, label }: CodePreviewProps) {
           type="button"
           onClick={copyContent}
         >
-          {copied ? 'Copied' : 'Copy'}
+          {copied ? t('common.copied') : t('common.copy')}
         </button>
       </div>
       <pre tabIndex={0}>

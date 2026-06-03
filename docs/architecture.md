@@ -89,6 +89,20 @@ helpers, and download components. The UI orchestrates the workflow but keeps
 cleaning rules, importers, renderers, and validation outside presentation
 components.
 
+### `src/i18n`
+
+Lightweight dictionary-based internationalisation for the user interface. The
+default language is English, French is available from the header selector, and
+the selected language is persisted in browser local storage. Translation lookup
+falls back to English when a selected-language key is missing and never calls a
+network service or external translation API.
+
+This layer translates core visible UI labels, help text, common warnings,
+buttons, workflow step labels, and selected rule-review/Plan-preview text. It
+does not translate generated SPSS, Stata, R, or Python syntax comments in this
+phase; renderer output remains deterministic and language-neutral from the
+Cleaning Plan.
+
 ### PWA And Offline Support
 
 `vite-plugin-pwa` generates installability metadata, `manifest.webmanifest`,
@@ -154,4 +168,5 @@ See [GitHub Pages Deployment](github-pages.md) for manual setup steps.
 
 The current release does not include full DDI lifecycle support,
 observation-level data profiling, AI-assisted interpretation, script execution,
-backend services, authentication, telemetry, analytics, or cloud storage.
+backend services, authentication, telemetry, analytics, cloud storage, external
+translation services, or AI-assisted translation.

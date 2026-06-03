@@ -19,13 +19,25 @@ https://bakodramane.github.io/DATA_CLEANING_SYNTAX_APP/
 Open the app and begin on the Project step. A project is the working context for
 one survey dictionary and one generated Cleaning Plan.
 
-### 2. Enter Project Information
+### 2. Choose The UI Language
+
+Use the language selector in the header to switch between English and French.
+The visible workflow text updates immediately, and the selected language is
+stored locally in the browser so it persists after reload. Switching language
+does not clear the project, imported variables, selected rules, or generated
+preview state.
+
+The generated SPSS, Stata, R, and Python syntax comments may remain English in
+this phase. The app does not use AI-assisted translation, external translation
+services, telemetry, or a backend.
+
+### 3. Enter Project Information
 
 Enter the survey name, country or organisation, survey year, notes, and target
 syntax languages. The survey name is used in generated file names and report
 headings.
 
-### 3. Load The Demo Dictionary
+### 4. Load The Demo Dictionary
 
 Use **Load demo household survey dictionary** to try the workflow without
 providing your own metadata. The built-in demo is a synthetic household/labour
@@ -35,19 +47,19 @@ maintained in the repository for agricultural holdings, livestock/crop modules,
 and income/expenditure modules. The demo works offline after the first
 successful app load.
 
-### 4. Paste Or Upload A CSV Dictionary
+### 5. Paste Or Upload A CSV Dictionary
 
 Paste CSV dictionary text into the metadata box, or upload a local `.csv` file.
 The app detects common dictionary columns such as variable name, label, type,
 role, value labels, missing codes, and valid ranges. Unknown columns are kept as
 source metadata for auditability.
 
-### 5. Upload An Excel Dictionary
+### 6. Upload An Excel Dictionary
 
 Upload a local `.xlsx` dictionary when the metadata is stored in a spreadsheet.
 The app reads the workbook in the browser. The file is not uploaded to a server.
 
-### 6. Upload A DDI XML Codebook
+### 7. Upload A DDI XML Codebook
 
 Upload a local `.xml` DDI Codebook file when the survey metadata is documented
 in IHSN or World Bank-style XML. The app reads the XML in the browser and does
@@ -70,7 +82,7 @@ reviewed.
 This is not full DDI lifecycle support. It focuses on practical DDI Codebook
 metadata import and does not support every DDI version or edge case.
 
-### 7. Upload Stata Or SPSS Package Files
+### 8. Upload Stata Or SPSS Package Files
 
 Upload a local `.dta` or `.sav` file only when your confidentiality rules allow
 the file to be opened in the browser. SPSS and Stata files may contain full
@@ -105,7 +117,7 @@ message:
 Direct metadata extraction from this file was not possible. Export a metadata-only variable dictionary from SPSS or Stata to CSV/Excel, including variable names, labels, storage types, value labels, missing codes, valid ranges, and notes where available, then import that dictionary instead.
 ```
 
-### 8. Add Variables Manually
+### 9. Add Variables Manually
 
 Use manual variable entry when no dictionary file is available. Add each
 variable with a name, label, type, role, and optional details such as storage
@@ -133,36 +145,36 @@ where the minimum is greater than the maximum. Manual variables can be edited or
 removed from the Metadata step, and their type or role can still be corrected in
 Variable review.
 
-### 9. Review Imported Or Manual Variables
+### 10. Review Imported Or Manual Variables
 
 Review each imported variable, including name, label, detected type, detected
 role, value labels, missing codes, valid ranges, and detection notes.
 
-### 10. Correct Variable Types And Roles
+### 11. Correct Variable Types And Roles
 
 Adjust the detected type or role when needed. Corrections immediately update
 recommended rules and the generated Cleaning Plan.
 
-### 11. Review Recommended Rules
+### 12. Review Recommended Rules
 
 Recommended rules are metadata-driven checks or documentation steps. They may
 include variable labels, value labels, range checks, domain checks, missingness
 diagnosis, duplicate identifier checks, or outlier flags.
 
-### 12. Understand Blocked Rules
+### 13. Understand Blocked Rules
 
 Blocked rules are shown when a rule is not suitable for a variable. For example,
 identifier variables are protected from imputation, and survey design variables
 require specialist review before modification.
 
-### 13. Preview The Cleaning Plan
+### 14. Preview The Cleaning Plan
 
 The Cleaning Plan is a language-neutral JSON representation of the selected
 steps, variables, assumptions, warnings, citations, and renderer capability
 information. It is the audit-friendly bridge between metadata and generated
 syntax.
 
-### 14. Preview Generated Syntax
+### 15. Preview Generated Syntax
 
 Preview generated SPSS v18, Stata v14, R, and Python syntax. Syntax is heavily
 commented so analysts can see which metadata and rule rationale produced each
@@ -173,19 +185,19 @@ downloads include warning comments when a step is a review template or needs
 analyst adaptation. See the [Renderer Support Matrix](renderer-support-matrix.md)
 for exact support by step type and language.
 
-### 15. Download Scripts And Reports
+### 16. Download Scripts And Reports
 
 Download generated scripts and the plain-language summary report from the Export
 step. Downloads are browser-generated files and are not cached as remote server
 responses.
 
-### 16. Save The Cleaning Plan JSON
+### 17. Save The Cleaning Plan JSON
 
 Save the Cleaning Plan JSON with the generated scripts. It records the selected
 rules, assumptions, warnings, citations, and renderer capability information
 used to produce the syntax.
 
-### 17. Reuse The Cleaning Plan
+### 18. Reuse The Cleaning Plan
 
 The current release exports the Cleaning Plan JSON for review and archival use.
 Future releases may add richer import or comparison workflows for saved plans.

@@ -1,4 +1,5 @@
-import type { CleaningPlan, ValidationResult } from '../../core'
+import type { CleaningPlan, CleaningStep, ValidationResult } from '../../core'
+import { useI18n } from '../../i18n/useI18n'
 import { formatValidationMessages } from '../state/appState'
 import { HelpText } from './HelpText'
 import { WarningList } from './WarningList'
@@ -12,42 +13,40 @@ export function CleaningPlanPreviewStep({
   plan,
   validation,
 }: CleaningPlanPreviewStepProps) {
+  const { t, tf } = useI18n()
   const validationMessages = formatValidationMessages(validation)
 
   return (
     <div className="step-content">
       <div className="step-heading">
-        <p className="eyebrow">Step 5</p>
-        <h2>Cleaning Plan preview</h2>
-        <HelpText>
-          A Cleaning Plan is the language-neutral checklist that renderers turn
-          into SPSS, Stata, R, and Python syntax.
-        </HelpText>
+        <p className="eyebrow">{t('workflow.step', { number: 5 })}</p>
+        <h2>{t('plan.title')}</h2>
+        <HelpText>{t('plan.help')}</HelpText>
       </div>
 
       {!plan ? (
-        <p className="empty-state">Select rules before previewing the plan.</p>
+        <p className="empty-state">{t('plan.empty')}</p>
       ) : (
         <>
-          <section className="summary-band" aria-label="Cleaning Plan summary">
+          <section className="summary-band" aria-label={t('plan.summary')}>
             <div>
               <span className="metric-value">{plan.variables.length}</span>
-              <span className="metric-label">Variables</span>
+              <span className="metric-label">{t('plan.variables')}</span>
             </div>
             <div>
               <span className="metric-value">{plan.steps.length}</span>
-              <span className="metric-label">Cleaning steps</span>
+              <span className="metric-label">{t('plan.cleaningSteps')}</span>
             </div>
             <div>
               <span className="metric-value">
-                {validation?.valid ? 'Ready' : 'Review'}
+                {validation?.valid ? t('common.ready') : t('common.review')}
               </span>
-              <span className="metric-label">Validation status</span>
+              <span className="metric-label">{t('plan.validationStatus')}</span>
             </div>
           </section>
 
           <WarningList
-            title="Validation messages"
+            title={t('plan.validationMessages')}
             messages={validationMessages}
           />
 
@@ -55,12 +54,12 @@ export function CleaningPlanPreviewStep({
             <table>
               <thead>
                 <tr>
-                  <th>Step</th>
-                  <th>Type</th>
-                  <th>Variables</th>
-                  <th>Action</th>
-                  <th>Rationale</th>
-                  <th>Citations</th>
+                  <th>{t('plan.step')}</th>
+                  <th>{t('plan.type')}</th>
+                  <th>{t('plan.variables')}</th>
+                  <th>{t('plan.action')}</th>
+                  <th>{t('plan.rationale')}</th>
+                  <th>{t('common.citations')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -69,10 +68,10 @@ export function CleaningPlanPreviewStep({
                     <td>
                       <code>{step.id}</code>
                     </td>
-                    <td>{step.type}</td>
+                    <td>{t(`stepType.${step.type}`)}</td>
                     <td>{step.variables.join(', ')}</td>
-                    <td>{step.defaultAction}</td>
-                    <td>{step.rationale}</td>
+                    <td>{t(`action.${step.defaultAction}`)}</td>
+                    <td>{translatedStepRationale(step, tf)}</td>
                     <td>{step.citationKeys.join(', ')}</td>
                   </tr>
                 ))}
@@ -83,4 +82,15 @@ export function CleaningPlanPreviewStep({
       )}
     </div>
   )
+}
+
+function translatedStepRationale(
+  step: CleaningStep,
+  tf: ReturnType<typeof useI18n>['tf'],
+): string {
+  const ruleId = step.parameters.ruleId
+
+  return typeof ruleId === 'string'
+    ? tf(`rule.${ruleId}.rationale`, step.rationale)
+    : step.rationale
 }

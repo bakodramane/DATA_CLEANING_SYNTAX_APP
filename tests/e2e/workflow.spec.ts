@@ -268,6 +268,61 @@ test('statistical package uploads show privacy warning and safe fallback', async
   ).toBeVisible()
 })
 
+test('French language selection persists and preserves demo workflow state', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await expect(
+    page.getByRole('heading', { name: 'Cleaning Syntax Generator' }),
+  ).toBeVisible()
+  await page.getByLabel('Interface language').selectOption('fr')
+  await expect(
+    page.getByRole('heading', { name: "Générateur de syntaxe d'apurement" }),
+  ).toBeVisible()
+  await expect(page.getByText('Informations sur le projet')).toBeVisible()
+
+  await page.reload()
+  await expect(
+    page.getByRole('heading', { name: "Générateur de syntaxe d'apurement" }),
+  ).toBeVisible()
+  await expect(page.getByLabel("Langue de l'interface")).toHaveValue('fr')
+
+  await page.getByRole('button', { name: 'Continuer' }).click()
+  await expect(page.getByText('Saisie des métadonnées')).toBeVisible()
+  await page
+    .getByRole('button', {
+      name: 'Charger le dictionnaire de démonstration ménage/travail',
+    })
+    .click()
+  await expect(page.getByText('Revue des variables')).toBeVisible()
+  await expect(page.getByText('household_id', { exact: true })).toBeVisible()
+
+  await page.getByLabel("Langue de l'interface").selectOption('en')
+  await expect(
+    page.getByRole('heading', { name: 'Variable review' }),
+  ).toBeVisible()
+  await expect(page.getByText('household_id', { exact: true })).toBeVisible()
+
+  await page.getByLabel('Interface language').selectOption('fr')
+  await page.getByRole('button', { name: 'Continuer' }).click()
+  await expect(page.getByText('Revue des règles recommandées')).toBeVisible()
+  await page.getByRole('button', { name: 'Continuer' }).click()
+  await expect(page.getByText("Aperçu du Plan d'apurement")).toBeVisible()
+  await page.getByRole('button', { name: 'Continuer' }).click()
+  await expect(page.getByText('Aperçu de la syntaxe')).toBeVisible()
+
+  for (const language of ['SPSS v18', 'Stata v14', 'R', 'Python']) {
+    await page.getByRole('tab', { name: language }).click()
+    await expect(page.locator('.code-preview pre')).toContainText(
+      language === 'SPSS v18'
+        ? 'SPSS'
+        : language === 'Stata v14'
+          ? 'Stata'
+          : language,
+    )
+  }
+})
+
 function createMinimalXlsx(): Buffer {
   const rows = [
     ['variable_name', 'variable_label', 'data_type', 'role'],

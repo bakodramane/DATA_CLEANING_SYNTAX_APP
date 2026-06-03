@@ -18,6 +18,10 @@ Status below is for the current v0.4.2 deployment checkpoint.
 ## Production Smoke Check
 
 - [x] Production preview opens.
+- [ ] Default UI language is English.
+- [ ] Language selector switches to French.
+- [ ] Selected UI language persists after reload.
+- [ ] Workflow state is preserved when switching language.
 - [x] Demo dictionary loads.
 - [x] CSV paste works.
 - [x] Excel upload works.
@@ -45,6 +49,14 @@ Status below is for the current v0.4.2 deployment checkpoint.
 - [x] Python script downloads.
 - [x] Summary report downloads.
 - [x] Offline reload opens the app shell after first load.
+
+## Notes For Multilingual UI Releases
+
+Before release, verify that English remains the default language, French UI
+text appears in the main workflow, the selected language is stored locally in
+the browser, and no backend, telemetry, external translation API, or
+AI-assisted translation is introduced. Generated SPSS, Stata, R, and Python
+syntax comments may remain English until a later terminology-review phase.
 
 ## Public Demo Smoke Check
 

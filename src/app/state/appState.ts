@@ -27,6 +27,7 @@ import {
   renderStataDoFile,
   type RenderedScript,
 } from '../../renderers'
+import type { Translator } from '../../i18n'
 import {
   createCleaningStepsFromRules,
   createPlanLevelCleaningStep,
@@ -386,43 +387,66 @@ export function formatValidationMessages(
   return validation.issues.map((issue) => issue.message)
 }
 
-export function summarizeValueLabels(variable: SurveyVariable): string {
+export function summarizeValueLabels(
+  variable: SurveyVariable,
+  t?: Translator,
+): string {
   const labels = variable.valueLabels ?? []
 
   if (labels.length === 0) {
-    return 'None'
+    return t ? t('common.none') : 'None'
   }
 
   return labels
     .slice(0, 3)
     .map((label) => `${String(label.value)} = ${label.label}`)
-    .concat(labels.length > 3 ? [`${labels.length - 3} more`] : [])
+    .concat(
+      labels.length > 3
+        ? [
+            t
+              ? t('common.more', { count: labels.length - 3 })
+              : `${labels.length - 3} more`,
+          ]
+        : [],
+    )
     .join('; ')
 }
 
-export function summarizeMissingCodes(variable: SurveyVariable): string {
+export function summarizeMissingCodes(
+  variable: SurveyVariable,
+  t?: Translator,
+): string {
   const codes = variable.declaredMissingCodes ?? []
 
   if (codes.length === 0) {
-    return 'None'
+    return t ? t('common.none') : 'None'
   }
 
   return codes.map((code) => `${String(code.value)} = ${code.label}`).join('; ')
 }
 
-export function summarizeValidRange(variable: SurveyVariable): string {
+export function summarizeValidRange(
+  variable: SurveyVariable,
+  t?: Translator,
+): string {
   if (!variable.validRange) {
-    return 'None'
+    return t ? t('common.none') : 'None'
   }
 
-  const min = variable.validRange.min ?? 'no minimum'
-  const max = variable.validRange.max ?? 'no maximum'
-  return `${String(min)} to ${String(max)}`
+  const min =
+    variable.validRange.min ?? (t ? t('common.noMinimum') : 'no minimum')
+  const max =
+    variable.validRange.max ?? (t ? t('common.noMaximum') : 'no maximum')
+  return `${String(min)} ${t ? t('common.to') : 'to'} ${String(max)}`
 }
 
-export function detectionNotes(variable: SurveyVariable): string {
+export function detectionNotes(
+  variable: SurveyVariable,
+  t?: Translator,
+): string {
   return (
-    variable.sourceMetadata?.notes?.join(' ') ?? 'No detection notes recorded.'
+    variable.sourceMetadata?.notes?.join(' ') ??
+    (t ? t('variables.noDetectionNotes') : 'No detection notes recorded.')
   )
 }
 

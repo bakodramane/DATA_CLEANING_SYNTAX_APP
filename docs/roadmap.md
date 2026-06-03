@@ -36,7 +36,11 @@ commitment to implement every item in order.
 - Refine manual variable-entry ergonomics and saved-session support.
 - Improve import mapping review before accepting metadata.
 - Add clearer warnings for partial renderer support.
-- Explore multilingual UI support after the core workflow stabilises.
+- Extend the English/French UI foundation to more dynamic methodology text,
+  rule rationales, and generated-comment terminology after statistical
+  terminology review.
+- Consider additional interface languages once English/French terminology and
+  workflow coverage are stable.
 - Improve import warnings for partial package-file metadata extraction.
 
 ## Deployment And Packaging
