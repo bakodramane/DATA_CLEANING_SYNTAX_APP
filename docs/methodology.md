@@ -7,6 +7,34 @@ data managers who may not have advanced statistical training.
 The app generates reviewable syntax from metadata. It does not inspect the
 dataset itself, run models, or make final editing decisions.
 
+## What The App Does Well
+
+- Converts survey metadata into a transparent, language-neutral Cleaning Plan.
+- Preserves variable labels, value labels, missing codes, ranges, roles, and
+  source notes where the importer can detect them.
+- Generates reviewable first-draft syntax for SPSS v18, Stata v14, R, and
+  Python.
+- Flags range, domain, duplicate-identifier, routing, missingness, and outlier
+  review items without silently changing records.
+- Protects identifiers, survey design variables, and structural missingness
+  from imputation-style treatment.
+- Documents assumptions, citations, renderer limitations, and unsupported steps
+  directly in the Cleaning Plan and generated syntax.
+
+## What The App Does Not Automate
+
+- It does not read or profile observation-level microdata for cleaning
+  decisions.
+- It does not execute SPSS, Stata, R, or Python code.
+- It does not decide whether a flagged value is an error, a valid rare case, or
+  a value needing treatment.
+- It does not delete records, cap values, winsorise values, or overwrite source
+  variables automatically.
+- It does not choose final imputation models, donor pools, variance methods, or
+  official production parameters.
+- It does not replace survey-processing governance, disclosure review,
+  reproducibility checks, or subject-matter sign-off.
+
 ## Data Editing As Review, Selection, And Treatment
 
 Statistical data editing usually involves:
@@ -81,6 +109,67 @@ syntax may require licensed functionality. Python output uses practical
 single-workflow examples, such as scikit-learn imputation templates, and must
 not be treated as full Rubin-style multiple-imputation inference or pooled
 analysis.
+
+## Reviewing Generated Syntax
+
+Generated syntax should be treated as a documented draft. Before production use,
+statisticians should:
+
+1. Compare every variable name, type, role, label, and missing code against the
+   approved questionnaire and data dictionary.
+2. Confirm that skip patterns and structural missing rules match the final
+   questionnaire routing, including universe restrictions and derived routes.
+3. Review every flag variable created by the generated syntax before deciding
+   whether correction, recoding, imputation, or no action is appropriate.
+4. Check that outlier syntax creates flags only and does not delete, cap, or
+   replace values.
+5. Confirm that identifiers, weights, strata, PSUs, and structural missing
+   values are excluded from imputation or automatic treatment.
+6. Run the syntax first on a controlled test copy, compare record counts and
+   summary statistics before and after each section, and archive the logs.
+
+## Validating Imputation Choices
+
+The app can render imputation review templates, but the statistical method must
+be approved outside the app. Validation should document:
+
+- which variables are eligible for imputation and why;
+- which missing-value categories are included, excluding structural missingness;
+- which predictors, stratification variables, donor classes, or models are used;
+- whether weights, clustering, stratification, and domain estimation affect the
+  imputation approach;
+- diagnostics comparing observed and imputed distributions;
+- sensitivity checks against simpler alternatives, such as no imputation or
+  deterministic editing where appropriate;
+- whether variance estimation, replicate weights, or pooled estimates are
+  handled correctly in the analyst's production environment;
+- the statistician who reviewed and approved the final imputation choice.
+
+## Documenting Edits In Official Workflows
+
+Generated syntax should be stored with the Cleaning Plan JSON, the source
+dictionary, reviewer notes, execution logs, and version identifiers. Official
+survey teams should record:
+
+- the source metadata version used to generate the plan;
+- all manual changes to variable types, roles, missing codes, ranges, and skip
+  patterns;
+- the reason for each accepted edit or imputation decision;
+- the number of records flagged by each check and the number treated;
+- the retained original variable, edited variable, and flag or audit variable
+  naming convention;
+- the reviewer, approver, date, and production environment used;
+- any unresolved warnings, unsupported renderer steps, or deviations from the
+  generated draft.
+
+## Reviewer Checklist
+
+- Variable types checked.
+- Missing codes checked.
+- Structural missingness protected.
+- Outliers flagged, not silently removed.
+- Imputation reviewed by a statistician.
+- Generated syntax reviewed before production use.
 
 ## Why Flagging Is The Default
 

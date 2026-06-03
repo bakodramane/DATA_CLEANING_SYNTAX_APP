@@ -19,9 +19,9 @@ describe('workflow state helpers', () => {
     const result = importDemoDictionary()
 
     expect(result.variables.map((variable) => variable.name)).toEqual(
-      expect.arrayContaining(['household_id', 'age', 'income']),
+      expect.arrayContaining(['household_id', 'age', 'wage_income_month']),
     )
-    expect(result.importedVariableCount).toBe(9)
+    expect(result.importedVariableCount).toBe(11)
   })
 
   it('updates variable type and role corrections in state', () => {

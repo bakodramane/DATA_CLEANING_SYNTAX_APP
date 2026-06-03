@@ -27,7 +27,7 @@ adapt, and run in their own statistical environment.
 - Stata `.dta` metadata paths
 - SPSS `.sav` metadata paths
 - Pasted CSV dictionary text
-- Built-in demo household survey dictionary
+- Built-in synthetic official-statistics demo dictionaries
 - Manual variable entry
 
 The current release focuses on metadata-driven checks, rule review, syntax
@@ -169,6 +169,8 @@ see:
 - [Importing SPSS And Stata Metadata](docs/importing-spss-stata.md)
 - [Architecture](docs/architecture.md)
 - [Methodology](docs/methodology.md)
+- [Official Statistics Review Guide](docs/official-statistics-review.md)
+- [Phase 16 Official-Statistics Examples](docs/phase-16-examples.md)
 - [References](docs/references.md)
 - [Offline Mode](docs/offline-mode.md)
 - [Adding a Rule](docs/adding-a-rule.md)

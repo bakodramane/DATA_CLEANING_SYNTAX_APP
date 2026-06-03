@@ -28,8 +28,12 @@ headings.
 ### 3. Load The Demo Dictionary
 
 Use **Load demo household survey dictionary** to try the workflow without
-providing your own metadata. The demo works offline after the first successful
-app load.
+providing your own metadata. The built-in demo is a synthetic household/labour
+survey dictionary with design variables, routing notes, declared missing codes,
+and income variables. Additional synthetic official-statistics dictionaries are
+maintained in the repository for agricultural holdings, livestock/crop modules,
+and income/expenditure modules. The demo works offline after the first
+successful app load.
 
 ### 4. Paste Or Upload A CSV Dictionary
 
@@ -215,3 +219,6 @@ demo dictionary, pasted/uploaded dictionaries, rule review, Cleaning Plan
 generation, syntax preview, and downloads all work locally.
 
 Generated syntax must be reviewed before production use.
+
+See [Official Statistics Review Guide](official-statistics-review.md) for the
+reviewer checklist, imputation validation notes, and documentation expectations.
