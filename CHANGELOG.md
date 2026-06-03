@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.7.0 - 2026-06-03
+
+### Added
+
+- English/French reviewer-facing rule text.
+- Translated rule labels, descriptions, rationales, and warnings.
+- French blocked-rule explanations.
+- French Cleaning Plan preview rationales.
+- English/French summary report reviewer text.
+
+### Notes
+
+- Generated executable syntax remains unchanged.
+- Generated syntax comments remain English for now.
+- No backend, telemetry, cloud storage, authentication, script execution,
+  external translation API, or AI-assisted translation was added.
+
 ## v0.6.0 - 2026-06-03
 
 ### Added
