@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.6.0 - 2026-06-03
+
+### Added
+
+- English/French UI foundation.
+- Lightweight local dictionary-based i18n.
+- Language selector in the application header.
+- English default language with a French option.
+- Local persistence of the selected language.
+- English fallback for missing translation keys.
+- French translations for the core workflow UI.
+- French importer and privacy warnings where feasible.
+- French workflow end-to-end coverage.
+
+### Notes
+
+- Generated syntax comments remain English for now.
+- No backend, telemetry, cloud storage, authentication, script execution,
+  external translation API, or AI-assisted translation was added.
+
 ## v0.5.0 - 2026-06-03
 
 ### Added
