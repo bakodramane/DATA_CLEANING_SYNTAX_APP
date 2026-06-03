@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.5.0 - 2026-06-03
+
+### Added
+
+- Realistic synthetic official-statistics demo dictionaries.
+- Household/labour, agricultural holding, livestock/crop, and
+  income/expenditure examples.
+- Reviewer Cleaning Plans for methodology validation.
+- Richer default demo dictionary.
+- Documented SPSS, Stata, R, and Python syntax examples.
+- Expanded methodology guidance.
+- Official-statistics reviewer checklist.
+- Regression tests confirming example dictionaries generate valid Cleaning Plans
+  and render in all four languages.
+
+### Notes
+
+- No backend, telemetry, cloud storage, authentication, script execution, or
+  AI-assisted interpretation was added.
+
 ## v0.4.2 - 2026-06-03
 
 ### Added
