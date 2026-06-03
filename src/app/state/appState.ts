@@ -27,7 +27,15 @@ import {
   renderStataDoFile,
   type RenderedScript,
 } from '../../renderers'
-import type { Translator } from '../../i18n'
+import {
+  ruleWarningsFromStep,
+  translate,
+  translateRuleLabel,
+  translateStepRationale,
+  translateWithFallback,
+  type LanguageCode,
+  type Translator,
+} from '../../i18n'
 import {
   createCleaningStepsFromRules,
   createPlanLevelCleaningStep,
@@ -285,6 +293,7 @@ export function createDownloadArtifacts(
   plan: CleaningPlan | undefined,
   validation: ValidationResult | undefined,
   renderedScripts: RenderedScriptsByLanguage,
+  language: LanguageCode = 'en',
 ): DownloadArtifact[] {
   const artifacts: DownloadArtifact[] = []
   const projectSlug = slugify(project.surveyName || 'cleaning-plan')
@@ -306,7 +315,13 @@ export function createDownloadArtifacts(
     label: 'Plain-language summary report',
     filename: `${projectSlug}-summary.md`,
     mimeType: 'text/markdown',
-    content: createSummaryReport(project, variables, plan, validation),
+    content: createSummaryReport(
+      project,
+      variables,
+      plan,
+      validation,
+      language,
+    ),
   })
 
   if (validation?.valid) {
@@ -333,17 +348,20 @@ export function createSummaryReport(
   variables: SurveyVariable[],
   plan: CleaningPlan | undefined,
   validation: ValidationResult | undefined,
+  language: LanguageCode = 'en',
 ): string {
   const stepLines =
     plan?.steps.map(
       (step, index) =>
-        `${index + 1}. ${step.id} (${step.type}) - ${step.variables.join(', ')}`,
+        `${index + 1}. ${step.id} (${translate(language, `stepType.${step.type}`)}) - ${step.variables.join(', ')}: ${translateStepRationale(language, step)}`,
     ) ?? []
+  const selectedRuleLines = buildSelectedRuleLines(plan, language)
   const warningLines = [
     ...(validation?.issues.map((issue) => `- ${issue.message}`) ?? []),
     ...(plan?.steps.flatMap((step) =>
       ruleWarningsFromStep(step).map(
-        (warning) => `- ${step.id}: ${warning.message}`,
+        (warning) =>
+          `- ${step.id}: ${translateStepWarning(language, step, warning)}`,
       ),
     ) ?? []),
   ]
@@ -352,27 +370,35 @@ export function createSummaryReport(
   )
 
   return [
-    `# ${project.surveyName || 'Cleaning Plan Summary'}`,
+    `# ${project.surveyName || translate(language, 'summary.defaultTitle')}`,
     '',
-    `Country or organisation: ${project.countryOrOrganisation || 'Not provided'}`,
-    `Survey year: ${project.surveyYear || 'Not provided'}`,
-    `Imported variables: ${variables.length}`,
-    `Selected cleaning steps: ${plan?.steps.length ?? 0}`,
+    `## ${translate(language, 'summary.project')}`,
+    `${translate(language, 'summary.country')}: ${project.countryOrOrganisation || translate(language, 'summary.notProvided')}`,
+    `${translate(language, 'summary.year')}: ${project.surveyYear || translate(language, 'summary.notProvided')}`,
+    `${translate(language, 'summary.importedVariables')}: ${variables.length}`,
+    `${translate(language, 'summary.selectedSteps')}: ${plan?.steps.length ?? 0}`,
     '',
-    '## Generated Cleaning Steps',
+    `## ${translate(language, 'summary.selectedRules')}`,
+    ...(selectedRuleLines.length > 0
+      ? selectedRuleLines
+      : [translate(language, 'summary.noRules')]),
+    '',
+    `## ${translate(language, 'summary.cleaningSteps')}`,
     ...(stepLines.length > 0
       ? stepLines
-      : ['No cleaning steps generated yet.']),
+      : [translate(language, 'summary.noSteps')]),
     '',
-    '## Warnings',
+    `## ${translate(language, 'summary.warnings')}`,
     ...(warningLines.length > 0
       ? warningLines
-      : ['No validation warnings were reported.']),
+      : [translate(language, 'summary.noWarnings')]),
     '',
-    '## Citation Keys',
-    citationKeys.length > 0 ? citationKeys.join(', ') : 'None',
+    `## ${translate(language, 'summary.citations')}`,
+    citationKeys.length > 0
+      ? citationKeys.join(', ')
+      : translate(language, 'summary.noCitations'),
     '',
-    'Generated syntax must be reviewed before production use.',
+    translate(language, 'summary.review'),
     '',
   ].join('\n')
 }
@@ -497,18 +523,42 @@ function buildCapabilityMatrix(
   return matrix
 }
 
-function ruleWarningsFromStep(step: CleaningStep): Array<{ message: string }> {
-  const ruleWarnings = step.parameters.ruleWarnings
+function buildSelectedRuleLines(
+  plan: CleaningPlan | undefined,
+  language: LanguageCode,
+): string[] {
+  if (!plan) {
+    return []
+  }
 
-  return Array.isArray(ruleWarnings)
-    ? ruleWarnings.filter(
-        (warning): warning is { message: string } =>
-          typeof warning === 'object' &&
-          warning !== null &&
-          'message' in warning &&
-          typeof warning.message === 'string',
+  const rulesById = new Map(loadDefaultRules().map((rule) => [rule.id, rule]))
+  const ruleIds = unique(
+    plan.steps
+      .map((step) => step.parameters.ruleId)
+      .filter((ruleId): ruleId is string => typeof ruleId === 'string'),
+  )
+
+  return ruleIds.map((ruleId) => {
+    const rule = rulesById.get(ruleId)
+
+    return `- ${rule ? translateRuleLabel(language, rule) : ruleId}`
+  })
+}
+
+function translateStepWarning(
+  language: LanguageCode,
+  step: CleaningStep,
+  warning: { code: string; message: string },
+): string {
+  const ruleId = step.parameters.ruleId
+
+  return typeof ruleId === 'string'
+    ? translateWithFallback(
+        language,
+        `rule.${ruleId}.warning.${warning.code}`,
+        warning.message,
       )
-    : []
+    : warning.message
 }
 
 function slugify(value: string): string {

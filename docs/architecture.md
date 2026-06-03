@@ -98,10 +98,11 @@ falls back to English when a selected-language key is missing and never calls a
 network service or external translation API.
 
 This layer translates core visible UI labels, help text, common warnings,
-buttons, workflow step labels, and selected rule-review/Plan-preview text. It
-does not translate generated SPSS, Stata, R, or Python syntax comments in this
-phase; renderer output remains deterministic and language-neutral from the
-Cleaning Plan.
+buttons, workflow step labels, rule-review labels/descriptions/rationales,
+blocked-rule explanations, Cleaning Plan preview rationales, and
+plain-language summary report headings and reviewer text. It does not translate
+generated SPSS, Stata, R, or Python syntax comments in this phase; renderer
+output remains deterministic and language-neutral from the Cleaning Plan.
 
 ### PWA And Offline Support
 

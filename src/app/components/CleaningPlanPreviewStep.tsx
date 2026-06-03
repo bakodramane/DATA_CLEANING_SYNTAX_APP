@@ -1,4 +1,5 @@
 import type { CleaningPlan, CleaningStep, ValidationResult } from '../../core'
+import { translateStepRationale } from '../../i18n'
 import { useI18n } from '../../i18n/useI18n'
 import { formatValidationMessages } from '../state/appState'
 import { HelpText } from './HelpText'
@@ -13,7 +14,7 @@ export function CleaningPlanPreviewStep({
   plan,
   validation,
 }: CleaningPlanPreviewStepProps) {
-  const { t, tf } = useI18n()
+  const { language, t } = useI18n()
   const validationMessages = formatValidationMessages(validation)
 
   return (
@@ -71,7 +72,7 @@ export function CleaningPlanPreviewStep({
                     <td>{t(`stepType.${step.type}`)}</td>
                     <td>{step.variables.join(', ')}</td>
                     <td>{t(`action.${step.defaultAction}`)}</td>
-                    <td>{translatedStepRationale(step, tf)}</td>
+                    <td>{translatedStepRationale(step, language)}</td>
                     <td>{step.citationKeys.join(', ')}</td>
                   </tr>
                 ))}
@@ -86,11 +87,7 @@ export function CleaningPlanPreviewStep({
 
 function translatedStepRationale(
   step: CleaningStep,
-  tf: ReturnType<typeof useI18n>['tf'],
+  language: ReturnType<typeof useI18n>['language'],
 ): string {
-  const ruleId = step.parameters.ruleId
-
-  return typeof ruleId === 'string'
-    ? tf(`rule.${ruleId}.rationale`, step.rationale)
-    : step.rationale
+  return translateStepRationale(language, step)
 }

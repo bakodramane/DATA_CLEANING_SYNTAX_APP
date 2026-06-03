@@ -54,9 +54,11 @@ Status below is for the current v0.4.2 deployment checkpoint.
 
 Before release, verify that English remains the default language, French UI
 text appears in the main workflow, the selected language is stored locally in
-the browser, and no backend, telemetry, external translation API, or
-AI-assisted translation is introduced. Generated SPSS, Stata, R, and Python
-syntax comments may remain English until a later terminology-review phase.
+the browser, French rule/reviewer text appears in rule review, Cleaning Plan
+preview, and the summary report, and no backend, telemetry, external
+translation API, or AI-assisted translation is introduced. Generated SPSS,
+Stata, R, and Python syntax comments may remain English until a later
+terminology-review phase.
 
 ## Public Demo Smoke Check
 

@@ -306,8 +306,21 @@ test('French language selection persists and preserves demo workflow state', asy
   await page.getByLabel('Interface language').selectOption('fr')
   await page.getByRole('button', { name: 'Continuer' }).click()
   await expect(page.getByText('Revue des règles recommandées')).toBeVisible()
+  await expect(
+    page.getByText('Conserver le libelle de variable').first(),
+  ).toBeVisible()
+  await page
+    .getByText('Voir les règles bloquées et les explications')
+    .first()
+    .click()
+  await expect(
+    page.getByText('Les identifiants ne doivent pas etre imputes').first(),
+  ).toBeVisible()
   await page.getByRole('button', { name: 'Continuer' }).click()
   await expect(page.getByText("Aperçu du Plan d'apurement")).toBeVisible()
+  await expect(
+    page.getByText('Les libelles des variables d enquete').first(),
+  ).toBeVisible()
   await page.getByRole('button', { name: 'Continuer' }).click()
   await expect(page.getByText('Aperçu de la syntaxe')).toBeVisible()
 

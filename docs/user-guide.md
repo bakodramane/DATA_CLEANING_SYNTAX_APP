@@ -27,9 +27,13 @@ stored locally in the browser so it persists after reload. Switching language
 does not clear the project, imported variables, selected rules, or generated
 preview state.
 
-The generated SPSS, Stata, R, and Python syntax comments may remain English in
-this phase. The app does not use AI-assisted translation, external translation
-services, telemetry, or a backend.
+French covers the core workflow, importer privacy warnings, rule labels,
+descriptions, rationales, blocked-rule explanations, Cleaning Plan preview
+rationales, and the plain-language summary report. Variable names, citation
+keys, package names, and generated SPSS, Stata, R, and Python executable syntax
+remain unchanged. Generated syntax comments may remain English in this phase.
+The app does not use AI-assisted translation, external translation services,
+telemetry, or a backend.
 
 ### 3. Enter Project Information
 
@@ -160,12 +164,17 @@ recommended rules and the generated Cleaning Plan.
 Recommended rules are metadata-driven checks or documentation steps. They may
 include variable labels, value labels, range checks, domain checks, missingness
 diagnosis, duplicate identifier checks, or outlier flags.
+When French is selected, visible rule labels, descriptions, rationales, and
+rule warnings are translated locally. If a translation key is missing, the app
+falls back to the English rule text instead of blocking the workflow.
 
 ### 13. Understand Blocked Rules
 
 Blocked rules are shown when a rule is not suitable for a variable. For example,
 identifier variables are protected from imputation, and survey design variables
 require specialist review before modification.
+Blocked-rule explanations use the selected interface language where local
+translations exist.
 
 ### 14. Preview The Cleaning Plan
 
@@ -190,6 +199,10 @@ for exact support by step type and language.
 Download generated scripts and the plain-language summary report from the Export
 step. Downloads are browser-generated files and are not cached as remote server
 responses.
+The summary report follows the selected interface language for reviewer-facing
+headings, selected rule names, step type labels, rationales, and translated rule
+warnings. Generated scripts keep technical syntax stable across language
+selection.
 
 ### 17. Save The Cleaning Plan JSON
 

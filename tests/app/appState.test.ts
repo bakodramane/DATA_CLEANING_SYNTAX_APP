@@ -152,4 +152,34 @@ describe('workflow state helpers', () => {
       downloads.find((download) => download.id === 'r-script')?.content,
     ).toContain('Generated target: R')
   })
+
+  it('creates French reviewer-facing summary report content', () => {
+    const project = createInitialProjectMetadata()
+    const variables = importDemoDictionary().variables
+    const context = buildRuleEngineContext(project)
+    const plan = createCleaningPlanFromSelectedRules(
+      project,
+      variables,
+      createDefaultSelectedRuleIds(variables, context),
+      context,
+    )
+    const validation = validatePlanForPreview(plan)
+    const downloads = createDownloadArtifacts(
+      project,
+      variables,
+      plan,
+      validation,
+      {},
+      'fr',
+    )
+    const summary = downloads.find(
+      (download) => download.id === 'summary-report',
+    )
+
+    expect(summary?.content).toContain('## Résumé du projet')
+    expect(summary?.content).toContain('## Règles sélectionnées')
+    expect(summary?.content).toContain("## Étapes du Plan d'apurement")
+    expect(summary?.content).toContain('Conserver le libelle de variable')
+    expect(summary?.content).toContain('À examiner avant utilisation')
+  })
 })

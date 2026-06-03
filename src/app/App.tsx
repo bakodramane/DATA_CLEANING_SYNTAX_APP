@@ -43,7 +43,7 @@ import type {
 import type { SurveyVariable } from '../core'
 
 function App() {
-  const { t } = useI18n()
+  const { language, t } = useI18n()
   const [activeStep, setActiveStep] = useState<WorkflowStepId>('project')
   const [project, setProject] = useState<ProjectMetadata>(
     createInitialProjectMetadata,
@@ -90,8 +90,9 @@ function App() {
         cleaningPlan,
         validation,
         renderedScripts,
+        language,
       ),
-    [cleaningPlan, project, renderedScripts, validation, variables],
+    [cleaningPlan, language, project, renderedScripts, validation, variables],
   )
   const completedSteps = completedWorkflowSteps(
     variables,

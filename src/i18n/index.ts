@@ -89,3 +89,4 @@ export type {
   TranslationValues,
   Translator,
 } from './types'
+export * from './ruleText'

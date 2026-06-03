@@ -1,5 +1,11 @@
 import type { RuleReviewItem } from '../state/workflowTypes'
-import { translateKnownMessage } from '../../i18n'
+import {
+  translateBlockedRuleReason,
+  translateRuleDescription,
+  translateRuleLabel,
+  translateRuleRationale,
+  translateRuleWarning,
+} from '../../i18n'
 import { useI18n } from '../../i18n/useI18n'
 import { HelpText } from './HelpText'
 
@@ -13,7 +19,7 @@ interface RuleReviewStepProps {
 }
 
 export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
-  const { language, t, tf } = useI18n()
+  const { language, t } = useI18n()
 
   return (
     <div className="step-content">
@@ -56,10 +62,9 @@ export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
                       }
                     />
                     <span>
-                      <strong>{tf(`rule.${rule.id}.label`, rule.label)}</strong>
-                      <small>
-                        {tf(`rule.${rule.id}.rationale`, rule.rationale)}
-                      </small>
+                      <strong>{translateRuleLabel(language, rule)}</strong>
+                      <small>{translateRuleDescription(language, rule)}</small>
+                      <small>{translateRuleRationale(language, rule)}</small>
                       <small>
                         {t('common.citations')}: {rule.citationKeys.join(', ')}
                       </small>
@@ -70,7 +75,7 @@ export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
                       ) : null}
                       {rule.warnings?.map((warning) => (
                         <small className="inline-warning" key={warning.code}>
-                          {translateKnownMessage(language, warning.message)}
+                          {translateRuleWarning(language, rule, warning)}
                         </small>
                       ))}
                     </span>
@@ -85,13 +90,9 @@ export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
                     {item.blockedRules.map((blockedRule) => (
                       <li key={`${blockedRule.rule.id}-${blockedRule.code}`}>
                         <strong>
-                          {tf(
-                            `rule.${blockedRule.rule.id}.label`,
-                            blockedRule.rule.label,
-                          )}
-                          :
+                          {translateRuleLabel(language, blockedRule.rule)}:
                         </strong>{' '}
-                        {blockedRule.reason}
+                        {translateBlockedRuleReason(language, blockedRule)}
                       </li>
                     ))}
                   </ul>
