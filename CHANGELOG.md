@@ -4,6 +4,29 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.4.2 - 2026-06-03
+
+### Added
+
+- Renderer capability metadata for SPSS v18, Stata v14, R, and Python.
+- Full-file golden tests for household, agriculture, and structural-missing
+  Cleaning Plans.
+- Twelve golden files covering SPSS, Stata, R, and Python renderer outputs.
+- Renderer support matrix documentation.
+- Support-matrix consistency tests.
+
+### Changed
+
+- Improved SPSS, Stata, R, and Python renderer warnings.
+- Added clearer partial-support comments in generated scripts.
+- Improved structural-missingness and imputation-limit documentation in
+  renderer output.
+
+### Notes
+
+- No backend, telemetry, cloud storage, authentication, script execution, or
+  AI-assisted interpretation was added.
+
 ## v0.4.1 - 2026-06-02
 
 ### Added
