@@ -2,6 +2,18 @@
 
 The app is a static Vite build and can be hosted on GitHub Pages.
 
+## Live Deployment
+
+The current public demo is deployed at:
+
+```text
+https://bakodramane.github.io/DATA_CLEANING_SYNTAX_APP/
+```
+
+The deployment uses the manual **Deploy GitHub Pages** workflow and publishes
+the static `dist/` artifact from `main`. The v0.4.2 deployment was validated in
+[Deployment Validation v0.4.2](deployment-validation-v0.4.2.md).
+
 ## Build Output
 
 Production files are emitted to:
@@ -60,11 +72,10 @@ actions.
 No repository secrets are required. The workflow uses the default GitHub token
 with `pages: write` and `id-token: write` permissions for deployment. The app is
 static and does not upload user dictionaries, generated scripts, or other user
-data during deployment.
+data during deployment. No telemetry or analytics are added by the deployment.
 
-The workflow has not been run as part of Phase 9. To deploy, run **Deploy GitHub
-Pages** manually from the Actions tab after enabling GitHub Pages with **GitHub
-Actions** as the source.
+To redeploy, run **Deploy GitHub Pages** manually from the Actions tab. GitHub
+Pages should remain configured with **GitHub Actions** as the source.
 
 ## Release Reminder
 
@@ -74,5 +85,8 @@ Before running a public deployment:
 - verify the production preview locally;
 - confirm offline reload after first load;
 - confirm generated downloads still work;
+- confirm the public demo URL loads;
+- confirm `manifest.webmanifest` and `sw.js` are available from the deployed
+  path;
 - verify remaining references marked `NEEDS_VERIFICATION` are acceptable for the
   release context.

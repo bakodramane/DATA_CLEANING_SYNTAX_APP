@@ -2,7 +2,7 @@
 
 Use this checklist before tagging a public release.
 
-Status below is for the current Phase 14 checkpoint.
+Status below is for the current v0.4.2 deployment checkpoint.
 
 ## Quality Checks
 
@@ -46,6 +46,20 @@ Status below is for the current Phase 14 checkpoint.
 - [x] Summary report downloads.
 - [x] Offline reload opens the app shell after first load.
 
+## Public Demo Smoke Check
+
+- [x] GitHub Pages source is configured for GitHub Actions.
+- [x] Manual **Deploy GitHub Pages** workflow completes successfully.
+- [x] Public demo opens at
+      `https://bakodramane.github.io/DATA_CLEANING_SYNTAX_APP/`.
+- [x] Public `manifest.webmanifest` is available.
+- [x] Public `sw.js` is available.
+- [x] Service worker registers from the deployed site.
+- [x] Public demo workflow works.
+- [x] Public CSV paste, Excel upload, manual entry, DDI XML upload, `.sav`, and
+      `.dta` paths behave correctly with synthetic fixtures.
+- [x] Public offline reload works after first load.
+
 ## Documentation
 
 - [x] README updated.
@@ -59,6 +73,7 @@ Status below is for the current Phase 14 checkpoint.
 - [x] Contributor guide updated.
 - [x] Rule and renderer contribution docs updated.
 - [x] GitHub Pages setup documented.
+- [x] GitHub Pages deployment validation documented.
 - [x] Screenshots added or placeholders documented.
 
 ## Release Metadata

@@ -114,6 +114,12 @@ npm audit --omit=dev
 
 ## GitHub Pages
 
+Live public demo:
+
+```text
+https://bakodramane.github.io/DATA_CLEANING_SYNTAX_APP/
+```
+
 The Vite configuration uses a relative default base path (`./`), which is safe
 for static hosting and GitHub Pages subpath deployments. If a deployment needs
 an explicit repository base path, set `VITE_BASE_PATH` before building:
@@ -124,7 +130,9 @@ npm run build
 ```
 
 See [GitHub Pages Deployment](docs/github-pages.md) for setup notes and the
-optional manual deployment workflow.
+manual deployment workflow. See the
+[v0.4.2 deployment validation note](docs/deployment-validation-v0.4.2.md) for
+the latest public-demo validation result.
 
 ## Current Limitations
 

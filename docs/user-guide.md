@@ -6,6 +6,12 @@ the Survey Data Cleaning Syntax Generator.
 The app generates syntax from metadata. It does not clean a dataset directly and
 it does not run SPSS, Stata, R, or Python code.
 
+The public demo is available at:
+
+```text
+https://bakodramane.github.io/DATA_CLEANING_SYNTAX_APP/
+```
+
 ## Workflow
 
 ### 1. Start A New Project
