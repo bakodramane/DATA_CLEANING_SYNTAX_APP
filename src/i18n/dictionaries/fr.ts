@@ -51,7 +51,7 @@ export const fr: TranslationDictionary = {
 
   'project.title': 'Informations sur le projet',
   'project.help':
-    'Ces informations apparaissent dans le Plan d apurement, les scripts generes et le rapport de synthese.',
+    'Le nom du projet apparait dans les scripts generes, les noms de fichiers et le rapport de synthese pour identifier le travail.',
   'project.surveyName': 'Nom de l enquete ou du projet',
   'project.country': 'Pays ou organisation',
   'project.year': "Année de l'enquête",
@@ -60,7 +60,7 @@ export const fr: TranslationDictionary = {
 
   'metadata.title': 'Saisie des métadonnées',
   'metadata.help':
-    'Collez ou importez un dictionnaire de donnees. Les colonnes inconnues sont conservees avec les metadonnees importees au lieu d etre ignorees.',
+    'Collez un CSV, importez un dictionnaire local, chargez la demonstration ou ajoutez des variables manuellement. Les fichiers sont traites localement dans votre navigateur.',
   'metadata.loadDemo':
     'Charger le dictionnaire de démonstration ménage/travail',
   'metadata.pasteCsv': 'Coller le texte CSV du dictionnaire',
@@ -79,6 +79,8 @@ export const fr: TranslationDictionary = {
   'metadata.unmappedColumns': 'Colonnes non mappees conservees',
   'metadata.mappingTitle': 'Correspondance des colonnes détectée',
   'metadata.importWarnings': 'Avertissements d importation',
+  'metadata.noImportWarnings':
+    'Aucun avertissement d importation. Continuez vers la revue des variables et verifiez le type et le role detectes.',
   'metadata.importError': 'Erreur d importation',
   'metadata.continueWithoutVariables':
     'Ajoutez, importez ou chargez au moins une variable avant de continuer.',
@@ -110,8 +112,9 @@ export const fr: TranslationDictionary = {
 
   'variables.title': 'Revue des variables',
   'variables.help':
-    'Verifiez le type et le role detectes. Les corrections mettent immediatement a jour les regles recommandees et la syntaxe generee.',
-  'variables.empty': 'Importez les metadonnees avant de reviser les variables.',
+    'Verifiez chaque type et role, car ils determinent les regles de revue et la syntaxe recommandees.',
+  'variables.empty':
+    'Aucune variable n est prete pour la revue. Ajoutez une variable manuelle, importez un dictionnaire ou chargez la demonstration depuis la saisie des metadonnees.',
   'variables.name': 'Nom',
   'variables.label': 'Libellé',
   'variables.type': 'Type',
@@ -126,21 +129,34 @@ export const fr: TranslationDictionary = {
 
   'rules.title': 'Revue des règles recommandées',
   'rules.help':
-    'Les regles recommandees privilegient le marquage et la revue. L imputation consiste a renseigner les valeurs manquantes au moyen d une methode statistique documentee.',
-  'rules.empty': 'Importez des variables avant de reviser les regles.',
+    'Les regles sont des recommandations pour des controles et une documentation approuves par le reviseur, pas des actions d apurement automatiques.',
+  'rules.empty':
+    'Aucune recommandation de regle n est disponible. Importez ou ajoutez des variables, puis revenez a cette etape.',
+  'rules.noneSelected':
+    'Aucune regle n est selectionnee pour cette variable. Selectionnez les controles a inclure avant de previsualiser le plan.',
   'rules.groupSummary': '{recommended} recommandées, {blocked} bloquées',
   'rules.userReviewNeeded': 'Revue utilisateur requise',
+  'rules.methodWarnings': 'Avertissement methodologique',
   'rules.viewBlocked': 'Voir les règles bloquées et les explications',
+  'rules.noBlocked':
+    'Aucune regle bloquee pour cette variable. Continuez la revue des recommandations selectionnees.',
 
   'plan.title': "Aperçu du Plan d'apurement",
   'plan.help':
-    'Un Plan d apurement est une liste de controle independante du langage que les moteurs de rendu transforment en syntaxe SPSS, Stata, R et Python.',
-  'plan.empty': 'Selectionnez des regles avant de previsualiser le plan.',
+    'Le Plan d apurement est une liste auditable des controles, actions, hypotheses, avertissements et citations proposes.',
+  'plan.empty':
+    'Aucun Plan d apurement n a encore ete genere. Importez des variables, revisez les regles, puis continuez vers cette etape.',
   'plan.summary': "Résumé du Plan d'apurement",
   'plan.variables': 'Variables',
   'plan.cleaningSteps': "Étapes d'apurement",
   'plan.validationStatus': 'Statut de validation',
   'plan.validationMessages': 'Messages de validation',
+  'plan.validationErrors': 'Erreurs de validation',
+  'plan.validationWarnings': 'Avertissements de validation',
+  'plan.noValidationErrors':
+    'Aucune erreur de validation. Le plan peut etre previsualise et rendu.',
+  'plan.noValidationWarnings':
+    'Aucun avertissement de validation. Continuez vers l apercu de la syntaxe et revisez les scripts generes.',
   'plan.step': 'Étape',
   'plan.type': 'Type',
   'plan.action': 'Action',
@@ -148,23 +164,38 @@ export const fr: TranslationDictionary = {
 
   'syntax.title': 'Aperçu de la syntaxe',
   'syntax.help':
-    'Chaque script est genere a partir du meme Plan d apurement. Examinez les avertissements avant d utiliser une syntaxe en production.',
+    'Chaque script est genere a partir du meme Plan d apurement et doit etre revise avant utilisation en production.',
   'syntax.invalid':
     'Resolvez les erreurs de validation du Plan d apurement avant d exporter la syntaxe.',
   'syntax.languages': 'Langages de syntaxe',
   'syntax.rendererWarnings': 'Avertissements du moteur de rendu',
   'syntax.generatedScript': 'Script généré {language}',
-  'syntax.empty': 'Aucun script n a encore ete genere.',
+  'syntax.empty':
+    'Aucun apercu de syntaxe n a encore ete genere. Generez un Plan d apurement valide et gardez au moins un langage cible selectionne.',
+  'syntax.noRendererWarnings':
+    'Aucun avertissement du moteur de rendu pour ce script. Revisez tout le code avant utilisation en production.',
 
   'export.title': 'Exportation et téléchargement',
   'export.help':
-    'Telechargez le Plan d apurement, la syntaxe generee et un resume en langage clair pour revue.',
+    'Telechargez le Plan d apurement reutilisable, les scripts generes et un resume en langage clair pour revue.',
   'export.blocked':
     'Les telechargements de syntaxe sont bloques jusqu a la resolution des erreurs de validation.',
   'export.empty': "Générez un Plan d'apurement avant l'exportation.",
 
   'download.cleaningPlanJson': "Plan d'apurement JSON",
+  'download.cleaningPlanJsonDescription':
+    'Configuration de projet reutilisable pour audit, revue ou comparaison ulterieure.',
+  'download.spssSyntax': 'Syntaxe SPSS',
+  'download.spssScriptDescription': 'Script pour SPSS v18.',
+  'download.stataDoFile': 'Do-file Stata',
+  'download.stataDoFileDescription': 'Script pour Stata v14.',
+  'download.rScript': 'Script R',
+  'download.rScriptDescription': 'Script pour R.',
+  'download.pythonScript': 'Script Python',
+  'download.pythonScriptDescription': 'Script pour Python.',
   'download.summaryReport': 'Rapport de synthèse en langage clair',
+  'download.summaryReportDescription':
+    'Documentation en langage clair pour la revue et la transmission.',
   'download.script': 'Script {language}',
 
   'summary.defaultTitle': "Résumé du Plan d'apurement",

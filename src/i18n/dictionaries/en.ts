@@ -51,7 +51,7 @@ export const en: TranslationDictionary = {
 
   'project.title': 'Project information',
   'project.help':
-    'These details appear in the Cleaning Plan, generated scripts, and summary report.',
+    'The project name appears in generated scripts, file names, and the summary report so reviewers can identify the work.',
   'project.surveyName': 'Survey or project name',
   'project.country': 'Country or organisation',
   'project.year': 'Survey year',
@@ -60,7 +60,7 @@ export const en: TranslationDictionary = {
 
   'metadata.title': 'Metadata input',
   'metadata.help':
-    'Paste or upload a data dictionary. Unknown columns are kept with the imported metadata instead of being discarded.',
+    'Paste CSV text, upload a local dictionary, load the demo, or add variables manually. Files are processed locally in your browser.',
   'metadata.loadDemo': 'Load demo household survey dictionary',
   'metadata.pasteCsv': 'Paste CSV dictionary text',
   'metadata.importPastedCsv': 'Import pasted CSV',
@@ -78,6 +78,8 @@ export const en: TranslationDictionary = {
   'metadata.unmappedColumns': 'Unmapped columns preserved',
   'metadata.mappingTitle': 'Detected column mapping',
   'metadata.importWarnings': 'Import warnings',
+  'metadata.noImportWarnings':
+    'No import warnings. Continue to Variable review and check the detected type and role.',
   'metadata.importError': 'Import error',
   'metadata.continueWithoutVariables':
     'Add, import, or load at least one variable before continuing.',
@@ -108,8 +110,9 @@ export const en: TranslationDictionary = {
 
   'variables.title': 'Variable review',
   'variables.help':
-    'Check the detected type and role. Corrections immediately update rule recommendations and generated syntax.',
-  'variables.empty': 'Import metadata before reviewing variables.',
+    'Check each type and role because they determine which review rules and syntax are recommended.',
+  'variables.empty':
+    'No variables are ready to review yet. Add a manual variable, import a dictionary, or load the demo from Metadata input.',
   'variables.name': 'Name',
   'variables.label': 'Label',
   'variables.type': 'Type',
@@ -124,21 +127,34 @@ export const en: TranslationDictionary = {
 
   'rules.title': 'Rule recommendation review',
   'rules.help':
-    'Recommended rules prefer flagging and review. Imputation means filling in missing values using a documented statistical method.',
-  'rules.empty': 'Import variables before reviewing rules.',
+    'Rules are recommendations for reviewer-approved checks and documentation, not automatic cleaning actions.',
+  'rules.empty':
+    'No rule recommendations are available yet. Import or add variables, then return to this step.',
+  'rules.noneSelected':
+    'No rules are selected for this variable. Select the checks to include before previewing the plan.',
   'rules.groupSummary': '{recommended} recommended, {blocked} blocked',
   'rules.userReviewNeeded': 'User review needed',
+  'rules.methodWarnings': 'Methodological warning',
   'rules.viewBlocked': 'View blocked rules and explanations',
+  'rules.noBlocked':
+    'No blocked rules for this variable. Continue reviewing selected recommendations.',
 
   'plan.title': 'Cleaning Plan preview',
   'plan.help':
-    'A Cleaning Plan is the language-neutral checklist that renderers turn into SPSS, Stata, R, and Python syntax.',
-  'plan.empty': 'Select rules before previewing the plan.',
+    'The Cleaning Plan is an auditable list of proposed checks, actions, assumptions, warnings, and citations.',
+  'plan.empty':
+    'No Cleaning Plan has been generated yet. Import variables, review rules, then continue to this step.',
   'plan.summary': 'Cleaning Plan summary',
   'plan.variables': 'Variables',
   'plan.cleaningSteps': 'Cleaning steps',
   'plan.validationStatus': 'Validation status',
   'plan.validationMessages': 'Validation messages',
+  'plan.validationErrors': 'Validation errors',
+  'plan.validationWarnings': 'Validation warnings',
+  'plan.noValidationErrors':
+    'No validation errors. The plan can be previewed and rendered.',
+  'plan.noValidationWarnings':
+    'No validation warnings. Continue to Syntax preview and review the generated scripts.',
   'plan.step': 'Step',
   'plan.type': 'Type',
   'plan.action': 'Action',
@@ -146,23 +162,38 @@ export const en: TranslationDictionary = {
 
   'syntax.title': 'Syntax preview',
   'syntax.help':
-    'Each script is generated from the same Cleaning Plan. Review warnings before using any syntax in production.',
+    'Each script is generated from the same Cleaning Plan and must be reviewed before production use.',
   'syntax.invalid':
     'Resolve Cleaning Plan validation errors before exporting syntax.',
   'syntax.languages': 'Syntax languages',
   'syntax.rendererWarnings': 'Renderer warnings',
   'syntax.generatedScript': '{language} generated script',
-  'syntax.empty': 'No script has been generated yet.',
+  'syntax.empty':
+    'No syntax preview has been generated yet. Generate a valid Cleaning Plan and keep at least one target language selected.',
+  'syntax.noRendererWarnings':
+    'No renderer warnings for this script. Review the full code before production use.',
 
   'export.title': 'Export and download',
   'export.help':
-    'Download the Cleaning Plan, generated syntax, and a plain-language summary for review.',
+    'Download the reusable Cleaning Plan, generated scripts, and a plain-language summary for review.',
   'export.blocked':
     'Syntax downloads are blocked until validation errors are resolved.',
   'export.empty': 'Generate a Cleaning Plan before exporting.',
 
   'download.cleaningPlanJson': 'Cleaning Plan JSON',
+  'download.cleaningPlanJsonDescription':
+    'Reusable project configuration for audit, review, or later comparison.',
+  'download.spssSyntax': 'SPSS syntax',
+  'download.spssScriptDescription': 'Script for SPSS v18.',
+  'download.stataDoFile': 'Stata do-file',
+  'download.stataDoFileDescription': 'Script for Stata v14.',
+  'download.rScript': 'R script',
+  'download.rScriptDescription': 'Script for R.',
+  'download.pythonScript': 'Python script',
+  'download.pythonScriptDescription': 'Script for Python.',
   'download.summaryReport': 'Plain-language summary report',
+  'download.summaryReportDescription':
+    'Plain-language documentation for reviewer sign-off and handover.',
   'download.script': '{language} script',
 
   'summary.defaultTitle': 'Cleaning Plan Summary',

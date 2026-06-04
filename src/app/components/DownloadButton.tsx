@@ -47,6 +47,18 @@ function translatedDownloadLabel(
     return t('download.summaryReport')
   }
 
+  const labelKeyById: Record<string, string> = {
+    'spss18-script': 'download.spssSyntax',
+    'stata14-script': 'download.stataDoFile',
+    'r-script': 'download.rScript',
+    'python-script': 'download.pythonScript',
+  }
+  const labelKey = labelKeyById[artifact.id]
+
+  if (labelKey) {
+    return t(labelKey)
+  }
+
   const language = artifact.id.replace(/-script$/, '')
   const label = languageLabels[language as keyof typeof languageLabels]
 

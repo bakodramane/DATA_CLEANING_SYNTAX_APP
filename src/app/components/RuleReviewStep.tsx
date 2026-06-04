@@ -73,15 +73,27 @@ export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
                           {t('rules.userReviewNeeded')}
                         </small>
                       ) : null}
-                      {rule.warnings?.map((warning) => (
-                        <small className="inline-warning" key={warning.code}>
-                          {translateRuleWarning(language, rule, warning)}
-                        </small>
-                      ))}
+                      {rule.warnings && rule.warnings.length > 0 ? (
+                        <span className="method-warning-group">
+                          <small>{t('rules.methodWarnings')}</small>
+                          {rule.warnings.map((warning) => (
+                            <small
+                              className="inline-warning"
+                              key={warning.code}
+                            >
+                              {translateRuleWarning(language, rule, warning)}
+                            </small>
+                          ))}
+                        </span>
+                      ) : null}
                     </span>
                   </label>
                 ))}
               </div>
+
+              {item.selectedRuleIds.length === 0 ? (
+                <p className="empty-state">{t('rules.noneSelected')}</p>
+              ) : null}
 
               {item.blockedRules.length > 0 ? (
                 <details className="blocked-rules">
@@ -97,7 +109,9 @@ export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
                     ))}
                   </ul>
                 </details>
-              ) : null}
+              ) : (
+                <p className="small-note">{t('rules.noBlocked')}</p>
+              )}
             </section>
           ))}
         </div>

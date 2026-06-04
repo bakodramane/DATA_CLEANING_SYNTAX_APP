@@ -1,7 +1,6 @@
 import type { CleaningPlan, CleaningStep, ValidationResult } from '../../core'
 import { translateStepRationale } from '../../i18n'
 import { useI18n } from '../../i18n/useI18n'
-import { formatValidationMessages } from '../state/appState'
 import { HelpText } from './HelpText'
 import { WarningList } from './WarningList'
 
@@ -15,7 +14,10 @@ export function CleaningPlanPreviewStep({
   validation,
 }: CleaningPlanPreviewStepProps) {
   const { language, t } = useI18n()
-  const validationMessages = formatValidationMessages(validation)
+  const validationErrors =
+    validation?.errors.map((issue) => issue.message) ?? []
+  const validationWarnings =
+    validation?.warnings.map((issue) => issue.message) ?? []
 
   return (
     <div className="step-content">
@@ -47,8 +49,16 @@ export function CleaningPlanPreviewStep({
           </section>
 
           <WarningList
-            title={t('plan.validationMessages')}
-            messages={validationMessages}
+            title={t('plan.validationErrors')}
+            emptyMessage={t('plan.noValidationErrors')}
+            messages={validationErrors}
+            tone="error"
+          />
+
+          <WarningList
+            title={t('plan.validationWarnings')}
+            emptyMessage={t('plan.noValidationWarnings')}
+            messages={validationWarnings}
           />
 
           <div className="table-scroll">

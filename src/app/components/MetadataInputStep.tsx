@@ -145,6 +145,7 @@ export function MetadataInputStep({
 
       <WarningList
         title={t('metadata.importWarnings')}
+        emptyMessage={importResult ? t('metadata.noImportWarnings') : undefined}
         messages={warningMessages}
       />
 
