@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.8.0 - 2026-06-04
+
+### Added
+
+- Generated script comments now follow the selected UI language.
+- English/French comment localisation for SPSS, Stata, R, and Python
+  renderers.
+- Syntax previews and downloads use the selected language.
+- Added and updated tests for language-aware renderer comments.
+
+### Notes
+
+- Executable syntax remains unchanged.
+- Variable names, package names, commands, and citation keys remain unchanged.
+- User-entered labels and value labels are not machine-translated.
+- French comments are UTF-8 compatible.
+- No backend, telemetry, cloud storage, authentication, script execution,
+  external translation API, or AI-assisted translation was added.
+
 ## v0.7.0 - 2026-06-03
 
 ### Added
