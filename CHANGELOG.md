@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.8.1 - 2026-06-04
+
+### Changed
+
+- Improved the Syntax step empty state.
+- Clarified the distinction between a missing Cleaning Plan and a validation
+  failure.
+- Expanded Playwright coverage for English/French workflow guidance.
+- Expanded Playwright coverage for empty states.
+- Expanded Playwright coverage for export descriptions and French export
+  completion.
+- Updated documentation for reviewer-friendly guidance, empty states, warning
+  grouping, and export purposes.
+
+### Notes
+
+- No backend, telemetry, cloud storage, authentication, script execution,
+  AI-assisted interpretation, or major workflow redesign was added.
+
 ## v0.8.0 - 2026-06-04
 
 ### Added
