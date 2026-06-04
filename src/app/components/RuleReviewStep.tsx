@@ -1,5 +1,10 @@
 import type { RuleReviewItem } from '../state/workflowTypes'
 import {
+  METHODOLOGY_PRESETS,
+  getMethodologyPresetDefinition,
+  type MethodologyPresetId,
+} from '../../rules'
+import {
   translateBlockedRuleReason,
   translateRuleDescription,
   translateRuleLabel,
@@ -11,6 +16,8 @@ import { HelpText } from './HelpText'
 
 interface RuleReviewStepProps {
   items: RuleReviewItem[]
+  methodologyPreset: MethodologyPresetId
+  onSelectMethodologyPreset: (methodologyPreset: MethodologyPresetId) => void
   onToggleRule: (
     variableName: string,
     ruleId: string,
@@ -18,7 +25,12 @@ interface RuleReviewStepProps {
   ) => void
 }
 
-export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
+export function RuleReviewStep({
+  items,
+  methodologyPreset,
+  onSelectMethodologyPreset,
+  onToggleRule,
+}: RuleReviewStepProps) {
   const { language, t } = useI18n()
 
   return (
@@ -28,6 +40,51 @@ export function RuleReviewStep({ items, onToggleRule }: RuleReviewStepProps) {
         <h2>{t('rules.title')}</h2>
         <HelpText>{t('rules.help')}</HelpText>
       </div>
+
+      <fieldset className="preset-selector">
+        <legend>{t('presets.title')}</legend>
+        <HelpText>{t('presets.help')}</HelpText>
+        <div className="preset-grid">
+          {METHODOLOGY_PRESETS.map((preset) => {
+            const definition = getMethodologyPresetDefinition(preset)
+
+            return (
+              <label className="preset-option" key={preset}>
+                <input
+                  type="radio"
+                  name="methodology-preset"
+                  value={preset}
+                  checked={methodologyPreset === preset}
+                  onChange={() => onSelectMethodologyPreset(preset)}
+                />
+                <span>
+                  <strong>{t(`preset.${preset}.name`)}</strong>
+                  <small>{t(`preset.${preset}.description`)}</small>
+                  <small>
+                    <b>{t('presets.useCase')}:</b>{' '}
+                    {t(`preset.${preset}.useCase`)}
+                  </small>
+                  <small>
+                    <b>{t('presets.includes')}:</b>{' '}
+                    {definition.includedFamilies
+                      .map((family) => t(`ruleFamily.${family}`))
+                      .join(', ')}
+                  </small>
+                  <small>
+                    <b>{t('presets.excludes')}:</b>{' '}
+                    {definition.excludedFamilies
+                      .map((family) => t(`ruleFamily.${family}`))
+                      .join(', ')}
+                  </small>
+                  <small className="inline-warning">
+                    {t(`preset.${preset}.caution`)}
+                  </small>
+                </span>
+              </label>
+            )
+          })}
+        </div>
+      </fieldset>
 
       {items.length === 0 ? (
         <p className="empty-state">{t('rules.empty')}</p>

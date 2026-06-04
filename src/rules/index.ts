@@ -1,5 +1,6 @@
 export * from './citations'
 export * from './defaultRules'
+export * from './methodologyPresets'
 export * from './ruleEngine'
 export * from './ruleFilters'
 export * from './ruleToCleaningStep'

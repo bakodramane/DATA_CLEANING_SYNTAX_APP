@@ -2,8 +2,8 @@
 
 Use this checklist before tagging a public release.
 
-Status below is for the current v0.8.0 deployment checkpoint and Phase 20
-usability-polish preparation.
+Status below is for the current v0.8.1 deployment checkpoint and Phase 21
+guided methodology preset preparation.
 
 ## Quality Checks
 
@@ -48,6 +48,17 @@ usability-polish preparation.
 - [x] Rules generate from DDI-imported variables.
 - [x] Variable review works.
 - [x] Rule review works.
+- [ ] Methodology preset selector appears in Rule Review.
+- [ ] Each methodology preset can be selected.
+- [ ] Rule defaults update when switching presets.
+- [ ] Documentation/reporting only excludes imputation and outlier rules by
+      default.
+- [ ] Basic validation excludes imputation and outlier rules by default.
+- [ ] Validation + outlier review selects outlier flags but excludes imputation
+      by default.
+- [ ] Analysis-ready with imputation suggestions selects eligible imputation
+      suggestions and keeps review warnings visible.
+- [ ] Hard protections remain enforced under all presets.
 - [x] Cleaning Plan preview works.
 - [x] SPSS v18 syntax preview renders.
 - [x] Stata v14 syntax preview renders.
@@ -59,6 +70,8 @@ usability-polish preparation.
 - [x] R script downloads.
 - [x] Python script downloads.
 - [x] Summary report downloads.
+- [ ] Summary report includes the selected methodology preset, included rule
+      families, excluded rule families, and the user-review warning.
 - [ ] Export descriptions explain Cleaning Plan JSON, SPSS syntax, Stata
       do-file, R script, Python script, and summary report purposes.
 - [x] Offline reload opens the app shell after first load.

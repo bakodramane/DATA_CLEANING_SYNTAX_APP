@@ -141,6 +141,43 @@ export const fr: TranslationDictionary = {
   'rules.noBlocked':
     'Aucune regle bloquee pour cette variable. Continuez la revue des recommandations selectionnees.',
 
+  'presets.title': 'Profil méthodologique',
+  'presets.help':
+    'Choisissez un point de depart prudent pour les regles selectionnees par defaut. Vous pouvez toujours revoir et modifier chaque regle.',
+  'presets.useCase': 'Cas d utilisation',
+  'presets.includes': 'Inclut',
+  'presets.excludes': 'Exclut',
+  'preset.documentation_only.name': 'Documentation uniquement',
+  'preset.documentation_only.description':
+    'Conserve les libelles, la tracabilite des metadonnees et la documentation de revue avec un minimum de regles d apurement.',
+  'preset.documentation_only.useCase':
+    'A utiliser lorsque l objectif immediat est la documentation d audit ou la transmission, pas un apurement pret pour l analyse.',
+  'preset.documentation_only.caution':
+    'Les regles de validation, d examen des valeurs atypiques et d imputation ne sont pas selectionnees par defaut.',
+  'preset.basic_validation.name': 'Validation de base uniquement',
+  'preset.basic_validation.description':
+    'Selectionne les libelles, declarations de valeurs manquantes, controles d intervalle ou de domaine, controles des identifiants en double et avertissements de protection.',
+  'preset.basic_validation.useCase':
+    'A utiliser pour une premiere validation des metadonnees lorsque les decisions de traitement sont hors perimetre.',
+  'preset.basic_validation.caution':
+    'L examen des valeurs atypiques et les suggestions d imputation ne sont pas selectionnes par defaut.',
+  'preset.validation_outlier_review.name':
+    'Validation et examen des valeurs atypiques',
+  'preset.validation_outlier_review.description':
+    'Ajoute des marquages transparents des valeurs numeriques atypiques a la validation de base, sans suppression ni traitement automatique.',
+  'preset.validation_outlier_review.useCase':
+    'A utiliser lorsque les reviseurs doivent voir les valeurs numeriques inhabituelles avant toute decision de traitement.',
+  'preset.validation_outlier_review.caution':
+    'L imputation et le traitement des valeurs atypiques restent non selectionnes; les marquages generes exigent toujours une revue.',
+  'preset.analysis_ready_imputation.name':
+    'Préparation pour l’analyse avec suggestions d’imputation',
+  'preset.analysis_ready_imputation.description':
+    'Ajoute le diagnostic des valeurs manquantes et des suggestions prudentes d imputation lorsque les metadonnees et les protections le permettent.',
+  'preset.analysis_ready_imputation.useCase':
+    'A utiliser pour preparer un jeu de donnees d analyse lorsque les reviseurs sont prets a evaluer les hypotheses d imputation.',
+  'preset.analysis_ready_imputation.caution':
+    'Les suggestions restent a reviser; les protections des identifiants, valeurs manquantes structurelles et variables de plan de sondage restent appliquees.',
+
   'plan.title': "Aperçu du Plan d'apurement",
   'plan.help':
     'Le Plan d apurement est une liste auditable des controles, actions, hypotheses, avertissements et citations proposes.',
@@ -205,6 +242,13 @@ export const fr: TranslationDictionary = {
   'summary.notProvided': 'Non renseigné',
   'summary.importedVariables': 'Variables importées',
   'summary.selectedSteps': "Étapes d'apurement sélectionnées",
+  'summary.methodologyPreset': 'Profil méthodologique',
+  'summary.presetSelected': 'Profil selectionne',
+  'summary.presetReason': 'Pourquoi il a ete selectionne',
+  'summary.presetIncluded': 'Familles de regles selectionnees par defaut',
+  'summary.presetExcluded': 'Familles de regles exclues par defaut',
+  'summary.presetReviewRequired':
+    'Une revue utilisateur reste obligatoire avant d executer toute syntaxe generee.',
   'summary.selectedRules': 'Règles sélectionnées',
   'summary.noRules': 'Aucune règle sélectionnée pour le moment.',
   'summary.cleaningSteps': "Étapes du Plan d'apurement",
@@ -258,6 +302,24 @@ export const fr: TranslationDictionary = {
   'stepType.summary_report': 'rapport de synthese',
   'stepType.variable_label': 'libelle de variable',
   'stepType.value_label': 'etiquette de valeur',
+
+  'ruleFamily.metadata_preservation': 'conservation des metadonnees',
+  'ruleFamily.variable_labelling': 'libelles de variables',
+  'ruleFamily.value_labelling': 'etiquettes de valeurs',
+  'ruleFamily.missing_value_declaration': 'declarations de valeurs manquantes',
+  'ruleFamily.range_and_domain_checks': 'controles d intervalle et de domaine',
+  'ruleFamily.structural_missingness_protection':
+    'protection des valeurs manquantes structurelles',
+  'ruleFamily.skip_pattern_checks': 'controles de filtre',
+  'ruleFamily.duplicate_identifier_checks':
+    'controles des identifiants en double',
+  'ruleFamily.consistency_checks': 'controles de coherence',
+  'ruleFamily.outlier_detection': 'marquage des valeurs atypiques',
+  'ruleFamily.outlier_treatment': 'traitement des valeurs atypiques',
+  'ruleFamily.missingness_diagnosis': 'diagnostic des valeurs manquantes',
+  'ruleFamily.imputation': 'suggestions d imputation',
+  'ruleFamily.audit_logging': 'journal d audit',
+  'ruleFamily.summary_reporting': 'rapport de synthese',
 
   'message.manual.nameRequired': 'Le nom de la variable est obligatoire.',
   'message.manual.invalidName':

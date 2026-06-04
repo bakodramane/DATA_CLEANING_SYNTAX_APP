@@ -47,6 +47,32 @@ Statistical data editing usually involves:
 The app defaults to review and documentation. It prefers flags, warnings, and
 plain-language rationales over silent deletion or automatic overwriting.
 
+## Guided Methodology Presets
+
+Methodology presets help non-expert users choose a conservative starting point
+for rule selection. A preset controls which rule families are selected by
+default; it does not approve the rules, execute scripts, or prevent manual
+review. Users can still select or deselect individual rules before generating a
+Cleaning Plan.
+
+- **Documentation/reporting only** focuses on variable labels, value labels,
+  metadata traceability, audit notes, and the summary report. It leaves
+  validation, outlier, and imputation rules unselected by default.
+- **Basic validation only** selects labels, missing-value declarations, range
+  checks, domain checks, structural-missingness protection, skip-pattern
+  checks, duplicate identifier checks, and design-variable warnings. It leaves
+  outlier and imputation rules unselected.
+- **Validation + outlier review** adds transparent outlier flags for eligible
+  numeric variables. It does not select deletion, capping, winsorisation, or
+  imputation.
+- **Analysis-ready with imputation suggestions** adds missingness diagnosis and
+  conservative imputation suggestions where the metadata supports them. These
+  suggestions remain review-required and may be partial in some renderers.
+
+All presets preserve hard protections. Identifiers must not be imputed,
+structural missing values must not be treated as item nonresponse, and survey
+design variables must not be modified without specialist review.
+
 ## Structural Missingness Versus Item Nonresponse
 
 Structural missingness occurs when a questionnaire route makes a question not

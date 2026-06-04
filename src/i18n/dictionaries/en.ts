@@ -139,6 +139,42 @@ export const en: TranslationDictionary = {
   'rules.noBlocked':
     'No blocked rules for this variable. Continue reviewing selected recommendations.',
 
+  'presets.title': 'Methodology preset',
+  'presets.help':
+    'Choose a conservative starting point for which rules are selected by default. You can still review and change individual rules.',
+  'presets.useCase': 'Use case',
+  'presets.includes': 'Includes',
+  'presets.excludes': 'Excludes',
+  'preset.documentation_only.name': 'Documentation/reporting only',
+  'preset.documentation_only.description':
+    'Keeps labels, metadata traceability, and reviewer documentation with minimal cleaning rules.',
+  'preset.documentation_only.useCase':
+    'Use when the immediate goal is audit documentation or handover, not analysis-ready cleaning.',
+  'preset.documentation_only.caution':
+    'Validation, outlier review, and imputation rules are left unselected by default.',
+  'preset.basic_validation.name': 'Basic validation only',
+  'preset.basic_validation.description':
+    'Selects labels, missing-value declarations, range/domain checks, duplicate identifier checks, and protection warnings.',
+  'preset.basic_validation.useCase':
+    'Use for first-pass metadata validation when treatment decisions are out of scope.',
+  'preset.basic_validation.caution':
+    'Outlier review and imputation suggestions are left unselected by default.',
+  'preset.validation_outlier_review.name': 'Validation + outlier review',
+  'preset.validation_outlier_review.description':
+    'Adds transparent numeric outlier flags to basic validation without deletion or automatic treatment.',
+  'preset.validation_outlier_review.useCase':
+    'Use when reviewers need visible flags for unusual numeric values before deciding any treatment.',
+  'preset.validation_outlier_review.caution':
+    'Imputation and outlier treatment remain unselected; generated flags still require review.',
+  'preset.analysis_ready_imputation.name':
+    'Analysis-ready with imputation suggestions',
+  'preset.analysis_ready_imputation.description':
+    'Adds missingness diagnosis and conservative imputation suggestions where metadata and protections allow them.',
+  'preset.analysis_ready_imputation.useCase':
+    'Use when preparing an analysis dataset and reviewers are ready to assess imputation assumptions.',
+  'preset.analysis_ready_imputation.caution':
+    'Suggestions remain review-only; identifier, structural-missing, and design-variable protections still apply.',
+
   'plan.title': 'Cleaning Plan preview',
   'plan.help':
     'The Cleaning Plan is an auditable list of proposed checks, actions, assumptions, warnings, and citations.',
@@ -203,6 +239,13 @@ export const en: TranslationDictionary = {
   'summary.notProvided': 'Not provided',
   'summary.importedVariables': 'Imported variables',
   'summary.selectedSteps': 'Selected cleaning steps',
+  'summary.methodologyPreset': 'Methodology preset',
+  'summary.presetSelected': 'Selected preset',
+  'summary.presetReason': 'Why it was selected',
+  'summary.presetIncluded': 'Rule families included by default',
+  'summary.presetExcluded': 'Rule families excluded by default',
+  'summary.presetReviewRequired':
+    'User review is still required before running any generated syntax.',
   'summary.selectedRules': 'Selected rules',
   'summary.noRules': 'No rules selected yet.',
   'summary.cleaningSteps': 'Cleaning Plan steps',
@@ -255,6 +298,23 @@ export const en: TranslationDictionary = {
   'stepType.summary_report': 'summary report',
   'stepType.variable_label': 'variable label',
   'stepType.value_label': 'value label',
+
+  'ruleFamily.metadata_preservation': 'metadata preservation',
+  'ruleFamily.variable_labelling': 'variable labels',
+  'ruleFamily.value_labelling': 'value labels',
+  'ruleFamily.missing_value_declaration': 'missing-value declarations',
+  'ruleFamily.range_and_domain_checks': 'range and domain checks',
+  'ruleFamily.structural_missingness_protection':
+    'structural-missingness protection',
+  'ruleFamily.skip_pattern_checks': 'skip-pattern checks',
+  'ruleFamily.duplicate_identifier_checks': 'duplicate identifier checks',
+  'ruleFamily.consistency_checks': 'consistency checks',
+  'ruleFamily.outlier_detection': 'outlier flagging',
+  'ruleFamily.outlier_treatment': 'outlier treatment',
+  'ruleFamily.missingness_diagnosis': 'missingness diagnosis',
+  'ruleFamily.imputation': 'imputation suggestions',
+  'ruleFamily.audit_logging': 'audit logging',
+  'ruleFamily.summary_reporting': 'summary reporting',
 
   'message.manual.nameRequired': 'The variable name is required.',
   'message.manual.invalidName':

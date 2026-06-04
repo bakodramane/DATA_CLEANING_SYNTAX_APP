@@ -39,12 +39,16 @@ import {
 import {
   createCleaningStepsFromRules,
   createPlanLevelCleaningStep,
+  defaultMethodologyPreset,
+  getApplicableRules,
+  getMethodologyPresetDefinition,
   getBlockedRules,
   getRecommendedPlanRules,
-  getRecommendedRules,
+  isRuleSelectedByPreset,
   loadDefaultCitations,
   loadDefaultRules,
   type CleaningRule,
+  type MethodologyPresetId,
   type RuleEngineContext,
 } from '../../rules'
 import { demoHouseholdDictionaryCsv } from './demoDictionary'
@@ -91,6 +95,7 @@ export function createInitialProjectMetadata(): ProjectMetadata {
     countryOrOrganisation: '',
     surveyYear: '',
     notes: '',
+    methodologyPreset: defaultMethodologyPreset,
     targetLanguages: [...TARGET_LANGUAGES],
   }
 }
@@ -165,6 +170,7 @@ export function buildRuleEngineContext(
 ): RuleEngineContext {
   return {
     surveyName: project.surveyName,
+    methodologyPreset: project.methodologyPreset,
     targetLanguages: project.targetLanguages,
     strictnessLevel: 'standard',
     imputationAllowed: true,
@@ -178,10 +184,10 @@ export function getRuleReviewItems(
   selectedRuleIdsByVariable: SelectedRuleIdsByVariable = {},
 ): RuleReviewItem[] {
   return variables.map((variable) => {
-    const recommendedRules = getRecommendedRules(variable, context)
+    const recommendedRules = getPresetRuleOptions(variable, context)
     const selectedRuleIds =
       selectedRuleIdsByVariable[variable.name] ??
-      recommendedRules.map((rule) => rule.id)
+      getDefaultSelectedRuleIdsForPreset(recommendedRules, context)
 
     return {
       variable,
@@ -199,7 +205,7 @@ export function createDefaultSelectedRuleIds(
   return Object.fromEntries(
     getRuleReviewItems(variables, context).map((item) => [
       item.variable.name,
-      item.recommendedRules.map((rule) => rule.id),
+      getDefaultSelectedRuleIdsForPreset(item.recommendedRules, context),
     ]),
   )
 }
@@ -258,6 +264,7 @@ export function createCleaningPlanFromSelectedRules(
       version: '0.1.0',
       assumptions: [
         'This plan was generated from imported metadata and selected rule-library recommendations.',
+        `Methodology preset: ${project.methodologyPreset}.`,
         'Generated syntax should be reviewed before production use.',
         'The application proposes checks and syntax only; it does not execute cleaning.',
       ],
@@ -268,7 +275,10 @@ export function createCleaningPlanFromSelectedRules(
       citationKeys.includes(citation.key),
     ),
     capabilityMatrix: buildCapabilityMatrix(usedRules),
-    notes: project.notes ? [project.notes] : [],
+    notes: [
+      `Methodology preset: ${project.methodologyPreset}`,
+      ...(project.notes ? [project.notes] : []),
+    ],
   }
 }
 
@@ -372,6 +382,10 @@ export function createSummaryReport(
   const citationKeys = unique(
     plan?.citations.map((citation) => citation.key) ?? [],
   )
+  const presetLines = buildPresetSummaryLines(
+    project.methodologyPreset,
+    language,
+  )
 
   return [
     `# ${project.surveyName || translate(language, 'summary.defaultTitle')}`,
@@ -381,6 +395,9 @@ export function createSummaryReport(
     `${translate(language, 'summary.year')}: ${project.surveyYear || translate(language, 'summary.notProvided')}`,
     `${translate(language, 'summary.importedVariables')}: ${variables.length}`,
     `${translate(language, 'summary.selectedSteps')}: ${plan?.steps.length ?? 0}`,
+    '',
+    `## ${translate(language, 'summary.methodologyPreset')}`,
+    ...presetLines,
     '',
     `## ${translate(language, 'summary.selectedRules')}`,
     ...(selectedRuleLines.length > 0
@@ -405,6 +422,47 @@ export function createSummaryReport(
     translate(language, 'summary.review'),
     '',
   ].join('\n')
+}
+
+export function getPresetRuleOptions(
+  variable: SurveyVariable,
+  context: RuleEngineContext,
+): CleaningRule[] {
+  return getApplicableRules(variable, context).filter(
+    (rule) =>
+      rule.recommendation !== 'planned' &&
+      rule.recommendation !== 'discouraged',
+  )
+}
+
+function getDefaultSelectedRuleIdsForPreset(
+  rules: CleaningRule[],
+  context: RuleEngineContext,
+): string[] {
+  const preset = context.methodologyPreset ?? defaultMethodologyPreset
+
+  return rules
+    .filter((rule) => isRuleSelectedByPreset(rule, preset))
+    .map((rule) => rule.id)
+}
+
+function buildPresetSummaryLines(
+  preset: MethodologyPresetId,
+  language: LanguageCode,
+): string[] {
+  const definition = getMethodologyPresetDefinition(preset)
+  const familyList = (families: string[]) =>
+    families
+      .map((family) => translate(language, `ruleFamily.${family}`))
+      .join(', ')
+
+  return [
+    `${translate(language, 'summary.presetSelected')}: ${translate(language, `preset.${preset}.name`)}`,
+    `${translate(language, 'summary.presetReason')}: ${translate(language, `preset.${preset}.useCase`)}`,
+    `${translate(language, 'summary.presetIncluded')}: ${familyList(definition.includedFamilies)}`,
+    `${translate(language, 'summary.presetExcluded')}: ${familyList(definition.excludedFamilies)}`,
+    translate(language, 'summary.presetReviewRequired'),
+  ]
 }
 
 export function formatValidationMessages(

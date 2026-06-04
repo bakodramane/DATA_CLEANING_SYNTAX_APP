@@ -1,6 +1,7 @@
 import { useMemo, useState, type Dispatch, type SetStateAction } from 'react'
 import './App.css'
 import type { Translator } from '../i18n'
+import type { MethodologyPresetId } from '../rules'
 import { useI18n } from '../i18n/useI18n'
 import { CleaningPlanPreviewStep } from './components/CleaningPlanPreviewStep'
 import { ExportStep } from './components/ExportStep'
@@ -187,6 +188,14 @@ function App() {
     setImportError('')
   }
 
+  const selectMethodologyPreset = (methodologyPreset: MethodologyPresetId) => {
+    const nextProject = { ...project, methodologyPreset }
+    const nextContext = buildRuleEngineContext(nextProject)
+
+    setProject(nextProject)
+    setSelectedRuleIds(createDefaultSelectedRuleIds(variables, nextContext))
+  }
+
   const continueWorkflow = () => {
     if (activeStep === 'metadata' && variables.length === 0) {
       setImportError(t('metadata.continueWithoutVariables'))
@@ -212,6 +221,7 @@ function App() {
     ruleReviews,
     selectedRuleIds,
     setSelectedRuleIds,
+    selectMethodologyPreset,
     cleaningPlan,
     validation,
     renderedScripts,
@@ -271,6 +281,7 @@ interface RenderStepArgs {
   ruleReviews: ReturnType<typeof getRuleReviewItems>
   selectedRuleIds: Record<string, string[]>
   setSelectedRuleIds: Dispatch<SetStateAction<Record<string, string[]>>>
+  selectMethodologyPreset: (methodologyPreset: MethodologyPresetId) => void
   cleaningPlan:
     | ReturnType<typeof createCleaningPlanFromSelectedRules>
     | undefined
@@ -319,6 +330,8 @@ function renderStepContent(step: WorkflowStepId, args: RenderStepArgs) {
       return (
         <RuleReviewStep
           items={args.ruleReviews}
+          methodologyPreset={args.project.methodologyPreset}
+          onSelectMethodologyPreset={args.selectMethodologyPreset}
           onToggleRule={(variableName, ruleId, selected) =>
             args.setSelectedRuleIds((current) =>
               toggleSelectedRule(current, variableName, ruleId, selected),

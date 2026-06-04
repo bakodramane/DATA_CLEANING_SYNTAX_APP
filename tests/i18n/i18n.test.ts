@@ -24,6 +24,13 @@ describe('i18n helpers', () => {
   it('translates English and French UI keys', () => {
     expect(translate('en', 'project.title')).toBe('Project information')
     expect(translate('fr', 'project.title')).toBe('Informations sur le projet')
+    expect(translate('en', 'preset.basic_validation.name')).toBe(
+      'Basic validation only',
+    )
+    expect(translate('fr', 'preset.basic_validation.name')).toBe(
+      'Validation de base uniquement',
+    )
+    expect(translate('fr', 'presets.title')).toBe('Profil méthodologique')
   })
 
   it('falls back to English when a selected language misses a key', () => {

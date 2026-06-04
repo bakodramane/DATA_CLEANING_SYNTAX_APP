@@ -29,6 +29,12 @@ export const RULE_FAMILIES = [
 
 export type RuleFamily = (typeof RULE_FAMILIES)[number]
 
+export type MethodologyPresetId =
+  | 'documentation_only'
+  | 'basic_validation'
+  | 'validation_outlier_review'
+  | 'analysis_ready_imputation'
+
 export const RULE_RECOMMENDATION_LEVELS = [
   'recommended',
   'optional',
@@ -99,6 +105,7 @@ export type RuleStrictnessLevel = 'minimal' | 'standard' | 'strict'
 export interface RuleEngineContext {
   surveyName?: string
   analysisPurpose?: 'analysis_ready' | 'production' | 'documentation' | 'other'
+  methodologyPreset?: MethodologyPresetId
   targetLanguages?: TargetLanguage[]
   strictnessLevel?: RuleStrictnessLevel
   imputationAllowed?: boolean

@@ -180,6 +180,29 @@ When French is selected, visible rule labels, descriptions, rationales, and
 rule warnings are translated locally. If a translation key is missing, the app
 falls back to the English rule text instead of blocking the workflow.
 
+At the top of Rule Review, choose a methodology preset. A preset changes which
+rules are selected by default; it does not remove the need to review each rule.
+You can still select or deselect individual rules after choosing a preset.
+
+- **Documentation/reporting only**: use for audit handover or documentation
+  when cleaning checks are not yet in scope. It focuses on labels, metadata
+  traceability, audit notes, and the summary report.
+- **Basic validation only**: use for first-pass metadata validation. It selects
+  missing-value declarations, range and domain checks, structural-missingness
+  protection, skip-pattern checks, duplicate identifier checks, and
+  design-variable warnings. It leaves outlier and imputation rules unselected.
+- **Validation + outlier review**: use when reviewers need flags for unusual
+  numeric values. It adds outlier flagging but still does not delete, cap,
+  winsorise, or impute values.
+- **Analysis-ready with imputation suggestions**: use when preparing an
+  analysis dataset and reviewers are ready to assess imputation assumptions. It
+  adds missingness diagnosis and conservative imputation suggestions where the
+  metadata and protections allow them.
+
+Presets never override hard protections: identifiers, structural missing
+values, and survey design variables remain protected; generated syntax must
+still be reviewed before production use.
+
 ### 13. Understand Blocked Rules
 
 Blocked rules are shown when a rule is not suitable for a variable. For example,

@@ -68,6 +68,11 @@ The exact field coverage and known limitations are documented in the
 The rule engine and editable rule/citation configuration. Rules are metadata
 driven: they inspect variable type, role, labels, missing codes, valid ranges,
 and project context to recommend, block, or mark planned cleaning steps.
+Guided methodology presets live in this layer as deterministic rule-family
+selection defaults. The preset layer chooses which applicable rules are checked
+by default in the UI, while hard protections such as identifier-imputation
+blocks, structural-missingness protection, and survey-design-variable
+protections remain enforced by the rule filters.
 
 ### `src/renderers`
 
@@ -102,6 +107,9 @@ next actions for empty states, separated import/validation warning groups, and
 download descriptions. These are UI/i18n concerns only; they do not change the
 statistical engine, importer behavior, renderer behavior, PWA/offline behavior,
 or validation contracts.
+The Rule Review step presents methodology presets before the per-variable rule
+list. Selecting a preset recalculates default checked rules but keeps individual
+rule checkboxes editable and keeps blocked-rule explanations visible.
 
 ### `src/i18n`
 

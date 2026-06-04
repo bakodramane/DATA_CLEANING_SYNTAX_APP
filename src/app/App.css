@@ -438,6 +438,58 @@ th {
   gap: 18px;
 }
 
+.preset-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-muted);
+  padding: 16px;
+}
+
+.preset-selector legend {
+  color: var(--text);
+  font-weight: 800;
+  padding: 0 6px;
+}
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.preset-option {
+  min-height: 220px;
+  flex-direction: row;
+  align-items: flex-start;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 14px;
+}
+
+.preset-option:has(input:checked) {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.preset-option input {
+  width: auto;
+}
+
+.preset-option span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.preset-option small {
+  color: var(--text-muted);
+}
+
 .rule-group {
   border-top: 1px solid var(--border);
   padding-top: 18px;
@@ -603,6 +655,7 @@ th {
   .form-grid,
   .summary-band,
   .mapping-list dl,
+  .preset-grid,
   .rule-grid {
     grid-template-columns: 1fr;
   }

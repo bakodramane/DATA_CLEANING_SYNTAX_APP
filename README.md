@@ -15,6 +15,26 @@ states, separated import and validation warnings, and export descriptions that
 explain what each downloaded file is for. These usability cues are intended for
 non-technical statisticians without changing the statistical engine.
 
+Phase 21 adds guided methodology presets in Rule Review. Presets choose which
+rules are selected by default for common workflows while keeping every visible
+rule manually reviewable:
+
+- Documentation/reporting only: labels, metadata traceability, audit notes, and
+  summary reporting.
+- Basic validation only: labels, missing-value declarations, range/domain
+  checks, structural-missingness protection, skip-pattern checks, duplicate
+  identifier checks, and design-variable warnings.
+- Validation + outlier review: basic validation plus transparent outlier flags
+  for eligible numeric variables.
+- Analysis-ready with imputation suggestions: validation, outlier flags,
+  missingness diagnosis, and conservative imputation suggestions where metadata
+  and protections allow them.
+
+Presets are conservative. They do not add backend services, telemetry, cloud
+storage, authentication, online template fetching, script execution, or
+AI-assisted interpretation. Generated syntax must still be reviewed before
+production use.
+
 ## What It Generates
 
 - SPSS v18 syntax

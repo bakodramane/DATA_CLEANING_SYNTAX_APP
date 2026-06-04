@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { strToU8, zipSync } from 'fflate'
-import { writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -139,6 +139,69 @@ test('demo dictionary workflow reaches export', async ({ page }) => {
   await expect(
     page.getByText('Plain-language documentation for reviewer sign-off'),
   ).toBeVisible()
+})
+
+test('methodology preset selection updates rule defaults and completes workflow', async ({
+  page,
+}) => {
+  await openMetadataStep(page)
+  await page
+    .getByRole('button', { name: 'Load demo household survey dictionary' })
+    .click()
+
+  await expect(
+    page.getByRole('heading', { name: 'Variable review' }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Rule recommendation review' }),
+  ).toBeVisible()
+  await expect(page.getByText('Methodology preset')).toBeVisible()
+  await expect(page.locator('input[value="basic_validation"]')).toBeChecked()
+
+  const tukeyRule = page.getByRole('checkbox', {
+    name: /Tukey boxplot outlier flag/,
+  })
+  await expect(tukeyRule.first()).not.toBeChecked()
+
+  await page.locator('input[value="validation_outlier_review"]').check()
+  await expect(
+    page.locator('input[value="validation_outlier_review"]'),
+  ).toBeChecked()
+  await expect(tukeyRule.first()).toBeChecked()
+
+  await page.locator('input[value="analysis_ready_imputation"]').check()
+  await expect(
+    page.locator('input[value="analysis_ready_imputation"]'),
+  ).toBeChecked()
+  await expect(
+    page.getByRole('checkbox', { name: /Hot-deck donor imputation/ }).first(),
+  ).toBeChecked()
+
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Cleaning Plan preview' }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Syntax preview' }),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await expect(
+    page.getByRole('heading', { name: 'Export and download' }),
+  ).toBeVisible()
+
+  const [summaryDownload] = await Promise.all([
+    page.waitForEvent('download'),
+    page
+      .getByRole('button', { name: 'Download Plain-language summary report' })
+      .click(),
+  ])
+  const summaryPath = await summaryDownload.path()
+  const summaryContent = readFileSync(summaryPath!, 'utf8')
+
+  expect(summaryContent).toContain('## Methodology preset')
+  expect(summaryContent).toContain('Analysis-ready with imputation suggestions')
 })
 
 test('manual-entry workflow generates syntax and export content', async ({

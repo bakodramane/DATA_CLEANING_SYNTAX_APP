@@ -13,6 +13,7 @@ import {
   validatePlanForPreview,
 } from '../../src/app/state/appState'
 import { validateCleaningPlan } from '../../src/core'
+import { loadDefaultRules, type MethodologyPresetId } from '../../src/rules'
 
 describe('workflow state helpers', () => {
   it('imports demo household variables for the workflow', () => {
@@ -56,6 +57,75 @@ describe('workflow state helpers', () => {
     expect(householdIdReview?.blockedRules.map((rule) => rule.code)).toContain(
       'identifier_imputation',
     )
+  })
+
+  it.each([
+    [
+      'documentation_only',
+      ['variable_labelling'],
+      ['imputation', 'outlier_detection'],
+    ],
+    [
+      'basic_validation',
+      ['missing_value_declaration', 'range_and_domain_checks'],
+      ['imputation', 'outlier_detection'],
+    ],
+    [
+      'validation_outlier_review',
+      ['outlier_detection', 'missingness_diagnosis'],
+      ['imputation'],
+    ],
+    [
+      'analysis_ready_imputation',
+      ['imputation', 'outlier_detection', 'missingness_diagnosis'],
+      [],
+    ],
+  ] as const)(
+    'selects expected rule families for the %s preset',
+    (methodologyPreset, includedFamilies, excludedFamilies) => {
+      const project = {
+        ...createInitialProjectMetadata(),
+        methodologyPreset,
+      }
+      const variables = importDemoDictionary().variables
+      const context = buildRuleEngineContext(project)
+      const selectedRuleIds = createDefaultSelectedRuleIds(variables, context)
+      const selectedFamilies = selectedRuleFamilies(selectedRuleIds)
+
+      includedFamilies.forEach((family) => {
+        expect(selectedFamilies).toContain(family)
+      })
+      excludedFamilies.forEach((family) => {
+        expect(selectedFamilies).not.toContain(family)
+      })
+    },
+  )
+
+  it('keeps hard protections enforced under every methodology preset', () => {
+    const variables = importDemoDictionary().variables
+
+    ;(
+      [
+        'documentation_only',
+        'basic_validation',
+        'validation_outlier_review',
+        'analysis_ready_imputation',
+      ] as MethodologyPresetId[]
+    ).forEach((methodologyPreset) => {
+      const context = buildRuleEngineContext({
+        ...createInitialProjectMetadata(),
+        methodologyPreset,
+      })
+      const householdIdReview = getRuleReviewItems(
+        variables,
+        context,
+        createDefaultSelectedRuleIds(variables, context),
+      ).find((item) => item.variable.name === 'household_id')
+
+      expect(
+        householdIdReview?.blockedRules.map((rule) => rule.code),
+      ).toContain('identifier_imputation')
+    })
   })
 
   it('generates a valid Cleaning Plan from selected rules', () => {
@@ -210,4 +280,51 @@ describe('workflow state helpers', () => {
     expect(summary?.content).toContain('Conserver le libelle de variable')
     expect(summary?.content).toContain('À examiner avant utilisation')
   })
+
+  it('includes methodology preset context in the summary report', () => {
+    const project = {
+      ...createInitialProjectMetadata(),
+      methodologyPreset: 'validation_outlier_review' as const,
+    }
+    const variables = importDemoDictionary().variables
+    const context = buildRuleEngineContext(project)
+    const plan = createCleaningPlanFromSelectedRules(
+      project,
+      variables,
+      createDefaultSelectedRuleIds(variables, context),
+      context,
+    )
+    const validation = validatePlanForPreview(plan)
+    const downloads = createDownloadArtifacts(
+      project,
+      variables,
+      plan,
+      validation,
+      {},
+    )
+    const summary = downloads.find(
+      (download) => download.id === 'summary-report',
+    )
+
+    expect(summary?.content).toContain('## Methodology preset')
+    expect(summary?.content).toContain('Validation + outlier review')
+    expect(summary?.content).toContain('outlier flagging')
+    expect(summary?.content).toContain('imputation suggestions')
+    expect(summary?.content).toContain('User review is still required')
+  })
 })
+
+function selectedRuleFamilies(selectedRuleIds: Record<string, string[]>) {
+  const ruleById = new Map(loadDefaultRules().map((rule) => [rule.id, rule]))
+
+  return [
+    ...new Set(
+      Object.values(selectedRuleIds)
+        .flat()
+        .map((ruleId) => ruleById.get(ruleId)?.family)
+        .filter((family): family is NonNullable<typeof family> =>
+          Boolean(family),
+        ),
+    ),
+  ]
+}

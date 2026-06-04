@@ -5,6 +5,7 @@ commitment to implement every item in order.
 
 ## Methodology And Statistical Validation
 
+- Iterate on Phase 21 methodology presets with external reviewer feedback.
 - Verify remaining bibliographic references.
 - Add external statistical review of default rules.
 - Clarify when imputation rules should be recommended, optional, discouraged, or

@@ -1,4 +1,8 @@
-import type { BlockedRule, CleaningRule } from '../../rules'
+import type {
+  BlockedRule,
+  CleaningRule,
+  MethodologyPresetId,
+} from '../../rules'
 import type { DictionaryImportResult } from '../../importers'
 import type { RenderedScript } from '../../renderers'
 import type {
@@ -30,6 +34,7 @@ export interface ProjectMetadata {
   countryOrOrganisation: string
   surveyYear: string
   notes: string
+  methodologyPreset: MethodologyPresetId
   targetLanguages: TargetLanguage[]
 }
 
