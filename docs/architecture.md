@@ -97,6 +97,12 @@ helpers, and download components. The UI orchestrates the workflow but keeps
 cleaning rules, importers, renderers, and validation outside presentation
 components.
 
+The wizard presentation layer provides reviewer guidance for each step, clear
+next actions for empty states, separated import/validation warning groups, and
+download descriptions. These are UI/i18n concerns only; they do not change the
+statistical engine, importer behavior, renderer behavior, PWA/offline behavior,
+or validation contracts.
+
 ### `src/i18n`
 
 Lightweight dictionary-based internationalisation for the user interface. The

@@ -2,7 +2,8 @@
 
 Use this checklist before tagging a public release.
 
-Status below is for the current v0.4.2 deployment checkpoint.
+Status below is for the current v0.8.0 deployment checkpoint and Phase 20
+usability-polish preparation.
 
 ## Quality Checks
 
@@ -19,8 +20,10 @@ Status below is for the current v0.4.2 deployment checkpoint.
 
 - [x] Production preview opens.
 - [ ] Default UI language is English.
+- [ ] English workflow guidance appears on each wizard step.
 - [ ] Default English syntax comments appear.
 - [ ] Language selector switches to French.
+- [ ] French workflow guidance appears after language switching.
 - [ ] Selected UI language persists after reload.
 - [ ] Workflow state is preserved when switching language.
 - [ ] Syntax preview comments switch to French.
@@ -34,6 +37,10 @@ Status below is for the current v0.4.2 deployment checkpoint.
 - [x] Stata `.dta` upload works or returns a safe fallback warning.
 - [x] SPSS `.sav` upload works or returns a safe fallback warning.
 - [x] SPSS/Stata privacy warning is visible before package-file import.
+- [ ] Import warnings are grouped separately from validation and methodology
+      warnings.
+- [ ] Empty states explain the next action when variables, rules, Cleaning Plan,
+      syntax preview, warnings, or blocked rules are absent.
 - [x] DDI-imported variables appear in Variable review.
 - [x] Package-imported variables appear in Variable review when direct metadata
       extraction succeeds.
@@ -52,6 +59,8 @@ Status below is for the current v0.4.2 deployment checkpoint.
 - [x] R script downloads.
 - [x] Python script downloads.
 - [x] Summary report downloads.
+- [ ] Export descriptions explain Cleaning Plan JSON, SPSS syntax, Stata
+      do-file, R script, Python script, and summary report purposes.
 - [x] Offline reload opens the app shell after first load.
 
 ## Notes For Multilingual UI Releases
@@ -65,6 +74,9 @@ Stata, R, and Python comments should follow the selected UI language where
 local renderer-comment translations exist. Executable syntax, variable names,
 commands, package names, function names, citation keys, and user-entered labels
 or value labels must remain unchanged. Generated script files should be UTF-8.
+Also verify that step guidance, empty states, warning headings, validation
+all-clear messages, and export descriptions are translated in English and
+French.
 
 ## Public Demo Smoke Check
 

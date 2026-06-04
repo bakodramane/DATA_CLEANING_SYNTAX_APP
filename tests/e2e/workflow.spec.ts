@@ -59,6 +59,58 @@ async function addManualVariable(
   await expect(page.getByText(variable.name, { exact: true })).toBeVisible()
 }
 
+test('wizard guidance and empty states appear in English and French', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await expect(
+    page.getByText(
+      'The project name appears in generated scripts, file names, and the summary report',
+    ),
+  ).toBeVisible()
+
+  await page.getByRole('button', { name: 'Metadata' }).click()
+  await expect(
+    page.getByText('Files are processed locally in your browser.'),
+  ).toBeVisible()
+
+  await page.getByRole('button', { name: 'Variables' }).click()
+  await expect(
+    page.getByText('No variables are ready to review yet.'),
+  ).toBeVisible()
+
+  await page.getByRole('button', { name: 'Rules' }).click()
+  await expect(
+    page.getByText('No rule recommendations are available yet.'),
+  ).toBeVisible()
+
+  await page.getByRole('button', { name: 'Cleaning Plan' }).click()
+  await expect(
+    page.getByText('No Cleaning Plan has been generated yet.'),
+  ).toBeVisible()
+
+  await page.getByRole('button', { name: 'Syntax' }).click()
+  await expect(
+    page.getByText('No syntax preview has been generated yet.'),
+  ).toBeVisible()
+
+  await page.getByRole('button', { name: 'Export' }).click()
+  await expect(
+    page.getByText('Generate a Cleaning Plan before exporting.'),
+  ).toBeVisible()
+
+  await page.getByLabel('Interface language').selectOption('fr')
+  await page.getByRole('button', { name: 'Projet' }).click()
+  await expect(
+    page.getByText('Le nom du projet apparait dans les scripts generes'),
+  ).toBeVisible()
+
+  await page.getByRole('button', { name: 'Variables' }).click()
+  await expect(
+    page.getByText('Aucune variable n est prete pour la revue.'),
+  ).toBeVisible()
+})
+
 test('demo dictionary workflow reaches export', async ({ page }) => {
   await openMetadataStep(page)
   await page
@@ -81,6 +133,11 @@ test('demo dictionary workflow reaches export', async ({ page }) => {
   await page.getByRole('button', { name: 'Continue' }).click()
   await expect(
     page.getByRole('heading', { name: 'Export and download' }),
+  ).toBeVisible()
+  await expect(page.getByText('Script for SPSS v18.')).toBeVisible()
+  await expect(page.getByText('Script for Stata v14.')).toBeVisible()
+  await expect(
+    page.getByText('Plain-language documentation for reviewer sign-off'),
   ).toBeVisible()
 })
 
@@ -134,6 +191,9 @@ test('manual-entry workflow generates syntax and export content', async ({
   ).toBeVisible()
   await expect(
     page.getByRole('button', { name: 'Download R script' }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: 'Download Stata do-file' }),
   ).toBeVisible()
 })
 
@@ -346,6 +406,14 @@ test('French language selection persists and preserves demo workflow state', asy
     'Survey Microdata Cleaning Syntax',
   )
   await expect(page.locator('.code-preview pre')).toContainText('Rationale')
+
+  await page.getByLabel('Interface language').selectOption('fr')
+  await page.getByRole('button', { name: 'Continuer' }).click()
+  await expect(page.getByText('Exportation et téléchargement')).toBeVisible()
+  await expect(page.getByText('Script pour SPSS v18.')).toBeVisible()
+  await expect(
+    page.getByRole('button', { name: 'Télécharger Syntaxe SPSS' }),
+  ).toBeVisible()
 })
 
 function createMinimalXlsx(): Buffer {

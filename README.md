@@ -10,6 +10,11 @@ execute generated scripts. Instead, it builds a language-neutral Cleaning Plan
 from imported metadata, then renders syntax that a human analyst can review,
 adapt, and run in their own statistical environment.
 
+The wizard includes concise reviewer guidance at each step, next-action empty
+states, separated import and validation warnings, and export descriptions that
+explain what each downloaded file is for. These usability cues are intended for
+non-technical statisticians without changing the statistical engine.
+
 ## What It Generates
 
 - SPSS v18 syntax
@@ -18,6 +23,15 @@ adapt, and run in their own statistical environment.
 - Python scripts
 - Cleaning Plan JSON
 - Plain-language summary reports
+
+The export step labels each file for review:
+
+- Cleaning Plan JSON: reusable project configuration
+- SPSS syntax: script for SPSS v18
+- Stata do-file: script for Stata v14
+- R script: script for R
+- Python script: script for Python
+- Plain-language summary report: reviewer-friendly documentation
 
 ## Multilingual Support
 
@@ -120,12 +134,13 @@ npm run preview
 Recommended release checks:
 
 ```powershell
-npm run lint
 npm run format
+npm run lint
 npm test
-npm run test:e2e
 npm run build
+npm run test:e2e
 npm audit --omit=dev
+git diff --check
 ```
 
 ## GitHub Pages

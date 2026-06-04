@@ -33,6 +33,10 @@ commitment to implement every item in order.
 
 ## UI Improvements
 
+- Keep Phase 20 reviewer-friendly guidance concise as new workflow surfaces are
+  added.
+- Continue testing empty states, export descriptions, and warning grouping in
+  English and French.
 - Refine manual variable-entry ergonomics and saved-session support.
 - Improve import mapping review before accepting metadata.
 - Add clearer warnings for partial renderer support.

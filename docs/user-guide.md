@@ -19,6 +19,9 @@ https://bakodramane.github.io/DATA_CLEANING_SYNTAX_APP/
 Open the app and begin on the Project step. A project is the working context for
 one survey dictionary and one generated Cleaning Plan.
 
+The project name appears in generated scripts, download file names, and the
+summary report. Use a name that a reviewer can recognise later.
+
 ### 2. Choose The UI Language
 
 Use the language selector in the header to switch between English and French.
@@ -156,6 +159,10 @@ Variable review.
 Review each imported variable, including name, label, detected type, detected
 role, value labels, missing codes, valid ranges, and detection notes.
 
+If no variables are visible, return to Metadata input and import a dictionary,
+load the demo, or add variables manually. The app shows this as an empty state
+instead of silently advancing.
+
 ### 11. Correct Variable Types And Roles
 
 Adjust the detected type or role when needed. Corrections immediately update
@@ -166,6 +173,9 @@ recommended rules and the generated Cleaning Plan.
 Recommended rules are metadata-driven checks or documentation steps. They may
 include variable labels, value labels, range checks, domain checks, missingness
 diagnosis, duplicate identifier checks, or outlier flags.
+Rules are recommendations for review. Selecting a rule adds the proposed check
+or documentation step to the Cleaning Plan; the app still does not clean data or
+run syntax automatically.
 When French is selected, visible rule labels, descriptions, rationales, and
 rule warnings are translated locally. If a translation key is missing, the app
 falls back to the English rule text instead of blocking the workflow.
@@ -177,6 +187,8 @@ identifier variables are protected from imputation, and survey design variables
 require specialist review before modification.
 Blocked-rule explanations use the selected interface language where local
 translations exist.
+When no rules are blocked for a variable, the app says so and prompts users to
+continue reviewing the selected recommendations.
 
 ### 14. Preview The Cleaning Plan
 
@@ -184,6 +196,9 @@ The Cleaning Plan is a language-neutral JSON representation of the selected
 steps, variables, assumptions, warnings, citations, and renderer capability
 information. It is the audit-friendly bridge between metadata and generated
 syntax.
+
+Validation errors and validation warnings are listed separately. An all-clear
+message appears when no validation issues are reported.
 
 ### 15. Preview Generated Syntax
 
@@ -199,12 +214,25 @@ Some renderer features are intentionally partial. The syntax preview and
 downloads include warning comments when a step is a review template or needs
 analyst adaptation. See the [Renderer Support Matrix](renderer-support-matrix.md)
 for exact support by step type and language.
+If no script has been generated yet, the Syntax step tells users to generate a
+valid Cleaning Plan and keep at least one target language selected.
 
 ### 16. Download Scripts And Reports
 
 Download generated scripts and the plain-language summary report from the Export
 step. Downloads are browser-generated files and are not cached as remote server
 responses.
+The export rows explain the purpose of each file:
+
+- Cleaning Plan JSON: reusable project configuration for audit, review, or later
+  comparison.
+- SPSS syntax: script for SPSS v18.
+- Stata do-file: script for Stata v14.
+- R script: script for R.
+- Python script: script for Python.
+- Plain-language summary report: documentation for reviewer sign-off and
+  handover.
+
 The summary report follows the selected interface language for reviewer-facing
 headings, selected rule names, step type labels, rationales, and translated rule
 warnings. Generated scripts keep technical syntax stable across language

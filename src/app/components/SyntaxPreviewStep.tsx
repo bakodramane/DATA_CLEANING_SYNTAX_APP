@@ -41,7 +41,20 @@ export function SyntaxPreviewStep({
     [activeLanguage, activeScript?.language, downloads],
   )
 
-  if (!validation?.valid) {
+  if (!validation) {
+    return (
+      <div className="step-content">
+        <div className="step-heading">
+          <p className="eyebrow">{t('workflow.step', { number: 6 })}</p>
+          <h2>{t('syntax.title')}</h2>
+          <HelpText>{t('syntax.help')}</HelpText>
+        </div>
+        <p className="empty-state">{t('syntax.empty')}</p>
+      </div>
+    )
+  }
+
+  if (!validation.valid) {
     return (
       <div className="step-content">
         <div className="step-heading">
