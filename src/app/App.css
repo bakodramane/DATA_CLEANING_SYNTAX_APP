@@ -370,9 +370,27 @@ button:disabled {
   background: #fff8ef;
 }
 
+.warning-list[data-empty='true'] {
+  border-color: var(--border);
+  background: var(--surface-muted);
+}
+
+.warning-list[data-tone='error'] {
+  border-color: #d799a2;
+  background: #fff3f5;
+}
+
 .warning-list h3,
 .privacy-warning h3 {
   color: var(--warning);
+}
+
+.warning-list[data-tone='error'] h3 {
+  color: var(--danger);
+}
+
+.warning-list[data-empty='true'] h3 {
+  color: var(--accent-strong);
 }
 
 .privacy-warning {
@@ -458,6 +476,12 @@ th {
   min-width: 0;
   flex-direction: column;
   gap: 6px;
+}
+
+.method-warning-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .review-needed,
@@ -610,5 +634,14 @@ th {
 
   .language-selector {
     grid-template-columns: 1fr;
+  }
+
+  .code-preview pre {
+    max-height: 440px;
+    font-size: 0.82rem;
+  }
+
+  .download-row .secondary-button {
+    width: 100%;
   }
 }
