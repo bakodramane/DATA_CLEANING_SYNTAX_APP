@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 This project uses conventional commits and versioned release tags.
 
+## v0.9.0 - 2026-06-04
+
+### Added
+
+- Guided methodology presets for Rule Review.
+- Documentation/reporting only preset.
+- Basic validation only preset.
+- Validation + outlier review preset.
+- Analysis-ready with imputation suggestions preset.
+- English/French preset UI and summary report text.
+- Unit, app state, i18n, and Playwright coverage for preset behavior.
+
+### Changed
+
+- Presets now control default selected rule families while users can still
+  manually select or deselect rules.
+- Hard protections remain enforced for identifiers, structural missingness, and
+  design variables.
+- Summary reports now include the selected preset, rationale, included and
+  excluded rule families, and review warning.
+
+### Notes
+
+- No backend, telemetry, cloud storage, authentication, script execution, or
+  AI-assisted interpretation was added.
+
 ## v0.8.1 - 2026-06-04
 
 ### Changed
